@@ -1,5 +1,14 @@
-export default function App() {
+import React from "react";
+import { Outlet } from "react-router-dom";
+import NavBar from "./components/NavBar";
+
+const App = () => {
   return (
-    <h1 className="text-3xl font-bold underline text-red-600">Hello world!</h1>
+    <>
+      <NavBar />
+      <Outlet />
+    </>
   );
-}
+};
+
+export default App;
