@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
-    <section className="bg-[#F6F8FD] px-4 pt-32">
-      <div className="flex flex-col md:flex-row mx-auto items-center justify-between max-w-7xl">
+    <section className="bg-[#F6F8FD] pt-32">
+      <div className="flex flex-col md:flex-row mx-auto items-center justify-between max-w-7xl px-4">
         {/* hero title and description */}
-        <div className="ml-0 text-center md:text-start md:ml-12">
+        <div className="text-center md:text-start">
           <span className="max-w-sm font-bold text-[32px] leading-none tracking-tight md:text-[54px]">
             Host, Connect, <br />
             Celebrate Your Events, <br />
@@ -25,7 +25,7 @@ const Hero = () => {
             </span>
           </div>
           <div className="flex text-white pt-4 justify-center md:justify-start mb-10">
-            <Link to="/booking">
+            <Link to="/">
               <button className=" bg-[#4338ca] px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in">
                 Explore Now
               </button>
