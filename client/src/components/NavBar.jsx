@@ -42,7 +42,7 @@ const NavBar = () => {
         {/* wallet connect button */}
         <div className="text-white lg:flex gap-4 items-center hidden">
           <button className="bg-[#4338ca] px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in">
-            Connect
+            Connect Wallet
           </button>
         </div>
 
@@ -61,7 +61,7 @@ const NavBar = () => {
       {/* mobile menu items */}
       <div>
         <ul
-          className={`md:hidden block gap-12 text-md space-y-4 px-5 mt-5 font-medium text-[#1e1b4b] bg-white ${
+          className={`md:hidden block gap-12 text-md space-y-4 px-5 py-5 font-medium text-[#1e1b4b] bg-white ${
             isMenuOpen
               ? "fixed w-full transition-all ease-out duration-75"
               : "hidden"
@@ -81,6 +81,16 @@ const NavBar = () => {
               </NavLink>
             </li>
           ))}
+          <li>
+            <NavLink
+              className={({ isActive, isPending }) => (isActive ? "" : "")}
+              onClick={toggleMenu}
+              to={"/"}
+              key={"wallet"}
+            >
+              {"Connect Wallet"}
+            </NavLink>
+          </li>
         </ul>
       </div>
     </header>
