@@ -1,5 +1,5 @@
 import React from "react";
-import Search from "../components/Search";
+import Search from "../../components/Search";
 const FilterSection = () => {
   return (
     <section className="mt-10 md:mt-16">

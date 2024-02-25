@@ -25,7 +25,7 @@ const NavBar = () => {
         {/* nav items */}
         <ul className="md:flex gap-12 hidden text-md font-medium text-[#1e1b4b]">
           {navLinks.map((item) => (
-            <li>
+            <li key={item.path}>
               <NavLink
                 className={({ isActive, isPending }) =>
                   isActive ? "active" : ""
@@ -68,7 +68,7 @@ const NavBar = () => {
           } `}
         >
           {navLinks.map((item) => (
-            <li>
+            <li key={item.path}>
               <NavLink
                 className={({ isActive, isPending }) =>
                   isActive ? "active" : ""
@@ -81,7 +81,7 @@ const NavBar = () => {
               </NavLink>
             </li>
           ))}
-          <li>
+          <li key={"wallet"}>
             <NavLink
               className={({ isActive, isPending }) => (isActive ? "" : "")}
               onClick={toggleMenu}

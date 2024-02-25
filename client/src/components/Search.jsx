@@ -14,10 +14,10 @@ const Search = () => {
   }
 
   return (
-    <div className="flex gap-3 min-h-[40px] md:w-2/5 overflow-hidden rounded-full bg-[#e7e9ec] px-4 py-2">
+    <div className="flex gap-3 min-h-[40px] w-full md:w-2/5 overflow-hidden rounded-full bg-[#F6F6F6] px-4 py-2">
       <IoSearchOutline className="mt-1 text-gray-500" />
       <input
-        className="bg-[#e7e9ec] border border-[#e7e9ec] w-full text-gray-900 focus:outline-none"
+        className="bg-[#F6F6F6] border border-[#F6F6F6] w-full text-gray-900 focus:outline-none"
         type="search"
         placeholder="Search events"
         onChange={handleChange}

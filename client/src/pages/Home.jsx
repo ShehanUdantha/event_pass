@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import Hero from "../sections/Hero";
-import Filter from "../sections/FilterSection";
-import GridView from "../sections/GridViewSection";
-import PaginationSection from "../sections/PaginationSection";
+import Hero from "../sections/Home/Hero";
+import Filter from "../sections/Home/FilterSection";
+import GridView from "../sections/Home/GridViewSection";
+import PaginationSection from "../sections/Home/PaginationSection";
 import Footer from "../components/Footer";
 
 const Home = () => {
@@ -71,7 +71,7 @@ const Home = () => {
       <Hero />
       {/* filter section */}
       <Filter />
-      {/* grid view and pagination */}
+      {/* grid view */}
       <GridView events={events} />
       {/* pagination section */}
       <PaginationSection />
