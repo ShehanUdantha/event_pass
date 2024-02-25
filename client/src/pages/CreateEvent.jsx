@@ -1,6 +1,7 @@
 import React from "react";
 import HeaderSection from "../sections/CreateEvent/HeaderSection";
 import FormSection from "../sections/CreateEvent/FormSection";
+import Footer from "../components/Footer";
 
 const CreateEvent = () => {
   return (
@@ -9,6 +10,8 @@ const CreateEvent = () => {
       <HeaderSection />
       {/* form section */}
       <FormSection />
+      {/* footer */}
+      <Footer />
     </div>
   );
 };

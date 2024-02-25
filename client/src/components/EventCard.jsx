@@ -6,6 +6,8 @@ const EventCard = ({ event }) => {
     <Link
       className="shadow-md rounded-[1rem] cursor-pointer w-full"
       key={event.id}
+      to={"/event"}
+      state={{ eventDetails: event }}
     >
       <div>
         <img
@@ -31,7 +33,7 @@ const EventCard = ({ event }) => {
               Ended at: {event.endsAt}
             </div>
           </div>
-          <div className="text-[14px] max-h-10 overflow-hidden leading-tight mt-1">
+          <div className="text-[14px] max-h-[2.4rem] text-ellipsis overflow-hidden leading-tight mt-1">
             {event.description}
           </div>
         </div>

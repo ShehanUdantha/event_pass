@@ -7,6 +7,7 @@ import "./index.css";
 import Home from "./pages/Home.jsx";
 import CreateEvent from "./pages/CreateEvent.jsx";
 import Profile from "./pages/Profile.jsx";
+import ViewEvent from "./pages/ViewEvent.jsx";
 
 // This is the chain your dApp will work on.
 // Change this to the chain your app is built for.
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "/event",
+        element: <ViewEvent />,
       },
     ],
   },
