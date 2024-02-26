@@ -17,13 +17,15 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     string imageUrl;
     string description;
     address owner;
-    uint256 sales;
     uint256 ticketCost;
     uint256 ticketAmount;
     uint256 ticketRemain;
     uint256 startsAt;
     uint256 endsAt;
+    string location;
     uint256 timestamp;
+    uint256 eventDate;
+    uint256 eventTime;
     bool deleted;
     bool paidOut;
     bool refunded;
@@ -47,7 +49,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
   mapping(uint256 => TicketStruct[]) tickets;
   mapping(uint256 => bool) eventExists;
 
-  constructor() ERC721('EventPass', 'EP') {}
+  constructor() ERC721('EventPass', 'EP'){}
 
   function createEvent(
     string memory title,
@@ -56,7 +58,10 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     uint256 ticketAmount,
     uint256 ticketCost,
     uint256 startsAt,
-    uint256 endsAt
+    uint256 endsAt,
+    string memory location,
+    uint256 eventDate,
+    uint256 eventTime
   ) public {
     require(ticketCost > 0 ether, 'TicketCost must be greater than zero');
     require(ticketAmount > 0, 'TicketAmount must be greater than zero');
@@ -65,6 +70,10 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     require(bytes(imageUrl).length > 0, 'ImageUrl cannot be empty');
     require(startsAt > 0, 'Start date must be greater than zero');
     require(endsAt > startsAt, 'End date must be greater than start date');
+    require(bytes(location).length > 0, 'Title cannot be empty');
+    require(eventDate > 0, 'Event date must be greater than zero');
+    require(eventTime > 0, 'Event time must be greater than zero');
+    require(eventTime < 12, 'Event time must be equal or less than twelve');
 
     _totalEvents.increment();
     EventStruct memory newEvent;
@@ -80,6 +89,9 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     newEvent.endsAt = endsAt;
     newEvent.owner = msg.sender;
     newEvent.timestamp = currentTime();
+    newEvent.location = location;
+    newEvent.eventDate = eventDate;
+    newEvent.eventTime = eventTime;
 
     eventExists[newEvent.id] = true;
     events[newEvent.id] = newEvent;
@@ -93,7 +105,10 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     uint256 ticketAmount,
     uint256 ticketCost,
     uint256 startsAt,
-    uint256 endsAt
+    uint256 endsAt,
+    string memory location,
+    uint256 eventDate,
+    uint256 eventTime
   ) public {
     require(eventExists[eventId], 'Event not found');
     require(events[eventId].owner == msg.sender, 'Unauthorized entity');
@@ -104,6 +119,10 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     require(bytes(imageUrl).length > 0, 'ImageUrl cannot be empty');
     require(startsAt > 0, 'Start date must be greater than zero');
     require(endsAt > startsAt, 'End date must be greater than start date');
+    require(bytes(location).length > 0, 'Title cannot be empty');
+    require(eventDate > 0, 'Event date must be greater than zero');
+    require(eventTime > 0, 'Event time must be greater than zero');
+    require(eventTime < 12, 'Event time must be equal or less than twelve');
 
     events[eventId].title = title;
     events[eventId].description = description;
@@ -112,6 +131,9 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     events[eventId].ticketCost = ticketCost;
     events[eventId].startsAt = startsAt;
     events[eventId].endsAt = endsAt;
+    events[eventId].location = location;
+    events[eventId].eventDate = eventDate;
+    events[eventId].eventTime = eventTime;
   }
 
   function deleteEvent(uint256 eventId) public {

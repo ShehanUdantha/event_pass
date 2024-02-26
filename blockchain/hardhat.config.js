@@ -14,8 +14,8 @@ module.exports = {
   networks: {
     zksync_testnet: {
       url: "https://zksync2-testnet.zksync.dev",
-      ethNetwork: "sepolia",
-      chainId: 11155111,
+      ethNetwork: "goerli",
+      chainId: 280,
       zksync: true,
     },
     zksync_mainnet: {
