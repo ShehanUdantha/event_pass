@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { eventCategoryList } from "../constants/index";
 
 const EventForm = () => {
   const schema = yup.object().shape({
@@ -19,12 +20,15 @@ const EventForm = () => {
       .required("Please enter the event ticket price"),
     startsAt: yup
       .date()
-      .typeError("Please select the event started date")
-      .required("Please enter the event started time"),
+      .typeError("Please select the event start date")
+      .required("Please enter the event start time"),
+    startsAtTime: yup.string().required("Please enter the event start time"),
     endsAt: yup
       .date()
       .typeError("Please select the event end date")
       .required("Please enter the event end time"),
+    endsAtTime: yup.string().required("Please enter the event end time"),
+    location: yup.string().required("Please enter the event location"),
     description: yup.string().required("Please enter the event description"),
   });
 
@@ -36,8 +40,14 @@ const EventForm = () => {
     resolver: yupResolver(schema),
   });
 
+  const [selectedCategory, setSelectedCategory] = useState("Other");
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
+  };
+
   const onSubmit = (data) => {
     console.log(data);
+    console.log(selectedCategory);
   };
 
   return (
@@ -46,22 +56,26 @@ const EventForm = () => {
         {/* event name and image url */}
         <div className="flex flex-col md:flex-row justify-between gap-0 md:gap-16">
           <div className="w-full">
+            <p className="text-[14px] font-medium mb-1">Event Title</p>
             <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2">
               <input
-                className="bg-[#F6F6F6] border border-[#F6F6F6]  w-full text-gray-900 focus:outline-none"
+                className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                 type="text"
-                placeholder="Event title"
+                placeholder="Enter event title"
                 {...register("title")}
               />
             </div>
             <p className="text-[12px] text-red-500">{errors.title?.message}</p>
           </div>
           <div className="w-full">
-            <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2 mt-5 md:mt-0">
+            <p className="text-[14px] font-medium mb-1 mt-3 md:mt-0">
+              Event Image
+            </p>
+            <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2">
               <input
-                className="bg-[#F6F6F6] border border-[#F6F6F6]  w-full text-gray-900 focus:outline-none"
+                className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                 type="text"
-                placeholder="Event image Url"
+                placeholder="Enter event image Url"
                 {...register("imageUrl")}
               />
             </div>
@@ -71,13 +85,14 @@ const EventForm = () => {
           </div>
         </div>
         {/* event total tickets and cost */}
-        <div className="flex flex-col md:flex-row justify-between gap-0 md:gap-16 mt-5">
+        <div className="flex flex-col md:flex-row justify-between gap-0 md:gap-16 mt-3 md:mt-5">
           <div className="w-full">
+            <p className="text-[14px] font-medium mb-1">Total Tickets</p>
             <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2">
               <input
-                className="bg-[#F6F6F6] border border-[#F6F6F6]  w-full text-gray-900 focus:outline-none"
+                className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                 type="number"
-                placeholder="Total tickets"
+                placeholder="Enter event total tickets"
                 {...register("ticketAmount")}
               />
             </div>
@@ -86,11 +101,14 @@ const EventForm = () => {
             </p>
           </div>
           <div className="w-full">
-            <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2 mt-5 md:mt-0">
+            <p className="text-[14px] font-medium mb-1 mt-3 md:mt-0">
+              Event Ticket Price
+            </p>
+            <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2">
               <input
-                className="bg-[#F6F6F6] border border-[#F6F6F6]  w-full text-gray-900 focus:outline-none"
+                className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                 type="number"
-                placeholder="Ticket price"
+                placeholder="Enter event ticket price"
                 {...register("ticketCost")}
               />
             </div>
@@ -100,37 +118,99 @@ const EventForm = () => {
           </div>
         </div>
         {/* event started date and end date */}
-        <div className="flex flex-col md:flex-row justify-between gap-0 md:gap-16 mt-5">
+        <div className="flex flex-col md:flex-row justify-between gap-0 md:gap-16 mt-3 md:mt-5">
           <div className="w-full">
-            <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2">
+            <p className="text-[14px] font-medium mb-1">
+              Event Start Date and Time
+            </p>
+            <div className="min-h-[40px] flex justify-between items-center gap-3 rounded-2xl w-full bg-[#F6F6F6] px-4 py-2">
               <input
-                className="bg-[#F6F6F6] border border-[#F6F6F6]  w-full text-gray-900 focus:outline-none"
+                className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                 type="date"
-                placeholder="Select started date"
+                placeholder="Select start date"
                 {...register("startsAt")}
+              />
+              <input
+                className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
+                type="time"
+                placeholder="Select start date"
+                {...register("startsAtTime")}
               />
             </div>
             <p className="text-[12px] text-red-500">
               {errors.startsAt?.message}
             </p>
+            <p className="text-[12px] text-red-500">
+              {errors.startsAtTime?.message}
+            </p>
           </div>
           <div className="w-full">
-            <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2 mt-5 md:mt-0">
+            <p className="text-[14px] font-medium mb-1 mt-3 md:mt-0">
+              Event End Date and Time
+            </p>
+            <div className="min-h-[40px] flex justify-between items-center gap-3 rounded-2xl w-full bg-[#F6F6F6] px-4 py-2">
               <input
-                className="bg-[#F6F6F6] border border-[#F6F6F6]  w-full text-gray-900 focus:outline-none"
+                className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                 type="date"
                 placeholder="Select end date"
                 {...register("endsAt")}
               />
+              <input
+                className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
+                type="time"
+                placeholder="Select end date"
+                {...register("endsAtTime")}
+              />
             </div>
             <p className="text-[12px] text-red-500">{errors.endsAt?.message}</p>
+            <p className="text-[12px] text-red-500">
+              {errors.endsAtTime?.message}
+            </p>
+          </div>
+        </div>
+        {/* event location and category */}
+        <div className="flex flex-col md:flex-row justify-between gap-0 md:gap-16 mt-3 md:mt-5">
+          <div className="w-full">
+            <p className="text-[14px] font-medium mb-1">Event Location</p>
+            <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2">
+              <input
+                className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
+                type="text"
+                placeholder="Enter event location"
+                {...register("location")}
+              />
+            </div>
+            <p className="text-[12px] text-red-500">
+              {errors.location?.message}
+            </p>
+          </div>
+          <div className="w-full">
+            <p className="text-[14px] font-medium mb-1 mt-3 md:mt-0">
+              Event Category
+            </p>
+            <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2">
+              <select
+                className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+              >
+                {eventCategoryList.map((item) => (
+                  <option value={item} key={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
         {/* event description */}
-        <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2 mt-5">
+        <p className="text-[14px] font-medium mb-1 mt-3 md:mt-5">
+          Event description
+        </p>
+        <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2">
           <textarea
-            className="bg-[#F6F6F6] border border-[#F6F6F6]  w-full text-gray-900 focus:outline-none"
-            placeholder="Event description"
+            className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
+            placeholder="Enter event description"
             rows={4}
             cols={40}
             {...register("description")}
