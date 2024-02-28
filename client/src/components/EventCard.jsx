@@ -7,7 +7,7 @@ const EventCard = ({ event }) => {
     <Link
       className="shadow-md rounded-[1rem] cursor-pointer w-full"
       key={event.id}
-      to={"/event"}
+      to={"/event/" + event.id}
       state={{ eventDetails: event }}
     >
       <div>
@@ -21,7 +21,7 @@ const EventCard = ({ event }) => {
       <div className="p-5">
         <div className="overflow-hidden">
           <div className="flex items-center justify-between">
-            <div className="font-bold text-lg text-ellipsis overflow-hidden">
+            <div className="font-bold text-md md:text-lg text-ellipsis overflow-hidden w-3/5">
               {event.title}
             </div>
             <div className="flex items-center justify-end">
@@ -33,11 +33,11 @@ const EventCard = ({ event }) => {
               </div>
             </div>
           </div>
-          <div className="text-[14px] text-gray-500 font-medium mt-1">
+          <div className="text-[13px] text-gray-500 font-medium mt-1">
             {formatDateAndTime(event.startsAt)}
           </div>
 
-          <div className="text-[14px] max-h-[2.4rem] text-ellipsis overflow-hidden leading-tight mt-1">
+          <div className="text-[13px] max-h-[2rem] text-ellipsis overflow-hidden leading-tight mt-[0.3rem]">
             {event.description}
           </div>
         </div>

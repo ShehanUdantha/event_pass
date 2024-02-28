@@ -3,8 +3,18 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { eventCategoryList } from "../constants/index";
+import { ethers } from "ethers";
+import { useStateContext } from "../context";
+import { checkIfImage, updateTime } from "../utils";
+import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 const EventForm = () => {
+  const { createEvent } = useStateContext();
+  const navigate = useNavigate();
+
+  const notifyNotImage = () => toast.error("Provide valid image URL");
+
   const schema = yup.object().shape({
     title: yup.string().required("Please enter the event title"),
     imageUrl: yup.string().required("Please enter the event image url"),
@@ -45,9 +55,34 @@ const EventForm = () => {
     setSelectedCategory(e.target.value);
   };
 
-  const onSubmit = (data) => {
-    console.log(data);
-    console.log(selectedCategory);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const onSubmit = async (data) => {
+    // console.log(data);
+    // console.log(selectedCategory);
+
+    checkIfImage(data.imageUrl, async (exists) => {
+      if (exists) {
+        setIsLoading(true);
+        let response = await createEvent({
+          title: data.title,
+          description: data.description,
+          imageUrl: data.imageUrl,
+          ticketAmount: data.ticketAmount,
+          ticketCost: ethers.utils.parseEther(data.ticketCost.toString()),
+          startsAt: new Date(
+            updateTime(data.startsAt, data.startsAtTime)
+          ).getTime(),
+          endsAt: new Date(updateTime(data.endsAt, data.endsAtTime)).getTime(),
+          location: data.location,
+          category: selectedCategory,
+        });
+        setIsLoading(false);
+        navigate("/");
+      } else {
+        notifyNotImage();
+      }
+    });
   };
 
   return (
@@ -227,6 +262,7 @@ const EventForm = () => {
           />
         </div>
       </form>
+      <Toaster position="bottom-right" />
     </div>
   );
 };

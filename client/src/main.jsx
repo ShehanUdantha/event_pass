@@ -9,10 +9,7 @@ import Home from "./pages/Home.jsx";
 import CreateEvent from "./pages/CreateEvent.jsx";
 import Profile from "./pages/Profile.jsx";
 import ViewEvent from "./pages/ViewEvent.jsx";
-
-// This is the chain your dApp will work on.
-// Change this to the chain your app is built for.
-// You can also import additional chains from `@thirdweb-dev/chains` and pass them directly.
+import { StateContextProvider } from "./context";
 
 const router = createBrowserRouter([
   {
@@ -29,7 +26,7 @@ const router = createBrowserRouter([
         element: <Profile />,
       },
       {
-        path: "/event",
+        path: "/event/:id",
         element: <ViewEvent />,
       },
     ],
@@ -44,7 +41,9 @@ root.render(
       clientId={import.meta.env.VITE_TEMPLATE_CLIENT_ID}
       activeChain={Sepolia}
     >
-      <RouterProvider router={router} />
+      <StateContextProvider>
+        <RouterProvider router={router} />
+      </StateContextProvider>
     </ThirdwebProvider>
   </React.StrictMode>
 );

@@ -4,6 +4,7 @@ import logo from "../assets/icons/logo-icon.png";
 import { NavLink } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
+import { useStateContext } from "../context";
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,6 +12,8 @@ const NavBar = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  const { address, connect } = useStateContext();
 
   return (
     <header className="bg-white fixed top-0 left-0 right-0">
@@ -41,8 +44,12 @@ const NavBar = () => {
 
         {/* wallet connect button */}
         <div className="text-white lg:flex gap-4 items-center hidden">
-          <button className="bg-[#4338ca] px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in">
-            Connect Wallet
+          <button
+            // open metamask wallet
+            onClick={() => connect()}
+            className="bg-[#4338ca] px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in"
+          >
+            {address != null ? "Connected" : "Connect Wallet"}
           </button>
         </div>
 
@@ -84,11 +91,14 @@ const NavBar = () => {
           <li key={"wallet"}>
             <NavLink
               className={({ isActive, isPending }) => (isActive ? "" : "")}
-              onClick={toggleMenu}
+              onClick={() => {
+                connect();
+                toggleMenu();
+              }}
               to={"/"}
               key={"wallet"}
             >
-              {"Connect Wallet"}
+              {address != null ? "Connected" : "Connect Wallet"}
             </NavLink>
           </li>
         </ul>

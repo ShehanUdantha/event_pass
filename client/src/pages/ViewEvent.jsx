@@ -7,6 +7,7 @@ const ViewEvent = () => {
   const location = useLocation();
   const [remainingDays, setRemainingDays] = useState(0);
   const event = location.state.eventDetails;
+  console.log(event);
 
   useEffect(() => {
     setRemainingDays(calculateRemainingDays(event.startsAt));
