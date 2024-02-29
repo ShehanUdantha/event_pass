@@ -10,6 +10,7 @@ import CreateEvent from "./pages/CreateEvent.jsx";
 import Profile from "./pages/Profile.jsx";
 import ViewEvent from "./pages/ViewEvent.jsx";
 import { StateContextProvider } from "./context";
+import EditEvent from "./pages/EditEvent.jsx";
 
 const router = createBrowserRouter([
   {
@@ -18,7 +19,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Home /> },
       {
-        path: "/handle-event",
+        path: "/create-event",
         element: <CreateEvent />,
       },
       {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: "/event/:id",
         element: <ViewEvent />,
+      },
+      {
+        path: "/event/:id/edit",
+        element: <EditEvent />,
       },
     ],
   },

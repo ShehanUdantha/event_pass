@@ -39,6 +39,16 @@ export const updateTime = (date, time) => {
   return updatedDateTime;
 };
 
+export const separateTime = (dateAndTime) => {
+  const hours = dateAndTime.getHours();
+  const minutes = dateAndTime.getMinutes();
+
+  // Format the time as HH:mm
+  return `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}`;
+}
+
 export function convertBigNumberToDate(bigNumber) {
   // Convert the big number to a regular number
   const timestamp = Number(bigNumber);

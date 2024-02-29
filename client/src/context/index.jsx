@@ -89,6 +89,47 @@ export const StateContextProvider = ({ children }) => {
     return parsedEvents;
   };
 
+  // 3. update event
+  const { mutateAsync: updateEvent, isUpdateLoading } = useContractWrite(
+    contract,
+    "updateEvent"
+  );
+
+  const callUpdateEvent = async (form) => {
+    const {
+      eventId,
+      title,
+      description,
+      imageUrl,
+      ticketAmount,
+      ticketCost,
+      startsAt,
+      endsAt,
+      location,
+      category,
+    } = form;
+
+    try {
+      const data = await updateEvent({
+        args: [
+          eventId,
+          title,
+          description,
+          imageUrl,
+          ticketAmount,
+          ticketCost,
+          startsAt,
+          endsAt,
+          location,
+          category,
+        ],
+      });
+      console.info("contract call success", data);
+    } catch (err) {
+      console.error("contract call failure", err);
+    }
+  };
+
   return (
     <StateContext.Provider
       value={{
@@ -97,6 +138,7 @@ export const StateContextProvider = ({ children }) => {
         connect,
         createEvent: callCreateEvent,
         getAllEvents,
+        updateEvent: callUpdateEvent,
       }}
     >
       {children}

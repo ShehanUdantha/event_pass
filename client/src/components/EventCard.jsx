@@ -21,7 +21,7 @@ const EventCard = ({ event }) => {
       <div className="p-5">
         <div className="overflow-hidden">
           <div className="flex items-center justify-between">
-            <div className="font-bold text-md md:text-lg text-ellipsis overflow-hidden w-3/5">
+            <div className="font-bold text-md md:text-lg text-ellipsis overflow-hidden md:w-3/5">
               {event.title}
             </div>
             <div className="flex items-center justify-end">

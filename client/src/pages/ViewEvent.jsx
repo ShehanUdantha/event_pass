@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { calculateRemainingDays, formatDateAndTime } from "../utils/index";
+import { useStateContext } from "../context";
+import { MdMoreVert } from "react-icons/md";
 import Footer from "../components/Footer";
+import EventMoreMenu from "../components/EventMoreMenu";
 
 const ViewEvent = () => {
   const location = useLocation();
@@ -9,9 +12,13 @@ const ViewEvent = () => {
   const event = location.state.eventDetails;
   console.log(event);
 
+  const { address } = useStateContext();
+
   useEffect(() => {
     setRemainingDays(calculateRemainingDays(event.startsAt));
   }, []);
+
+  const [displayMoreMenu, setDisplayMoreMenu] = useState(false);
 
   return (
     <>
@@ -27,8 +34,22 @@ const ViewEvent = () => {
           </div>
           {/* event text details */}
           <div className="w-full">
-            {/* event title */}
-            <h3 className="font-bold text-2xl md:text-3xl">{event.title}</h3>
+            <div className="flex items-center justify-between gap-1">
+              {/* event title */}
+              <h3 className="font-bold text-2xl md:text-3xl md:leading-12">
+                {event.title}
+              </h3>
+              {/* event more option button */}
+              {event.owner == address ? (
+                <div>
+                  <MdMoreVert
+                    onClick={() => setDisplayMoreMenu(!displayMoreMenu)}
+                    className="cursor-pointer text-lg"
+                  />
+                  {displayMoreMenu ? <EventMoreMenu event={event} /> : null}
+                </div>
+              ) : null}
+            </div>
             {/* event remaining and tickets left */}
             <div className="flex items-center mt-1 justify-between md:justify-start">
               <div className="text-[14px] text-[#b8b6b6] font-medium md:mr-10">
