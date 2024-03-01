@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { eventCategoryList } from "../constants/index";
 import { ethers } from "ethers";
 import { useStateContext } from "../context";
@@ -10,12 +8,13 @@ import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 
 const EventForm = ({ event }) => {
-  const { createEvent, updateEvent } = useStateContext();
+  const { createEvent, updateEvent, address } = useStateContext();
   const navigate = useNavigate();
 
   const notifyNotImage = () => toast.error("Provide valid image URL");
   const notifyEndDateMustBeHigher = () =>
     toast.error("End date must be greater than start date");
+  const notifyUnAuthorized = () => toast.error("Unauthorized entity");
 
   useEffect(() => {
     if (event) setEventDetails();
@@ -61,7 +60,7 @@ const EventForm = ({ event }) => {
     endsAt: "",
     endsAtTime: "",
     location: "",
-    category: "",
+    category: "Other",
   });
 
   const [errors, setErrors] = useState({});
@@ -94,26 +93,30 @@ const EventForm = ({ event }) => {
             setIsLoading(true);
 
             if (event) {
-              let response = await updateEvent({
-                eventId: event.id,
-                title: formDetails.title,
-                description: formDetails.description,
-                imageUrl: formDetails.imageUrl,
-                ticketAmount: formDetails.ticketAmount,
-                ticketCost: ethers.utils.parseEther(
-                  formDetails.ticketCost.toString()
-                ),
-                startsAt: new Date(
-                  updateTime(formDetails.startsAt, formDetails.startsAtTime)
-                ).getTime(),
-                endsAt: new Date(
-                  updateTime(formDetails.endsAt, formDetails.endsAtTime)
-                ).getTime(),
-                location: formDetails.location,
-                category: formDetails.category,
-              });
+              if (address == event.owner) {
+                await updateEvent({
+                  eventId: event.id,
+                  title: formDetails.title,
+                  description: formDetails.description,
+                  imageUrl: formDetails.imageUrl,
+                  ticketAmount: formDetails.ticketAmount,
+                  ticketCost: ethers.utils.parseEther(
+                    formDetails.ticketCost.toString()
+                  ),
+                  startsAt: new Date(
+                    updateTime(formDetails.startsAt, formDetails.startsAtTime)
+                  ).getTime(),
+                  endsAt: new Date(
+                    updateTime(formDetails.endsAt, formDetails.endsAtTime)
+                  ).getTime(),
+                  location: formDetails.location,
+                  category: formDetails.category,
+                });
+              } else {
+                notifyUnAuthorized();
+              }
             } else {
-              let response = await createEvent({
+              await createEvent({
                 title: formDetails.title,
                 description: formDetails.description,
                 imageUrl: formDetails.imageUrl,

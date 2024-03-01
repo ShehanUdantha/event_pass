@@ -15,6 +15,8 @@ const ViewEvent = () => {
   const { address } = useStateContext();
 
   useEffect(() => {
+    console.log(address);
+    console.log(event.owner);
     setRemainingDays(calculateRemainingDays(event.startsAt));
   }, []);
 

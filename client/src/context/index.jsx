@@ -10,11 +10,15 @@ import {
 import { ethers } from "ethers";
 import { CONTRACT_ADDRESS } from "../constants/index";
 import { convertBigNumberToDate, convertBigNumberToInt } from "../utils";
+import toast, { Toaster } from "react-hot-toast";
 
 const StateContext = createContext();
 
 export const StateContextProvider = ({ children }) => {
   const { contract } = useContract(CONTRACT_ADDRESS);
+
+  const triggerSuccessToast = (message) => toast.success(message);
+  const triggerErrorToast = (message) => toast.error(message);
 
   // console.log(contract);
 
@@ -56,37 +60,48 @@ export const StateContextProvider = ({ children }) => {
           category,
         ],
       });
+      triggerSuccessToast("contract call success");
       console.info("contract call success", data);
     } catch (err) {
+      triggerErrorToast(err);
       console.error("contract call failure", err);
     }
   };
 
   // 2. get all events
   const getAllEvents = async () => {
-    const data = await contract.call("getAllEvents");
+    let parsedEvents = null;
 
-    const parsedEvents = data.map((event, i) => ({
-      id: convertBigNumberToInt(event.id),
-      title: event.title,
-      description: event.description,
-      imageUrl: event.imageUrl,
-      ticketAmount: convertBigNumberToInt(event.ticketAmount),
-      ticketRemain: convertBigNumberToInt(event.ticketRemain),
-      ticketCost: ethers.utils.formatEther(event.ticketCost.toString()),
-      startsAt: convertBigNumberToDate(event.startsAt),
-      endsAt: convertBigNumberToDate(event.endsAt),
-      location: event.location,
-      category: event.category,
-      owner: event.owner,
-      timestamp: event.timestamp,
-      deleted: event.deleted,
-      paidOut: event.paidOut,
-      refunded: event.refunded,
-      minted: event.minted,
-    }));
+    try {
+      const data = await contract.call("getAllEvents");
 
-    return parsedEvents;
+      parsedEvents = data.map((event, i) => ({
+        id: convertBigNumberToInt(event.id),
+        title: event.title,
+        description: event.description,
+        imageUrl: event.imageUrl,
+        ticketAmount: convertBigNumberToInt(event.ticketAmount),
+        ticketRemain: convertBigNumberToInt(event.ticketRemain),
+        ticketCost: ethers.utils.formatEther(event.ticketCost.toString()),
+        startsAt: convertBigNumberToDate(event.startsAt),
+        endsAt: convertBigNumberToDate(event.endsAt),
+        location: event.location,
+        category: event.category,
+        owner: event.owner,
+        timestamp: event.timestamp,
+        deleted: event.deleted,
+        paidOut: event.paidOut,
+        refunded: event.refunded,
+        minted: event.minted,
+      }));
+
+      console.info("contract call success", data);
+    } catch (err) {
+      triggerErrorToast(err);
+      console.error("contract call failure", err);
+    }
+
+    return parsedEvents != null ? parsedEvents : [];
   };
 
   // 3. update event
@@ -124,10 +139,31 @@ export const StateContextProvider = ({ children }) => {
           category,
         ],
       });
+      triggerSuccessToast("contract call success");
+      console.info("contract call success", data);
+    } catch (err) {
+      triggerErrorToast(err);
+      console.error("contract call failure", err);
+    }
+  };
+
+  // 4. delete event
+  const { mutateAsync: deleteEvent, isDeleteLoading } = useContractWrite(
+    contract,
+    "deleteEvent"
+  );
+
+  const callDeleteEvent = async (eventId) => {
+    let isSuccess = false;
+    try {
+      const data = await deleteEvent({ args: [eventId] });
+      isSuccess = true;
+      triggerSuccessToast("contract call success");
       console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
+    return isSuccess;
   };
 
   return (
@@ -139,9 +175,11 @@ export const StateContextProvider = ({ children }) => {
         createEvent: callCreateEvent,
         getAllEvents,
         updateEvent: callUpdateEvent,
+        deleteEvent: callDeleteEvent,
       }}
     >
       {children}
+      <Toaster position="bottom-right" />
     </StateContext.Provider>
   );
 };
