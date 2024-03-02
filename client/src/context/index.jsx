@@ -52,6 +52,8 @@ export const StateContextProvider = ({ children }) => {
       category,
     } = form;
 
+    let isSuccess = false;
+
     try {
       const data = await createEvent({
         args: [
@@ -66,12 +68,13 @@ export const StateContextProvider = ({ children }) => {
           category,
         ],
       });
+      isSuccess = true;
       triggerSuccessToast("contract call success");
       console.info("contract call success", data);
     } catch (err) {
-      triggerErrorToast(err);
       console.error("contract call failure", err);
     }
+    return isSuccess;
   };
 
   // 2. get all events
@@ -131,6 +134,8 @@ export const StateContextProvider = ({ children }) => {
       category,
     } = form;
 
+    let isSuccess = false;
+
     try {
       const data = await updateEvent({
         args: [
@@ -147,12 +152,13 @@ export const StateContextProvider = ({ children }) => {
           category,
         ],
       });
+      isSuccess = true;
       triggerSuccessToast("contract call success");
       console.info("contract call success", data);
     } catch (err) {
-      triggerErrorToast(err);
       console.error("contract call failure", err);
     }
+    return isSuccess;
   };
 
   // 4. delete event

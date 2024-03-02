@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useStateContext } from "../context";
 import { useNavigate } from "react-router-dom";
@@ -7,12 +7,15 @@ import toast, { Toaster } from "react-hot-toast";
 const EventMoreMenu = ({ event }) => {
   const { address, deleteEvent } = useStateContext();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const notifyUnAuthorized = () => toast.error("Unauthorized entity");
 
   const callEventDelete = async () => {
     if (address == event.owner) {
+      setIsLoading(true);
       const response = await deleteEvent(event.id);
+      setIsLoading(false);
       if (response) navigate("/");
     } else {
       notifyUnAuthorized();

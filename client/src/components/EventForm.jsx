@@ -6,6 +6,7 @@ import { useStateContext } from "../context";
 import { checkIfImage, updateTime, separateTime } from "../utils";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import Loader from "./Loader";
 
 const EventForm = ({ event }) => {
   const { createEvent, updateEvent, address } = useStateContext();
@@ -96,7 +97,7 @@ const EventForm = ({ event }) => {
 
             if (event) {
               if (address == event.owner) {
-                await updateEvent({
+                const response = await updateEvent({
                   eventId: event.id,
                   title: formDetails.title,
                   description: formDetails.description,
@@ -122,12 +123,14 @@ const EventForm = ({ event }) => {
                   location: formDetails.location,
                   category: formDetails.category,
                 });
+                setIsLoading(false);
+                if (response) navigate("/");
               } else {
                 notifyUnAuthorized();
               }
             } else {
               if (address != null) {
-                await createEvent({
+                const response = await createEvent({
                   title: formDetails.title,
                   description: formDetails.description,
                   imageUrl: formDetails.imageUrl,
@@ -146,7 +149,7 @@ const EventForm = ({ event }) => {
                 });
 
                 setIsLoading(false);
-                navigate("/");
+                if (response) navigate("/");
               } else {
                 notifyConnectWallet();
               }
@@ -192,6 +195,7 @@ const EventForm = ({ event }) => {
 
   return (
     <div className="w-full">
+      {isLoading && <Loader />}
       <form onSubmit={onSubmit}>
         {/* event name and image url */}
         <div className="flex flex-col md:flex-row justify-between gap-0 md:gap-16">

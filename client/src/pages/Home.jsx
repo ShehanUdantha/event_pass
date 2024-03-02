@@ -31,7 +31,7 @@ const Home = () => {
       {/* filter section */}
       <Filter />
       {/* grid view */}
-      <GridView events={events} />
+      <GridView events={events} isLoading={isLoading} />
       {/* pagination section */}
       <PaginationSection />
       {/* footer */}

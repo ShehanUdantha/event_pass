@@ -20,7 +20,7 @@ const MyEventsSection = () => {
 
   return (
     <>
-      <GridView events={events} />
+      <GridView events={events} isLoading={isLoading} />
     </>
   );
 };
