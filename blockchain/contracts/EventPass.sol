@@ -37,6 +37,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     address owner;
     uint256 ticketCost;
     uint256 timestamp;
+    string qrCode;
     bool refunded;
     bool minted;
   }
@@ -46,6 +47,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
 
   mapping(uint256 => EventStruct) events;
   mapping(uint256 => TicketStruct[]) tickets;
+  mapping(address => TicketStruct[]) myTickets;
   mapping(uint256 => bool) eventExists;
 
   constructor() ERC721('EventPass', 'EP'){}
@@ -98,6 +100,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     string memory description,
     string memory imageUrl,
     uint256 ticketAmount,
+    uint256 ticketRemain,
     uint256 ticketCost,
     uint256 startsAt,
     uint256 endsAt,
@@ -108,6 +111,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     require(events[eventId].owner == msg.sender, 'Unauthorized entity');
     require(ticketCost > 0 ether, 'TicketCost must be greater than zero');
     require(ticketAmount > 0, 'TicketAmount must be greater than zero');
+    require(ticketRemain > 0, 'TicketRemain must be greater than zero');
     require(bytes(title).length > 0, 'Title cannot be empty');
     require(bytes(description).length > 0, 'Description cannot be empty');
     require(bytes(imageUrl).length > 0, 'ImageUrl cannot be empty');
@@ -120,6 +124,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     events[eventId].description = description;
     events[eventId].imageUrl = imageUrl;
     events[eventId].ticketAmount = ticketAmount;
+    events[eventId].ticketRemain = ticketRemain;
     events[eventId].ticketCost = ticketCost;
     events[eventId].startsAt = startsAt;
     events[eventId].endsAt = endsAt;
@@ -157,11 +162,11 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     }
   }
 
-  function getMyEvents() public view returns (EventStruct[] memory Events) {
+  function getMyEvents(address myAddress) public view returns (EventStruct[] memory Events) {
       uint256 available;
 
     for (uint256 i = 1; i <= _totalEvents.current(); i++) {
-      if (!events[i].deleted && events[i].owner == msg.sender) {
+      if (!events[i].deleted && events[i].owner == myAddress) {
         available++;
       }
     }
@@ -169,7 +174,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     uint256 index;
 
     for (uint256 i = 1; i <= _totalEvents.current(); i++) {
-      if (!events[i].deleted && events[i].owner == msg.sender) {
+      if (!events[i].deleted && events[i].owner == myAddress) {
         Events[index++] = events[i];
       }
     }
@@ -179,12 +184,13 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     return events[eventId];
   }
 
-  function buyTickets(uint256 eventId, uint256 numOfticket) public payable {
+  function buyTickets(uint256 eventId, uint256 numOfticket, string memory qr) public payable {
     require(eventExists[eventId], 'Event not found');
     require(msg.value >= events[eventId].ticketCost * numOfticket, 'Insufficient amount');
     require(numOfticket > 0, 'NumOfticket must be greater than zero');
     require(numOfticket > TOTALTICKETCANPURCHASE, 'NumOfticket must be less than 5');
     require(numOfticket < events[eventId].ticketRemain,'Out of tickets');
+    require(bytes(qr).length > 0, 'QR code cannot be empty');
 
     for (uint i = 0; i < numOfticket; i++) {
       TicketStruct memory ticket;
@@ -193,7 +199,11 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
       ticket.owner = msg.sender;
       ticket.ticketCost = events[eventId].ticketCost;
       ticket.timestamp = currentTime();
+      ticket.qrCode = qr;
+
+      // push ticket to array
       tickets[eventId].push(ticket);
+      myTickets[msg.sender].push(ticket);
     }
 
     events[eventId].ticketRemain -= numOfticket;
@@ -202,6 +212,10 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
 
   function getTickets(uint256 eventId) public view returns (TicketStruct[] memory Tickets) {
     return tickets[eventId];
+  }
+
+  function getMyTickets(address myAddress) public view returns (TicketStruct[] memory Tickets) {
+    return myTickets[myAddress];
   }
 
   function refundTickets(uint256 eventId) internal returns (bool) {

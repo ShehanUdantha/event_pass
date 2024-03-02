@@ -1,7 +1,7 @@
 import React from "react";
-import EventCard from "../../components/EventCard";
+import EventCard from "./EventCard";
 
-const GridViewSection = ({ events }) => {
+const EventGridView = ({ events }) => {
   const fetchedEvents = events;
 
   return (
@@ -21,4 +21,4 @@ const GridViewSection = ({ events }) => {
   );
 };
 
-export default GridViewSection;
+export default EventGridView;

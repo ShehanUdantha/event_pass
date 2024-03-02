@@ -89,7 +89,7 @@ const ViewEvent = () => {
               <div className="flex flex-row mt-[0.2rem] md:mt-0">
                 <div className="text-[14px] font-medium mr-1">Ended at:</div>
                 <div className="text-[14px]">
-                  {formatDateAndTime(event.startsAt)}
+                  {formatDateAndTime(event.endsAt)}
                 </div>
               </div>
             </div>

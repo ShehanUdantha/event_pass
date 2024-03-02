@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = '0x8c8273bFb2780b1551A564fDa5FA2b66895237CC';
+export const CONTRACT_ADDRESS = '0xe9c6CD61BcA13e8075503ACE734d1f49298db110';
 
 export const navLinks = [
   { path: "/", link: "Home" },

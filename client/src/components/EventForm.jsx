@@ -55,6 +55,7 @@ const EventForm = ({ event }) => {
     description: "",
     imageUrl: "",
     ticketAmount: 0,
+    ticketPreviousAmount: 0,
     ticketCost: 0,
     startsAt: "",
     startsAtTime: "",
@@ -101,6 +102,14 @@ const EventForm = ({ event }) => {
                   description: formDetails.description,
                   imageUrl: formDetails.imageUrl,
                   ticketAmount: formDetails.ticketAmount,
+                  ticketRemain:
+                    formDetails.ticketAmount > formDetails.ticketPreviousAmount
+                      ? event.ticketRemain +
+                        (formDetails.ticketAmount -
+                          formDetails.ticketPreviousAmount)
+                      : event.ticketRemain -
+                        (formDetails.ticketPreviousAmount -
+                          formDetails.ticketAmount),
                   ticketCost: ethers.utils.parseEther(
                     formDetails.ticketCost.toString()
                   ),
@@ -170,6 +179,7 @@ const EventForm = ({ event }) => {
       description: event.description,
       imageUrl: event.imageUrl,
       ticketAmount: event.ticketAmount,
+      ticketPreviousAmount: event.ticketAmount,
       ticketCost: event.ticketCost,
       startsAt: startedDateObject.toISOString().split("T")[0],
       startsAtTime: separateTime(startedDateObject),

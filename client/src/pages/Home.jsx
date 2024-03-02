@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Hero from "../sections/Home/Hero";
 import Filter from "../sections/Home/FilterSection";
-import GridView from "../sections/Home/GridViewSection";
+import GridView from "../components/EventGridView";
 import PaginationSection from "../sections/Home/PaginationSection";
 import Footer from "../components/Footer";
 import { useStateContext } from "../context";

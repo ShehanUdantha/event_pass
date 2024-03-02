@@ -123,6 +123,7 @@ export const StateContextProvider = ({ children }) => {
       description,
       imageUrl,
       ticketAmount,
+      ticketRemain,
       ticketCost,
       startsAt,
       endsAt,
@@ -138,6 +139,7 @@ export const StateContextProvider = ({ children }) => {
           description,
           imageUrl,
           ticketAmount,
+          ticketRemain,
           ticketCost,
           startsAt,
           endsAt,
@@ -172,6 +174,43 @@ export const StateContextProvider = ({ children }) => {
     return isSuccess;
   };
 
+  // 5. get my events
+  const getMyEvents = async () => {
+    let parsedEvents = null;
+
+    try {
+      const data = await contract.call("getMyEvents", [address]);
+      console.log(data);
+
+      parsedEvents = data.map((event, i) => ({
+        id: convertBigNumberToInt(event.id),
+        title: event.title,
+        description: event.description,
+        imageUrl: event.imageUrl,
+        ticketAmount: convertBigNumberToInt(event.ticketAmount),
+        ticketRemain: convertBigNumberToInt(event.ticketRemain),
+        ticketCost: ethers.utils.formatEther(event.ticketCost.toString()),
+        startsAt: convertBigNumberToDate(event.startsAt),
+        endsAt: convertBigNumberToDate(event.endsAt),
+        location: event.location,
+        category: event.category,
+        owner: event.owner,
+        timestamp: event.timestamp,
+        deleted: event.deleted,
+        paidOut: event.paidOut,
+        refunded: event.refunded,
+        minted: event.minted,
+      }));
+
+      console.info("contract call success", data);
+    } catch (err) {
+      triggerErrorToast(err);
+      console.error("contract call failure", err);
+    }
+
+    return parsedEvents != null ? parsedEvents : [];
+  };
+
   return (
     <StateContext.Provider
       value={{
@@ -179,10 +218,12 @@ export const StateContextProvider = ({ children }) => {
         contract,
         connect,
         disconnect,
+        signer,
         createEvent: callCreateEvent,
         getAllEvents,
         updateEvent: callUpdateEvent,
         deleteEvent: callDeleteEvent,
+        getMyEvents,
       }}
     >
       {children}
