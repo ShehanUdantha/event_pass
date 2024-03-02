@@ -13,7 +13,7 @@ const NavBar = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const { address, connect } = useStateContext();
+  const { address, connect, disconnect } = useStateContext();
 
   return (
     <header className="bg-white fixed top-0 left-0 right-0">
@@ -43,15 +43,27 @@ const NavBar = () => {
         </ul>
 
         {/* wallet connect button */}
-        <div className="text-white lg:flex gap-4 items-center hidden">
-          <button
-            // open metamask wallet
-            onClick={() => connect()}
-            className="bg-[#4338ca] px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in"
-          >
-            {address != null ? "Connected" : "Connect Wallet"}
-          </button>
-        </div>
+        {address == null ? (
+          <div className="text-white lg:flex gap-4 items-center hidden">
+            <button
+              // open metamask wallet
+              onClick={() => connect()}
+              className="bg-[#4338ca] px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in"
+            >
+              Connect Wallet
+            </button>
+          </div>
+        ) : (
+          <div className="text-white lg:flex gap-4 items-center hidden">
+            <button
+              // open metamask wallet
+              onClick={() => disconnect()}
+              className="bg-[#4338ca] px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in"
+            >
+              Disconnect
+            </button>
+          </div>
+        )}
 
         {/* mobile menu icon */}
         <div className="md:hidden">
@@ -88,19 +100,35 @@ const NavBar = () => {
               </NavLink>
             </li>
           ))}
-          <li key={"wallet"}>
-            <NavLink
-              className={({ isActive, isPending }) => (isActive ? "" : "")}
-              onClick={() => {
-                connect();
-                toggleMenu();
-              }}
-              to={"/"}
-              key={"wallet"}
-            >
-              {address != null ? "Connected" : "Connect Wallet"}
-            </NavLink>
-          </li>
+          {address == null ? (
+            <li key={"wallet"}>
+              <NavLink
+                className={({ isActive, isPending }) => (isActive ? "" : "")}
+                onClick={() => {
+                  connect();
+                  toggleMenu();
+                }}
+                to={"/"}
+                key={"wallet"}
+              >
+                Connect Wallet
+              </NavLink>
+            </li>
+          ) : (
+            <li key={"wallet"}>
+              <NavLink
+                className={({ isActive, isPending }) => (isActive ? "" : "")}
+                onClick={() => {
+                  disconnect();
+                  toggleMenu();
+                }}
+                to={"/"}
+                key={"wallet"}
+              >
+                Disconnect
+              </NavLink>
+            </li>
+          )}
         </ul>
       </div>
     </header>

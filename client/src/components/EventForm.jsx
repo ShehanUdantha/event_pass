@@ -15,6 +15,7 @@ const EventForm = ({ event }) => {
   const notifyEndDateMustBeHigher = () =>
     toast.error("End date must be greater than start date");
   const notifyUnAuthorized = () => toast.error("Unauthorized entity");
+  const notifyConnectWallet = () => toast.error("Please connect your wallet");
 
   useEffect(() => {
     if (event) setEventDetails();
@@ -116,26 +117,31 @@ const EventForm = ({ event }) => {
                 notifyUnAuthorized();
               }
             } else {
-              await createEvent({
-                title: formDetails.title,
-                description: formDetails.description,
-                imageUrl: formDetails.imageUrl,
-                ticketAmount: formDetails.ticketAmount,
-                ticketCost: ethers.utils.parseEther(
-                  formDetails.ticketCost.toString()
-                ),
-                startsAt: new Date(
-                  updateTime(formDetails.startsAt, formDetails.startsAtTime)
-                ).getTime(),
-                endsAt: new Date(
-                  updateTime(formDetails.endsAt, formDetails.endsAtTime)
-                ).getTime(),
-                location: formDetails.location,
-                category: formDetails.category,
-              });
+              if (address != null) {
+                await createEvent({
+                  title: formDetails.title,
+                  description: formDetails.description,
+                  imageUrl: formDetails.imageUrl,
+                  ticketAmount: formDetails.ticketAmount,
+                  ticketCost: ethers.utils.parseEther(
+                    formDetails.ticketCost.toString()
+                  ),
+                  startsAt: new Date(
+                    updateTime(formDetails.startsAt, formDetails.startsAtTime)
+                  ).getTime(),
+                  endsAt: new Date(
+                    updateTime(formDetails.endsAt, formDetails.endsAtTime)
+                  ).getTime(),
+                  location: formDetails.location,
+                  category: formDetails.category,
+                });
+
+                setIsLoading(false);
+                navigate("/");
+              } else {
+                notifyConnectWallet();
+              }
             }
-            setIsLoading(false);
-            navigate("/");
           } else {
             notifyEndDateMustBeHigher();
           }

@@ -11,6 +11,7 @@ import Profile from "./pages/Profile.jsx";
 import ViewEvent from "./pages/ViewEvent.jsx";
 import { StateContextProvider } from "./context";
 import EditEvent from "./pages/EditEvent.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
       {
         path: "/event/:id/edit",
         element: <EditEvent />,
+      },
+      {
+        path: "/*",
+        element: <NotFound />,
       },
     ],
   },

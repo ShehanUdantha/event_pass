@@ -6,6 +6,9 @@ import {
   useContractWrite,
   useContractRead,
   useContractEvents,
+  useDisconnect,
+  useConnectionStatus,
+  useSigner,
 } from "@thirdweb-dev/react";
 import { ethers } from "ethers";
 import { CONTRACT_ADDRESS } from "../constants/index";
@@ -24,6 +27,9 @@ export const StateContextProvider = ({ children }) => {
 
   const address = useAddress();
   const connect = useMetamask();
+  const disconnect = useDisconnect();
+  const connectionStatus = useConnectionStatus();
+  const signer = useSigner();
 
   // contract functions
 
@@ -172,6 +178,7 @@ export const StateContextProvider = ({ children }) => {
         address,
         contract,
         connect,
+        disconnect,
         createEvent: callCreateEvent,
         getAllEvents,
         updateEvent: callUpdateEvent,
