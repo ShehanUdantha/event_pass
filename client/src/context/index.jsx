@@ -113,7 +113,43 @@ export const StateContextProvider = ({ children }) => {
     return parsedEvents != null ? parsedEvents : [];
   };
 
-  // 3. update event
+  // 3. get single event
+  const getSingleEvent = async (eventId) => {
+    let parsedEvent = null;
+
+    try {
+      const data = await contract.call("getSingleEvent", [eventId]);
+
+      parsedEvent = {
+        id: convertBigNumberToInt(data.id),
+        title: data.title,
+        description: data.description,
+        imageUrl: data.imageUrl,
+        ticketAmount: convertBigNumberToInt(data.ticketAmount),
+        ticketRemain: convertBigNumberToInt(data.ticketRemain),
+        ticketCost: ethers.utils.formatEther(data.ticketCost.toString()),
+        startsAt: convertBigNumberToDate(data.startsAt),
+        endsAt: convertBigNumberToDate(data.endsAt),
+        location: data.location,
+        category: data.category,
+        owner: data.owner,
+        timestamp: data.timestamp,
+        deleted: data.deleted,
+        paidOut: data.paidOut,
+        refunded: data.refunded,
+        minted: data.minted,
+      };
+
+      console.info("contract call success", data);
+    } catch (err) {
+      triggerErrorToast(err);
+      console.error("contract call failure", err);
+    }
+
+    return parsedEvent != null ? parsedEvent : {};
+  };
+
+  // 4. update event
   const { mutateAsync: updateEvent, isUpdateLoading } = useContractWrite(
     contract,
     "updateEvent"
@@ -161,7 +197,7 @@ export const StateContextProvider = ({ children }) => {
     return isSuccess;
   };
 
-  // 4. delete event
+  // 5. delete event
   const { mutateAsync: deleteEvent, isDeleteLoading } = useContractWrite(
     contract,
     "deleteEvent"
@@ -170,7 +206,7 @@ export const StateContextProvider = ({ children }) => {
   const callDeleteEvent = async (eventId) => {
     let isSuccess = false;
     try {
-      const data = await deleteEvent({ args: [eventId] });
+      const data = await deleteEvent([eventId]);
       isSuccess = true;
       triggerSuccessToast("contract call success");
       console.info("contract call success", data);
@@ -180,7 +216,7 @@ export const StateContextProvider = ({ children }) => {
     return isSuccess;
   };
 
-  // 5. get my events
+  // 6. get my events
   const getMyEvents = async () => {
     let parsedEvents = null;
 
@@ -227,6 +263,7 @@ export const StateContextProvider = ({ children }) => {
         signer,
         createEvent: callCreateEvent,
         getAllEvents,
+        getSingleEvent,
         updateEvent: callUpdateEvent,
         deleteEvent: callDeleteEvent,
         getMyEvents,

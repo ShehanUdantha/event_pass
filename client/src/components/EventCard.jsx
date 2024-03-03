@@ -8,7 +8,6 @@ const EventCard = ({ event }) => {
       className="shadow-md rounded-[1rem] cursor-pointer w-full"
       key={event.id}
       to={"/event/" + event.id}
-      state={{ eventDetails: event }}
     >
       <div>
         <img
