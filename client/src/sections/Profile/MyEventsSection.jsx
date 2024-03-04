@@ -15,7 +15,11 @@ const MyEventsSection = () => {
   };
 
   useEffect(() => {
-    if (contract) fetchEvents();
+    if (contract && address) {
+      fetchEvents();
+    } else {
+      setEvents([]);
+    }
   }, [contract, address]);
 
   return (

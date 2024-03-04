@@ -1,4 +1,6 @@
-export const CONTRACT_ADDRESS = '0xe9c6CD61BcA13e8075503ACE734d1f49298db110';
+export const CONTRACT_ADDRESS = '0xFa297379aA08013BE3eb6FA31aa1c9021BaD9a45';
+
+export const TOTAL_TICKET_CAN_PURCHASE = 5;
 
 export const navLinks = [
   { path: "/", link: "Home" },

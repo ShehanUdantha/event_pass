@@ -206,7 +206,7 @@ export const StateContextProvider = ({ children }) => {
   const callDeleteEvent = async (eventId) => {
     let isSuccess = false;
     try {
-      const data = await deleteEvent([eventId]);
+      const data = await deleteEvent({ args: [eventId] });
       isSuccess = true;
       triggerSuccessToast("contract call success");
       console.info("contract call success", data);
@@ -253,6 +253,34 @@ export const StateContextProvider = ({ children }) => {
     return parsedEvents != null ? parsedEvents : [];
   };
 
+  // 7. buy tickets
+  const { mutateAsync: buyTickets, isBuyTicketLoading } = useContractWrite(
+    contract,
+    "buyTickets"
+  );
+
+  const callBuyTickets = async ({ eventId, numOfTicket, ticketCost }) => {
+    let isSuccess = false;
+
+    try {
+      const data = await buyTickets({
+        args: [eventId, numOfTicket, window.location.origin],
+        overrides: {
+          gasLimit: 3000000, // override default gas limit
+          value: ethers.utils.parseEther(
+            (ticketCost * numOfTicket).toFixed(6).toString()
+          ),
+        },
+      });
+      isSuccess = true;
+      triggerSuccessToast("contract call success");
+      console.info("contract call success", data);
+    } catch (err) {
+      console.error("contract call failure", err);
+    }
+    return isSuccess;
+  };
+
   return (
     <StateContext.Provider
       value={{
@@ -267,6 +295,7 @@ export const StateContextProvider = ({ children }) => {
         updateEvent: callUpdateEvent,
         deleteEvent: callDeleteEvent,
         getMyEvents,
+        buyTickets: callBuyTickets,
       }}
     >
       {children}

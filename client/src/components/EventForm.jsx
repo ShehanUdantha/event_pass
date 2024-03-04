@@ -20,7 +20,7 @@ const EventForm = ({ event }) => {
 
   useEffect(() => {
     if (event) setEventDetails();
-  }, []);
+  }, [event]);
 
   const schema = yup.object().shape({
     title: yup.string().required("Please enter the event title"),
@@ -33,7 +33,6 @@ const EventForm = ({ event }) => {
     ticketCost: yup
       .number("Ticket price must be a number")
       .typeError("Please enter the event ticket price")
-      .positive("Ticket price must be a positive number")
       .required("Please enter the event ticket price"),
     startsAt: yup
       .date()
@@ -111,8 +110,9 @@ const EventForm = ({ event }) => {
                       : event.ticketRemain -
                         (formDetails.ticketPreviousAmount -
                           formDetails.ticketAmount),
-                  ticketCost: ethers.utils.parseEther(
-                    formDetails.ticketCost.toString()
+                  ticketCost: ethers.utils.parseUnits(
+                    formDetails.ticketCost.toString(),
+                    "ether"
                   ),
                   startsAt: new Date(
                     updateTime(formDetails.startsAt, formDetails.startsAtTime)
@@ -126,6 +126,7 @@ const EventForm = ({ event }) => {
                 setIsLoading(false);
                 if (response) navigate("/");
               } else {
+                setIsLoading(false);
                 notifyUnAuthorized();
               }
             } else {
@@ -135,8 +136,9 @@ const EventForm = ({ event }) => {
                   description: formDetails.description,
                   imageUrl: formDetails.imageUrl,
                   ticketAmount: formDetails.ticketAmount,
-                  ticketCost: ethers.utils.parseEther(
-                    formDetails.ticketCost.toString()
+                  ticketCost: ethers.utils.parseUnits(
+                    formDetails.ticketCost.toString(),
+                    "ether"
                   ),
                   startsAt: new Date(
                     updateTime(formDetails.startsAt, formDetails.startsAtTime)
@@ -184,10 +186,15 @@ const EventForm = ({ event }) => {
       ticketAmount: event.ticketAmount,
       ticketPreviousAmount: event.ticketAmount,
       ticketCost: event.ticketCost,
-      startsAt: startedDateObject.toISOString().split("T")[0],
-      startsAtTime: separateTime(startedDateObject),
-      endsAt: endedDateObject.toISOString().split("T")[0],
-      endsAtTime: separateTime(endedDateObject),
+      startsAt:
+        event.startsAt != null
+          ? startedDateObject.toISOString().split("T")[0]
+          : "",
+      startsAtTime:
+        event.startsAt != null ? separateTime(startedDateObject) : "",
+      endsAt:
+        event.endsAt != null ? endedDateObject.toISOString().split("T")[0] : "",
+      endsAtTime: event.endsAt != null ? separateTime(endedDateObject) : "",
       location: event.location,
       category: event.category,
     });

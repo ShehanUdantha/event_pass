@@ -1,18 +1,53 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import HeaderSection from "../sections/CreateEvent/HeaderSection";
 import FormSection from "../sections/CreateEvent/FormSection";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { useStateContext } from "../context";
 import Footer from "../components/Footer";
+import Spinner from "../assets/images/spinning-dots.svg";
 
 const EditEvent = () => {
-  const location = useLocation();
-  const event = location.state.editEventDetails;
+  const { id } = useParams();
+  console.log(id);
+  const { contract, address, getSingleEvent } = useStateContext();
+
+  const [event, setEvent] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchEvent = async () => {
+    setIsLoading(true);
+
+    if (!isNaN(+id)) {
+      const data = await getSingleEvent(id);
+      if (address == data.owner) {
+        setEvent(data);
+      }
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (contract && id) fetchEvent();
+  }, [contract, address]);
+
+  console.log(event);
+
   return (
     <div>
       {/* header section */}
       <HeaderSection title={"Edit"} />
       {/* form section */}
-      <FormSection event={event} />
+      {isLoading ? (
+        <div className="flex justify-center items-center text-[14px] h-[20rem]">
+          <img
+            src={Spinner}
+            alt="spinner"
+            className="w-[60px] h-[60px] object-contain"
+          />
+        </div>
+      ) : (
+        <FormSection event={event} />
+      )}
       {/* footer */}
       <Footer />
     </div>

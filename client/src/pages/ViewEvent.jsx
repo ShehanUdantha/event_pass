@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { calculateRemainingDays, formatDateAndTime } from "../utils/index";
 import { useStateContext } from "../context";
@@ -6,6 +6,7 @@ import { MdMoreVert } from "react-icons/md";
 import EventMoreMenu from "../components/EventMoreMenu";
 import Spinner from "../assets/images/spinning-dots.svg";
 import Footer from "../components/Footer";
+import TicketBuyModal from "../components/TicketBuyModal";
 
 const ViewEvent = () => {
   const { id } = useParams();
@@ -16,6 +17,7 @@ const ViewEvent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [remainingDays, setRemainingDays] = useState(0);
   const [displayMoreMenu, setDisplayMoreMenu] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   const fetchEvent = async () => {
     setIsLoading(true);
@@ -38,7 +40,7 @@ const ViewEvent = () => {
   console.log(event);
 
   return (
-    <>
+    <Fragment>
       <div className="bg-[#F6F8FD] pt-32 pb-16 h-screen">
         {isLoading ? (
           <div className="flex justify-center items-center text-[14px] h-[20rem]">
@@ -103,9 +105,14 @@ const ViewEvent = () => {
                 by {event.owner}
               </div>
               {/* buy ticket button */}
-              <button className="bg-[#4338ca] text-white px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in mt-5">
-                Get Ticket
-              </button>
+              {remainingDays > 0 ? (
+                <button
+                  onClick={() => setIsVisible(true)}
+                  className="bg-[#4338ca] text-white px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in mt-5"
+                >
+                  Get Tickets
+                </button>
+              ) : null}
               {/* event time */}
               <div className="flex flex-col md:flex-row items-start md:items-center mt-5 justify-start">
                 <div className="flex flex-row">
@@ -140,7 +147,23 @@ const ViewEvent = () => {
       </div>
       {/* footer */}
       {/* <Footer /> */}
-    </>
+
+      {/* ticket buy modal */}
+      {isVisible ? (
+        <TicketBuyModal
+          eventId={event.id}
+          eventOwner={event.owner}
+          ticketCost={event.ticketCost}
+          isVisible={isVisible}
+          onClose={() => {
+            setIsVisible(false);
+          }}
+          onCallBack={() => {
+            if (contract && id && address) fetchEvent();
+          }}
+        />
+      ) : null}
+    </Fragment>
   );
 };
 
