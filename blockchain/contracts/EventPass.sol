@@ -206,7 +206,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
           ticket.owner = msg.sender;
           ticket.ticketCost = events[eventId].ticketCost;
           ticket.timestamp = currentTime();
-          ticket.qrCode = string(abi.encodePacked(baseUrl, "/ticket-info/", Strings.toHexString(uint256(uint160(msg.sender)), 20), "/", Strings.toString(tickets[eventId].length)));
+          ticket.qrCode = string(abi.encodePacked(baseUrl, "/ticket-info/", Strings.toHexString(uint256(uint160(msg.sender)), 20), "/", Strings.toString(eventId), "/", Strings.toString(tickets[eventId].length)));
 
           // push ticket to array
           tickets[eventId].push(ticket);
@@ -267,7 +267,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     _transfer(tickets[eventId][ticketId].owner, newOwner, ticketId);
     
     tickets[eventId][ticketId].owner = newOwner;
-    tickets[eventId][ticketId].qrCode = string(abi.encodePacked(baseUrl, "/ticket-info/", Strings.toHexString(uint256(uint160(newOwner)), 20), "/", Strings.toString(tickets[eventId].length)));
+    tickets[eventId][ticketId].qrCode = string(abi.encodePacked(baseUrl, "/ticket-info/", Strings.toHexString(uint256(uint160(msg.sender)), 20), "/", Strings.toString(eventId), "/", Strings.toString(tickets[eventId].length)));
     myTickets[newOwner].push(tickets[eventId][ticketId]);
     removeTicketFromSecondary(ticketId,tickets[eventId][ticketId].owner);
     
@@ -284,11 +284,23 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     return available;
   }
 
+  function verifyTicket(address myAddress, uint256 ticketId, uint256 eventId) public view returns (bool) {
+    bool isVerified = false;
+    for (uint i = 0; i < tickets[eventId].length; i++) {
+      if (tickets[eventId][i].owner == myAddress && tickets[eventId][i].id == ticketId) {
+        isVerified = true;
+        break;
+      }
+    }
+    return isVerified;
+  }
+
   function payout(uint256 eventId) public {
     require(eventExists[eventId], 'Event not found');
     require(!events[eventId].paidOut, 'Event already paid out');
-    require(currentTime() > events[eventId].endsAt, 'Event still ongoing'); // disable while testing
+    require(currentTime() > events[eventId].endsAt, 'Event still ongoing');
     require(events[eventId].owner == msg.sender || msg.sender == owner(), 'Unauthorized entity');
+    // minted all tickets
     require(mintTickets(eventId), 'Event failed to mint');
 
     uint256 revenue = events[eventId].ticketCost * (events[eventId].ticketAmount - events[eventId].ticketRemain);
