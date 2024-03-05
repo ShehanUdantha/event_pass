@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { calculateRemainingDays, formatDateAndTime } from "../utils/index";
+import { calculateRemainingTime, formatDateAndTime } from "../utils/index";
 import { useStateContext } from "../context";
 import { MdMoreVert } from "react-icons/md";
 import EventMoreMenu from "../components/EventMoreMenu";
@@ -15,7 +15,7 @@ const ViewEvent = () => {
 
   const [event, setEvent] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [remainingDays, setRemainingDays] = useState(0);
+  const [remainingTimes, setRemainingTimes] = useState(0);
   const [displayMoreMenu, setDisplayMoreMenu] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -26,7 +26,7 @@ const ViewEvent = () => {
       const data = await getSingleEvent(id);
       console.log(data);
       setEvent(data);
-      setRemainingDays(calculateRemainingDays(data.startsAt));
+      setRemainingTimes(calculateRemainingTime(data.startsAt));
     } else {
       setEvent({ id: 0 });
     }
@@ -83,9 +83,11 @@ const ViewEvent = () => {
                 ) : null}
               </div>
               {/* event remaining and tickets left */}
-              <div className="flex items-center mt-1 justify-between md:justify-start">
+              <div className="flex flex-col md:flex-row items-start md:items-center mt-1 justify-start">
                 <div className="text-[14px] text-[#b8b6b6] font-medium md:mr-10">
-                  {remainingDays > 0 ? remainingDays : 0} day's remaining
+                  {remainingTimes != "Expired"
+                    ? remainingTimes + " remaining"
+                    : "Expired"}
                 </div>
                 <div className="text-[14px] text-[#b8b6b6] font-medium">
                   {event.ticketRemain} ticket's left
@@ -105,7 +107,7 @@ const ViewEvent = () => {
                 by {event.owner}
               </div>
               {/* buy ticket button */}
-              {remainingDays > 0 ? (
+              {remainingTimes != "Expired" ? (
                 <button
                   onClick={() => setIsVisible(true)}
                   className="bg-[#4338ca] text-white px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in mt-5"
@@ -154,6 +156,7 @@ const ViewEvent = () => {
           eventId={event.id}
           eventOwner={event.owner}
           ticketCost={event.ticketCost}
+          startsAt={event.startsAt}
           isVisible={isVisible}
           onClose={() => {
             setIsVisible(false);

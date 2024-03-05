@@ -1,7 +1,12 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
-import { ThirdwebProvider } from "@thirdweb-dev/react";
+import {
+  ThirdwebProvider,
+  metamaskWallet,
+  coinbaseWallet,
+  walletConnect,
+} from "@thirdweb-dev/react";
 import { Sepolia } from "@thirdweb-dev/chains";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
@@ -12,6 +17,7 @@ import ViewEvent from "./pages/ViewEvent.jsx";
 import { StateContextProvider } from "./context";
 import EditEvent from "./pages/EditEvent.jsx";
 import NotFound from "./pages/NotFound.jsx";
+import TicketInfo from "./pages/TicketInfo.jsx";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +42,11 @@ const router = createBrowserRouter([
         element: <EditEvent />,
       },
       {
+        path: "/ticket-info/:address/:event/:id",
+        element: <TicketInfo />,
+      },
+
+      {
         path: "/*",
         element: <NotFound />,
       },
@@ -50,6 +61,12 @@ root.render(
     <ThirdwebProvider
       clientId={import.meta.env.VITE_TEMPLATE_CLIENT_ID}
       activeChain={Sepolia}
+      switchToActiveChain={true}
+      supportedWallets={[
+        metamaskWallet({ recommended: true }),
+        coinbaseWallet(),
+        walletConnect(),
+      ]}
     >
       <StateContextProvider>
         <RouterProvider router={router} />

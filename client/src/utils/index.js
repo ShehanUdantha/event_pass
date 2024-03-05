@@ -1,12 +1,21 @@
-export const calculateRemainingDays = (startedDate) => {
+export const calculateRemainingTime = (startedDate) => {
   const start = new Date();
   const end = new Date(startedDate);
 
   // Calculate the difference in milliseconds
   const difference = end - start;
-  // Convert milliseconds to days
-  const daysRemaining = Math.ceil(difference / (1000 * 60 * 60 * 24));
-  return daysRemaining;
+
+  // Convert milliseconds to days, hours, minutes, and seconds
+  const daysRemaining = Math.floor(difference / (1000 * 60 * 60 * 24));
+  const hoursRemaining = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutesRemaining = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)); // Corrected line
+  const secondsRemaining = Math.floor((difference % (1000 * 60)) / 1000);
+
+  if (daysRemaining <= 0 && hoursRemaining <= 0 && minutesRemaining <= 0 && secondsRemaining <= 0) {
+    return "Expired";
+  }
+
+  return daysRemaining + ' days ' + hoursRemaining + ' hours ' + minutesRemaining + ' minutes ' + secondsRemaining + ' seconds';
 };
 
 export const formatDateAndTime = (inputDate) => {

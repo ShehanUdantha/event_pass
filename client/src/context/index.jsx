@@ -281,6 +281,34 @@ export const StateContextProvider = ({ children }) => {
     return isSuccess;
   };
 
+  // 8. get my tickets
+  const getMyTickets = async () => {
+    let parsedTickets = null;
+
+    try {
+      const data = await contract.call("getMyTickets", [address]);
+      console.log(data);
+
+      parsedTickets = data.map((ticket, i) => ({
+        id: convertBigNumberToInt(ticket.id),
+        eventId: convertBigNumberToInt(ticket.eventId),
+        owner: ticket.owner,
+        ticketCost: ethers.utils.formatEther(ticket.ticketCost.toString()),
+        timestamp: ticket.timestamp,
+        qrCode: ticket.qrCode,
+        refunded: ticket.refunded,
+        minted: ticket.minted,
+      }));
+
+      console.info("contract call success", data);
+    } catch (err) {
+      triggerErrorToast(err);
+      console.error("contract call failure", err);
+    }
+
+    return parsedTickets != null ? parsedTickets : [];
+  };
+
   return (
     <StateContext.Provider
       value={{
@@ -296,6 +324,7 @@ export const StateContextProvider = ({ children }) => {
         deleteEvent: callDeleteEvent,
         getMyEvents,
         buyTickets: callBuyTickets,
+        getMyTickets,
       }}
     >
       {children}

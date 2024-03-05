@@ -5,6 +5,7 @@ import { NavLink } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { useStateContext } from "../context";
+import { ConnectWallet } from "@thirdweb-dev/react";
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,7 +17,7 @@ const NavBar = () => {
   const { address, connect, disconnect } = useStateContext();
 
   return (
-    <header className="bg-white fixed top-0 left-0 right-0">
+    <header className="bg-white fixed top-0 left-0 right-0 z-8">
       <nav className="px-4 py-4 max-w-7xl mx-auto flex justify-between items-center">
         {/* logo */}
         <div className="flex items-center">
@@ -43,27 +44,20 @@ const NavBar = () => {
         </ul>
 
         {/* wallet connect button */}
-        {address == null ? (
-          <div className="text-white lg:flex gap-4 items-center hidden">
-            <button
-              // open metamask wallet
-              onClick={() => connect()}
-              className="bg-[#4338ca] px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in"
-            >
-              Connect Wallet
-            </button>
-          </div>
-        ) : (
-          <div className="text-white lg:flex gap-4 items-center hidden">
-            <button
-              // open metamask wallet
-              onClick={() => disconnect()}
-              className="bg-[#4338ca] px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in"
-            >
-              Disconnect
-            </button>
-          </div>
-        )}
+        <div className="text-white lg:flex gap-4 items-center hidden">
+          <ConnectWallet
+            theme={"light"}
+            modalSize={"compact"}
+            detailsBtn={() => {
+              return (
+                <button className="bg-[#4338ca] px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in">
+                  Disconnect
+                </button>
+              );
+            }}
+            className="wallet-btn"
+          />
+        </div>
 
         {/* mobile menu icon */}
         <div className="md:hidden">
@@ -100,35 +94,21 @@ const NavBar = () => {
               </NavLink>
             </li>
           ))}
-          {address == null ? (
-            <li key={"wallet"}>
-              <NavLink
-                className={({ isActive, isPending }) => (isActive ? "" : "")}
-                onClick={() => {
-                  connect();
-                  toggleMenu();
-                }}
-                to={"/"}
-                key={"wallet"}
-              >
-                Connect Wallet
-              </NavLink>
-            </li>
-          ) : (
-            <li key={"wallet"}>
-              <NavLink
-                className={({ isActive, isPending }) => (isActive ? "" : "")}
-                onClick={() => {
-                  disconnect();
-                  toggleMenu();
-                }}
-                to={"/"}
-                key={"wallet"}
-              >
-                Disconnect
-              </NavLink>
-            </li>
-          )}
+          {/* mobile view wallet */}
+          <li key={"wallet"} className="flex justify-center">
+            <ConnectWallet
+              theme={"light"}
+              modalSize={"compact"}
+              detailsBtn={() => {
+                return (
+                  <button className="bg-[#4338ca] text-white px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in">
+                    Disconnect
+                  </button>
+                );
+              }}
+              className="wallet-btn"
+            />
+          </li>
         </ul>
       </div>
     </header>

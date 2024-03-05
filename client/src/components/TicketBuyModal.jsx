@@ -8,11 +8,13 @@ import { useStateContext } from "../context";
 import toast, { Toaster } from "react-hot-toast";
 import { ethers } from "ethers";
 import Loader from "./Loader";
+import { calculateRemainingTime } from "../utils/index";
 
 const TicketBuyModal = ({
   eventId,
   eventOwner,
   ticketCost,
+  startsAt,
   isVisible,
   onClose,
   onCallBack,
@@ -40,6 +42,7 @@ const TicketBuyModal = ({
   });
 
   const notifyEventNotFound = () => toast.error("Event not found!");
+  const notifyEventExpired = () => toast.error("Event expired!");
   const notifyUnAuthorized = () => toast.error("Unauthorized entity");
   const InsufficientAmount = () => toast.error("Insufficient amount");
   const somethingWentWrong = () => toast.error("Something went wrong!");
@@ -67,26 +70,30 @@ const TicketBuyModal = ({
   const onSubmit = async (data) => {
     if (eventId != null && eventId > 0 && ethers.utils.isAddress(eventOwner)) {
       if (address && contract) {
-        if (address != eventOwner) {
-          if (userBalance > ticketCost * data.ticketAmount) {
-            setIsLoading(true);
-            const response = await buyTickets({
-              eventId: eventId,
-              numOfTicket: data.ticketAmount,
-              ticketCost: ticketCost,
-            });
-            if (response) {
-              onClose();
-              onCallBack();
+        if (calculateRemainingTime(startsAt) != "Expired") {
+          if (address != eventOwner) {
+            if (userBalance > ticketCost * data.ticketAmount) {
+              setIsLoading(true);
+              const response = await buyTickets({
+                eventId: eventId,
+                numOfTicket: data.ticketAmount,
+                ticketCost: ticketCost,
+              });
+              if (response) {
+                onClose();
+                onCallBack();
+              } else {
+                somethingWentWrong();
+              }
+              setIsLoading(false);
             } else {
-              somethingWentWrong();
+              InsufficientAmount();
             }
-            setIsLoading(false);
           } else {
-            InsufficientAmount();
+            notifyOwnerCantPurchase();
           }
         } else {
-          notifyOwnerCantPurchase();
+          notifyEventExpired();
         }
       } else {
         if (address == null) {
