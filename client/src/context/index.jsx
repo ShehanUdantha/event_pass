@@ -203,10 +203,10 @@ export const StateContextProvider = ({ children }) => {
     "deleteEvent"
   );
 
-  const callDeleteEvent = async (eventId) => {
+  const callDeleteEvent = async (eventId, isRefunded) => {
     let isSuccess = false;
     try {
-      const data = await deleteEvent({ args: [eventId] });
+      const data = await deleteEvent({ args: [eventId, isRefunded] });
       isSuccess = true;
       triggerSuccessToast("contract call success");
       console.info("contract call success", data);
@@ -309,6 +309,51 @@ export const StateContextProvider = ({ children }) => {
     return parsedTickets != null ? parsedTickets : [];
   };
 
+  // 9. verify ticket
+  const verifyTicket = async ({ myAddress, eventId, ticketId }) => {
+    let ticketVerificationInfo = "";
+
+    try {
+      const data = await contract.call("verifyTicket", [
+        myAddress,
+        ticketId,
+        eventId,
+      ]);
+      console.log(data);
+
+      ticketVerificationInfo = data;
+
+      console.info("contract call success", data);
+    } catch (err) {
+      triggerErrorToast(err);
+      console.error("contract call failure", err);
+    }
+
+    return ticketVerificationInfo;
+  };
+
+  // 10. payout
+  const { mutateAsync: payout, isPayoutLoading } = useContractWrite(
+    contract,
+    "payout"
+  );
+
+  const callPayout = async ({ eventId }) => {
+    let isSuccess = false;
+
+    try {
+      const data = await payout({
+        args: [eventId],
+      });
+      isSuccess = true;
+      triggerSuccessToast("contract call success");
+      console.info("contract call success", data);
+    } catch (err) {
+      console.error("contract call failure", err);
+    }
+    return isSuccess;
+  };
+
   return (
     <StateContext.Provider
       value={{
@@ -325,6 +370,8 @@ export const StateContextProvider = ({ children }) => {
         getMyEvents,
         buyTickets: callBuyTickets,
         getMyTickets,
+        verifyTicket,
+        payout: callPayout,
       }}
     >
       {children}

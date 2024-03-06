@@ -1,10 +1,11 @@
-export const CONTRACT_ADDRESS = '0xe41Db744c1C429b604FBc9a8e377cDfF668A57B1';
+export const CONTRACT_ADDRESS = '0x20EC023E96d8B548AD82fDF49DF8bDb257Bc1334';
 
 export const TOTAL_TICKET_CAN_PURCHASE = 5;
 
 export const navLinks = [
   { path: "/", link: "Home" },
   { path: "/create-event", link: "Create Event" },
+  { path: "/scanner", link: "Scanner" },
   { path: "/profile", link: "Profile" },
 ];
 

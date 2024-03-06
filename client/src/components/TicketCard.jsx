@@ -4,11 +4,14 @@ import { formatDateAndTime } from "../utils/index";
 import Spinner from "../assets/images/spinning-dots.svg";
 import QRCode from "react-qr-code";
 import { Link } from "react-router-dom";
+import { MdMoreVert } from "react-icons/md";
+import TicketMoreMenu from "./TicketMoreMenu";
 
 const TicketCard = ({ ticket }) => {
   const { contract, address, getSingleEvent } = useStateContext();
   const [event, setEvent] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [displayMoreMenu, setDisplayMoreMenu] = useState(false);
 
   const fetchEvent = async () => {
     setIsLoading(true);
@@ -34,7 +37,16 @@ const TicketCard = ({ ticket }) => {
         </div>
       ) : (
         <Link key={ticket.id} to={ticket.qrCode}>
-          <div className="flex justify-center mt-5">
+          <div className="flex justify-end pl-5 pt-3">
+            <MdMoreVert
+              onClick={() => setDisplayMoreMenu(!displayMoreMenu)}
+              className="cursor-pointer text-lg"
+            />
+            {displayMoreMenu ? (
+              <TicketMoreMenu eventId={event.id} ticket={ticket} />
+            ) : null}
+          </div>
+          <div className="flex justify-center">
             <QRCode className="w-[150px] h-[100px]" value={ticket.qrCode} />
           </div>
           <div className="p-5 pt-2">

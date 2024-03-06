@@ -84,3 +84,17 @@ export function convertBigNumberToInt(bigNumber) {
   return intValue;
 }
 
+export const getUrlParams = (url) => {
+  console.log(url);
+  const urlParts = url.toString().split('/');
+  const address = urlParts[4];
+  const eventId = parseInt(urlParts[5]);
+  const ticketId = parseInt(urlParts[6]);
+
+  return {
+    address,
+    eventId,
+    ticketId
+  };
+};
+

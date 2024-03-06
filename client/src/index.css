@@ -28,7 +28,7 @@
 }
 
 .wallet-btn:hover {
-  background: #6366f1;
+  background: #6366f1 !important;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {

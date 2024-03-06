@@ -13,6 +13,7 @@
     "@thirdweb-dev/react": "^4.4.9",
     "@thirdweb-dev/sdk": "^4.0.36",
     "ethers": "^5.7.2",
+    "html5-qrcode": "^2.3.8",
     "react": "^18.2",
     "react-dom": "^18.2",
     "react-hook-form": "^7.50.1",

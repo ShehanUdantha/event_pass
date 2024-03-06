@@ -4,7 +4,6 @@ import logo from "../assets/icons/logo-icon.png";
 import { NavLink } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
-import { useStateContext } from "../context";
 import { ConnectWallet } from "@thirdweb-dev/react";
 
 const NavBar = () => {
@@ -13,8 +12,6 @@ const NavBar = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
-  const { address, connect, disconnect } = useStateContext();
 
   return (
     <header className="bg-white fixed top-0 left-0 right-0 z-8">

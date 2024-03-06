@@ -4,9 +4,10 @@ import { useStateContext } from "../context";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import Loader from "./Loader";
+import { calculateRemainingTime } from "../utils/index";
 
 const EventMoreMenu = ({ event }) => {
-  const { address, deleteEvent } = useStateContext();
+  const { address, deleteEvent, payout } = useStateContext();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -15,9 +16,24 @@ const EventMoreMenu = ({ event }) => {
   const callEventDelete = async () => {
     if (address == event.owner) {
       setIsLoading(true);
-      const response = await deleteEvent(event.id);
+      const remainingTime = calculateRemainingTime(event.endsAt);
+      const response = await deleteEvent(
+        event.id,
+        remainingTime != "Expired" ? true : false
+      );
       setIsLoading(false);
       if (response) navigate("/");
+    } else {
+      notifyUnAuthorized();
+    }
+  };
+
+  const callPayout = async () => {
+    if (address == event.owner) {
+      setIsLoading(true);
+      const response = await payout(event.id);
+      console.log(response);
+      setIsLoading(false);
     } else {
       notifyUnAuthorized();
     }
@@ -31,7 +47,9 @@ const EventMoreMenu = ({ event }) => {
           <Link key={event.id} to={"/event/" + event.id + "/edit"}>
             <li className="border-b cursor-pointer">Edit</li>
           </Link>
-          <li className="border-b cursor-pointer">Payout</li>
+          <li onClick={callPayout} className="border-b cursor-pointer">
+            Payout
+          </li>
           <li onClick={callEventDelete} className="border-b cursor-pointer">
             Delete
           </li>

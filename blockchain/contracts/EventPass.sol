@@ -39,6 +39,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     uint256 ticketCost;
     uint256 timestamp;
     string qrCode;
+    string verified;
     bool refunded;
     bool minted;
   }
@@ -49,7 +50,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
   mapping(uint256 => EventStruct) events;
   mapping(uint256 => TicketStruct[]) tickets;
   mapping(address => TicketStruct[]) myTickets;
-  mapping(address => TicketStruct[]) secondaryTickets;
+  mapping(uint256 => TicketStruct[]) secondaryTickets;
   mapping(uint256 => bool) eventExists;
 
   constructor() ERC721('EventPass', 'EP'){}
@@ -134,15 +135,19 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     events[eventId].category = category;
   }
 
-  function deleteEvent(uint256 eventId) public {
+  function deleteEvent(uint256 eventId, bool isRefunded) public {
     require(eventExists[eventId], 'Event not found');
     require(events[eventId].owner == msg.sender || msg.sender == owner(), 'Unauthorized entity');
     require(!events[eventId].paidOut, 'Event already paid out');
     require(!events[eventId].refunded, 'Event already refunded');
     require(!events[eventId].deleted, 'Event already deleted');
-    require(refundTickets(eventId), 'Event failed to refund');
 
-    events[eventId].deleted = true;
+    if(isRefunded == true){
+      refundTickets(eventId);
+      events[eventId].deleted = true;
+    }else{
+      events[eventId].deleted = true;
+    }
   }
 
   function getAllEvents() public view returns (EventStruct[] memory Events) {
@@ -246,9 +251,13 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     require(tickets[eventId][ticketId].owner == myAddress, "You don't own this ticket");
     require(currentTime() < tickets[eventId][ticketId].timestamp, 'Event has already occurred');
 
-    secondaryTickets[myAddress].push(tickets[eventId][ticketId]);
+    secondaryTickets[eventId].push(tickets[eventId][ticketId]);
 
     return true;
+  }
+
+  function getResellTicketsByEventId(uint256 eventId) public view returns (TicketStruct[] memory Tickets) {
+    return secondaryTickets[eventId];
   }
 
   function buyReselledTicket(uint256 eventId, uint256 ticketId, address newOwner, string memory baseUrl) public payable {
@@ -269,7 +278,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     tickets[eventId][ticketId].owner = newOwner;
     tickets[eventId][ticketId].qrCode = string(abi.encodePacked(baseUrl, "/ticket-info/", Strings.toHexString(uint256(uint160(msg.sender)), 20), "/", Strings.toString(eventId), "/", Strings.toString(tickets[eventId].length)));
     myTickets[newOwner].push(tickets[eventId][ticketId]);
-    removeTicketFromSecondary(ticketId,tickets[eventId][ticketId].owner);
+    removeTicketFromSecondary(ticketId,tickets[eventId][ticketId].owner,eventId);
     
   }
 
@@ -284,11 +293,14 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     return available;
   }
 
-  function verifyTicket(address myAddress, uint256 ticketId, uint256 eventId) public view returns (bool) {
-    bool isVerified = false;
+  function verifyTicket(address myAddress, uint256 ticketId, uint256 eventId) public view returns (string memory) {
+    string memory isVerified = "Not verified";
     for (uint i = 0; i < tickets[eventId].length; i++) {
-      if (tickets[eventId][i].owner == myAddress && tickets[eventId][i].id == ticketId) {
-        isVerified = true;
+      if(Strings.equal(tickets[eventId][i].verified,"Verified")){
+        isVerified = "Already Verified";
+        break;
+      }else if (tickets[eventId][i].owner == myAddress && tickets[eventId][i].id == ticketId) {
+        isVerified = "Verified";
         break;
       }
     }
@@ -331,14 +343,16 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     return (block.timestamp * 1000) + 1000;
   }
 
-  function removeTicketFromSecondary(uint256 ticketIdToRemove, address ownerAddress) internal {
-    for (uint i = 0; i < secondaryTickets[ownerAddress].length; i++) {
-      if (secondaryTickets[ownerAddress][i].id == ticketIdToRemove) {
+  function removeTicketFromSecondary(uint256 ticketIdToRemove, address ownerAddress, uint256 eventId) internal {
+    for (uint i = 0; i < secondaryTickets[eventId].length; i++) {
+      if(secondaryTickets[eventId][i].owner == ownerAddress){
+        if (secondaryTickets[eventId][i].id == ticketIdToRemove) {
         // Swap with the last element
-        secondaryTickets[ownerAddress][i] = secondaryTickets[ownerAddress][secondaryTickets[ownerAddress].length - 1];
+        secondaryTickets[eventId][i] = secondaryTickets[eventId][secondaryTickets[eventId].length - 1];
         // Delete the last element
-        secondaryTickets[ownerAddress].pop();
+        secondaryTickets[eventId].pop();
         break;
+      }
       }
     }
   }
