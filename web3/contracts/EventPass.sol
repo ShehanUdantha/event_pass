@@ -40,6 +40,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     uint256 timestamp;
     string qrCode;
     string verified;
+    bool reselled;
     bool refunded;
     bool minted;
   }
@@ -50,7 +51,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
   mapping(uint256 => EventStruct) events;
   mapping(uint256 => TicketStruct[]) tickets;
   mapping(address => TicketStruct[]) myTickets;
-  mapping(uint256 => TicketStruct[]) secondaryTickets;
   mapping(uint256 => bool) eventExists;
 
   constructor() ERC721('EventPass', 'EP'){}
@@ -247,17 +247,32 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     return true;
   }
   
-  function resellTicket(uint256 eventId, uint256 ticketId, address myAddress) external returns (bool) {
+  function resellTicket(uint256 eventId, uint256 ticketId, address myAddress) public returns (bool) {
     require(tickets[eventId][ticketId].owner == myAddress, "You don't own this ticket");
     require(currentTime() < tickets[eventId][ticketId].timestamp, 'Event has already occurred');
 
-    secondaryTickets[eventId].push(tickets[eventId][ticketId]);
+    tickets[eventId][ticketId].reselled = true;
 
     return true;
   }
 
   function getResellTicketsByEventId(uint256 eventId) public view returns (TicketStruct[] memory Tickets) {
-    return secondaryTickets[eventId];
+    uint256 available;
+
+    for (uint256 i = 1; i <= tickets[eventId].length; i++) {
+      if (tickets[eventId][i].reselled) {
+        available++;
+      }
+    }
+
+    Tickets = new TicketStruct[](available);
+    uint256 index;
+
+    for (uint256 i = 1; i <= tickets[eventId].length; i++) {
+      if (tickets[eventId][i].reselled) {
+        Tickets[index++] = tickets[eventId][i];
+      }
+    }
   }
 
   function buyReselledTicket(uint256 eventId, uint256 ticketId, address newOwner, string memory baseUrl) public payable {
@@ -278,8 +293,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     tickets[eventId][ticketId].owner = newOwner;
     tickets[eventId][ticketId].qrCode = string(abi.encodePacked(baseUrl, "/ticket-info/", Strings.toHexString(uint256(uint160(msg.sender)), 20), "/", Strings.toString(eventId), "/", Strings.toString(tickets[eventId].length)));
     myTickets[newOwner].push(tickets[eventId][ticketId]);
-    removeTicketFromSecondary(ticketId,tickets[eventId][ticketId].owner,eventId);
-    
   }
 
   function getNumberOfTicketUserByFromEvent(uint256 eventId, address myAddress) public view returns (uint256) {
@@ -341,19 +354,5 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
 
   function currentTime() internal view returns (uint256) {
     return (block.timestamp * 1000) + 1000;
-  }
-
-  function removeTicketFromSecondary(uint256 ticketIdToRemove, address ownerAddress, uint256 eventId) internal {
-    for (uint i = 0; i < secondaryTickets[eventId].length; i++) {
-      if(secondaryTickets[eventId][i].owner == ownerAddress){
-        if (secondaryTickets[eventId][i].id == ticketIdToRemove) {
-        // Swap with the last element
-        secondaryTickets[eventId][i] = secondaryTickets[eventId][secondaryTickets[eventId].length - 1];
-        // Delete the last element
-        secondaryTickets[eventId].pop();
-        break;
-      }
-      }
-    }
   }
 }
