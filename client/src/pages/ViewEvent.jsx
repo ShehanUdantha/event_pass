@@ -7,6 +7,7 @@ import EventMoreMenu from "../components/EventMoreMenu";
 import Spinner from "../assets/images/spinning-dots.svg";
 import Footer from "../components/Footer";
 import TicketBuyModal from "../components/TicketBuyModal";
+import SecondaryMarketSection from "../sections/ViewEvent/SecondaryMarketSection";
 
 const ViewEvent = () => {
   const { id } = useParams();
@@ -41,7 +42,7 @@ const ViewEvent = () => {
 
   return (
     <Fragment>
-      <div className="bg-[#F6F8FD] pt-32 pb-16 h-screen">
+      <div className="bg-[#F6F8FD] pt-32 pb-16 h-full">
         {isLoading ? (
           <div className="flex justify-center items-center text-[14px] h-[20rem]">
             <img
@@ -147,8 +148,10 @@ const ViewEvent = () => {
           </div>
         )}
       </div>
+      {/* secondary market section */}
+      <SecondaryMarketSection eventId={id} />
       {/* footer */}
-      {/* <Footer /> */}
+      <Footer />
 
       {/* ticket buy modal */}
       {isVisible ? (

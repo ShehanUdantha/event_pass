@@ -2,7 +2,7 @@ import React from "react";
 import Spinner from "../assets/images/spinning-dots.svg";
 import TicketCard from "./TicketCard";
 
-const TicketGridView = ({ tickets, isLoading }) => {
+const TicketGridView = ({ tickets, isLoading, isSecondary }) => {
   const fetchedTickets = tickets;
   return (
     <section className="mt-10 md:mt-10">
@@ -17,7 +17,11 @@ const TicketGridView = ({ tickets, isLoading }) => {
       ) : fetchedTickets != null && fetchedTickets.length > 0 ? (
         <div className="mx-auto max-w-7xl px-4 grid md:grid-cols-5 grid-cols-1 gap-8">
           {fetchedTickets.map((ticket) => (
-            <TicketCard ticket={ticket} />
+            <TicketCard
+              key={ticket.id}
+              ticket={ticket}
+              isSecondary={isSecondary}
+            />
           ))}
         </div>
       ) : (

@@ -14,7 +14,7 @@ const NavBar = () => {
   };
 
   return (
-    <header className="bg-white fixed top-0 left-0 right-0 z-8">
+    <header className="bg-white fixed top-0 left-0 right-0 z-20">
       <nav className="px-4 py-4 max-w-7xl mx-auto flex justify-between items-center">
         {/* logo */}
         <div className="flex items-center">

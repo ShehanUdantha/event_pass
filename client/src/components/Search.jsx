@@ -14,7 +14,7 @@ const Search = () => {
   }
 
   return (
-    <div className="flex gap-3 min-h-[40px] w-full md:w-2/5 overflow-hidden rounded-full bg-[#F6F6F6] px-4 py-2">
+    <div className="flex gap-3 min-h-[40px] w-full overflow-hidden rounded-full bg-[#F6F6F6] px-4 py-2">
       <IoSearchOutline className="mt-1 text-gray-500" />
       <input
         className="bg-[#F6F6F6] border border-[#F6F6F6] w-full text-gray-900 focus:outline-none"

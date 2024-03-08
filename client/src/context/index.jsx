@@ -296,6 +296,8 @@ export const StateContextProvider = ({ children }) => {
         ticketCost: ethers.utils.formatEther(ticket.ticketCost.toString()),
         timestamp: ticket.timestamp,
         qrCode: ticket.qrCode,
+        verified: ticket.verified,
+        reselled: ticket.reselled,
         refunded: ticket.refunded,
         minted: ticket.minted,
       }));
@@ -310,7 +312,7 @@ export const StateContextProvider = ({ children }) => {
   };
 
   // 9. verify ticket
-  const verifyTicket = async ({ myAddress, eventId, ticketId }) => {
+  const verifyTicket = async (myAddress, eventId, ticketId) => {
     let ticketVerificationInfo = "";
 
     try {
@@ -338,12 +340,81 @@ export const StateContextProvider = ({ children }) => {
     "payout"
   );
 
-  const callPayout = async ({ eventId }) => {
+  const callPayout = async (eventId) => {
     let isSuccess = false;
 
     try {
       const data = await payout({
         args: [eventId],
+      });
+      isSuccess = true;
+      triggerSuccessToast("contract call success");
+      console.info("contract call success", data);
+    } catch (err) {
+      console.error("contract call failure", err);
+    }
+    return isSuccess;
+  };
+
+  // 11. resell ticket
+  const { mutateAsync: resellTicket, isResellTicketLoading } = useContractWrite(
+    contract,
+    "resellTicket"
+  );
+
+  const callResellTicket = async (eventId, ticketId, myAddress) => {
+    let isSuccess = false;
+
+    try {
+      const data = await resellTicket({
+        args: [eventId, ticketId, myAddress],
+      });
+      isSuccess = true;
+      triggerSuccessToast("contract call success");
+      console.info("contract call success", data);
+    } catch (err) {
+      console.error("contract call failure", err);
+    }
+    return isSuccess;
+  };
+
+  // 12. get resell tickets by event id
+  const getResellTicketsByEventId = async (eventId) => {
+    let parsedTickets = null;
+
+    try {
+      const data = await contract.call("getResellTicketsByEventId", [eventId]);
+      console.log(data);
+
+      parsedTickets = data.map((ticket, i) => ({
+        id: convertBigNumberToInt(ticket.id),
+        eventId: convertBigNumberToInt(ticket.eventId),
+        owner: ticket.owner,
+        ticketCost: ethers.utils.formatEther(ticket.ticketCost.toString()),
+        timestamp: ticket.timestamp,
+        qrCode: ticket.qrCode,
+        refunded: ticket.refunded,
+        minted: ticket.minted,
+      }));
+
+      console.info("contract call success", data);
+    } catch (err) {
+      console.error("contract call failure", err);
+    }
+
+    return parsedTickets != null ? parsedTickets : [];
+  };
+
+  // 13. get back resell ticket
+  const { mutateAsync: getBackResellTicket, isGetBackResellTicketLoading } =
+    useContractWrite(contract, "getBackResellTicket");
+
+  const callGetBackResellTicket = async (eventId, ticketId, myAddress) => {
+    let isSuccess = false;
+
+    try {
+      const data = await getBackResellTicket({
+        args: [eventId, ticketId, myAddress],
       });
       isSuccess = true;
       triggerSuccessToast("contract call success");
@@ -372,6 +443,9 @@ export const StateContextProvider = ({ children }) => {
         getMyTickets,
         verifyTicket,
         payout: callPayout,
+        resellTicket: callResellTicket,
+        getResellTicketsByEventId,
+        getBackResellTicket: callGetBackResellTicket,
       }}
     >
       {children}

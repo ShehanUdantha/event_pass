@@ -46,7 +46,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
   }
 
   uint256 public balance;
-  uint256 constant TOTALTICKETCANPURCHASE = 5;
+  uint256 public TOTAL_TICKETS_CAN_PURCHASE = 5;
 
   mapping(uint256 => EventStruct) events;
   mapping(uint256 => TicketStruct[]) tickets;
@@ -54,6 +54,10 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
   mapping(uint256 => bool) eventExists;
 
   constructor() ERC721('EventPass', 'EP'){}
+
+  function changeTotalTicketsCanPurchase(uint256 newAmount) public onlyOwner {
+    TOTAL_TICKETS_CAN_PURCHASE = newAmount;
+  }
 
   function createEvent(
     string memory title,
@@ -193,17 +197,18 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
 
   function buyTickets(uint256 eventId, uint256 numOfTicket, string memory baseUrl) public payable {
     require(eventExists[eventId], 'Event not found');
+    require(events[eventId].owner != msg.sender, "You can't purchase a ticket");
     require(msg.value >= events[eventId].ticketCost * numOfTicket, 'Insufficient amount');
     require(numOfTicket > 0, 'numOfTicket must be greater than zero');
-    require(numOfTicket <= TOTALTICKETCANPURCHASE, 'numOfTicket must be less than 5');
+    require(numOfTicket <= TOTAL_TICKETS_CAN_PURCHASE, 'numOfTicket must be less than 5');
     require(numOfTicket <= events[eventId].ticketRemain,'Out of tickets');
     require(bytes(baseUrl).length > 0, 'Url cannot be empty');
 
     uint256 userBoughtTickets = getNumberOfTicketUserByFromEvent(eventId, msg.sender);
-    require(userBoughtTickets <= TOTALTICKETCANPURCHASE, 'Ticket purchase limit reached');
-    require(userBoughtTickets + numOfTicket <= TOTALTICKETCANPURCHASE, 'You cannot purchase this amount of tickets, because you are limit the reached');
+    require(userBoughtTickets <= TOTAL_TICKETS_CAN_PURCHASE, 'Ticket purchase limit reached');
+    require(userBoughtTickets + numOfTicket <= TOTAL_TICKETS_CAN_PURCHASE, 'You cannot purchase this amount of tickets, because you are limit the reached');
 
-      if(userBoughtTickets <= TOTALTICKETCANPURCHASE && (userBoughtTickets + numOfTicket) <= TOTALTICKETCANPURCHASE){
+      if(userBoughtTickets <= TOTAL_TICKETS_CAN_PURCHASE && (userBoughtTickets + numOfTicket) <= TOTAL_TICKETS_CAN_PURCHASE){
         for (uint i = 0; i < numOfTicket; i++) {
           TicketStruct memory ticket;
           ticket.id = tickets[eventId].length;
@@ -247,19 +252,27 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     return true;
   }
   
-  function resellTicket(uint256 eventId, uint256 ticketId, address myAddress) public returns (bool) {
+  function resellTicket(uint256 eventId, uint256 ticketId, address myAddress) public {
     require(tickets[eventId][ticketId].owner == myAddress, "You don't own this ticket");
-    require(currentTime() < tickets[eventId][ticketId].timestamp, 'Event has already occurred');
+    require(myTickets[myAddress][ticketId].owner == myAddress, "You don't own this ticket");
+    require(currentTime() < events[eventId].startsAt, 'Event has already occurred');
 
     tickets[eventId][ticketId].reselled = true;
+    myTickets[myAddress][ticketId].reselled = true;
+  }
 
-    return true;
+  function getBackResellTicket(uint256 eventId, uint256 ticketId, address myAddress) public {
+    require(tickets[eventId][ticketId].owner == myAddress, "You don't own this ticket");
+    require(myTickets[myAddress][ticketId].owner == myAddress, "You don't own this ticket");
+
+    tickets[eventId][ticketId].reselled = false;
+    myTickets[myAddress][ticketId].reselled = false;
   }
 
   function getResellTicketsByEventId(uint256 eventId) public view returns (TicketStruct[] memory Tickets) {
     uint256 available;
 
-    for (uint256 i = 1; i <= tickets[eventId].length; i++) {
+    for (uint256 i = 0; i < tickets[eventId].length; i++) {
       if (tickets[eventId][i].reselled) {
         available++;
       }
@@ -268,7 +281,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     Tickets = new TicketStruct[](available);
     uint256 index;
 
-    for (uint256 i = 1; i <= tickets[eventId].length; i++) {
+    for (uint256 i = 0; i < tickets[eventId].length; i++) {
       if (tickets[eventId][i].reselled) {
         Tickets[index++] = tickets[eventId][i];
       }
@@ -277,19 +290,22 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
 
   function buyReselledTicket(uint256 eventId, uint256 ticketId, address newOwner, string memory baseUrl) public payable {
     require(eventExists[eventId], 'Event not found');
+    require(tickets[eventId][ticketId].owner != newOwner, "You can't purchase this ticket");
     require(msg.value >= events[eventId].ticketCost, 'Insufficient amount');
-    require(currentTime() < tickets[eventId][ticketId].timestamp, 'Event has already occurred');
+    require(currentTime() < events[eventId].startsAt, 'Event has already occurred');
     require(bytes(baseUrl).length > 0, 'Url cannot be empty');
 
     uint256 userBoughtTickets = getNumberOfTicketUserByFromEvent(eventId, newOwner);
-    require(userBoughtTickets <= TOTALTICKETCANPURCHASE, 'Ticket purchase limit reached');
-    require(userBoughtTickets + 1 <= TOTALTICKETCANPURCHASE, 'You cannot purchase this amount of tickets, because you are limit the reached');
+    require(userBoughtTickets <= TOTAL_TICKETS_CAN_PURCHASE, 'Ticket purchase limit reached');
+    require(userBoughtTickets + 1 <= TOTAL_TICKETS_CAN_PURCHASE, 'You cannot purchase this amount of tickets, because you are limit the reached');
 
     payTo(tickets[eventId][ticketId].owner, tickets[eventId][ticketId].ticketCost);
 
     // Transfer ownership of the ticket
     _transfer(tickets[eventId][ticketId].owner, newOwner, ticketId);
     
+    removeTicketFromMyTickets(ticketId,tickets[eventId][ticketId].owner,eventId);
+
     tickets[eventId][ticketId].owner = newOwner;
     tickets[eventId][ticketId].qrCode = string(abi.encodePacked(baseUrl, "/ticket-info/", Strings.toHexString(uint256(uint160(msg.sender)), 20), "/", Strings.toString(eventId), "/", Strings.toString(tickets[eventId].length)));
     myTickets[newOwner].push(tickets[eventId][ticketId]);
@@ -354,5 +370,19 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
 
   function currentTime() internal view returns (uint256) {
     return (block.timestamp * 1000) + 1000;
+  }
+
+  function removeTicketFromMyTickets(uint256 ticketIdToRemove, address ownerAddress, uint256 eventId) internal {
+    for (uint i = 0; i < myTickets[ownerAddress].length; i++) {
+      if(myTickets[ownerAddress][i].eventId == eventId){
+        if (myTickets[ownerAddress][i].id == ticketIdToRemove) {
+        // Swap with the last element
+        myTickets[ownerAddress][i] = myTickets[ownerAddress][myTickets[ownerAddress].length - 1];
+        // Delete the last element
+        myTickets[ownerAddress].pop();
+        break;
+        }
+      }
+    }
   }
 }
