@@ -42,17 +42,21 @@ const EventMoreMenu = ({ event }) => {
   return (
     <>
       {isLoading && <Loader />}
-      <div className="flex flex-col absolute w-[100px] p-[15px] bg-white border-spacing-1 right-[1.5rem] md:right-[4rem] border border-gray">
-        <ul className="flex flex-col gap-4 text-[12px]">
-          <Link key={event.id} to={"/event/" + event.id + "/edit"}>
-            <li className="border-b cursor-pointer">Edit</li>
+      <div className="flex flex-col absolute w-[100px] bg-white border-spacing-1 right-[1.5rem] md:right-[3rem] border border-gray">
+        <ul className="flex flex-col text-[12px]">
+          <Link
+            key={event.id}
+            to={"/event/" + event.id + "/edit"}
+            className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
+          >
+            <li>Edit</li>
           </Link>
-          <li onClick={callPayout} className="border-b cursor-pointer">
-            Payout
-          </li>
-          <li onClick={callEventDelete} className="border-b cursor-pointer">
-            Delete
-          </li>
+          <div className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100">
+            <li onClick={callPayout}>Withdraw</li>
+          </div>
+          <div className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100">
+            <li onClick={callEventDelete}>Delete</li>
+          </div>
         </ul>
         <Toaster position="bottom-right" />
       </div>

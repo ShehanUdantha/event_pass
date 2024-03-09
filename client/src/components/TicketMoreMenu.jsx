@@ -3,7 +3,7 @@ import { useStateContext } from "../context";
 import toast, { Toaster } from "react-hot-toast";
 import { calculateRemainingTime } from "../utils/index";
 import Loader from "./Loader";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const TicketMoreMenu = ({ event, ticket }) => {
   const { resellTicket, getBackResellTicket, address } = useStateContext();
@@ -56,20 +56,28 @@ const TicketMoreMenu = ({ event, ticket }) => {
   return (
     <>
       {isLoading && <Loader />}
-      <div className="flex flex-col absolute w-[100px] p-[15px] bg-white border-spacing-1 mt-5 border border-gray">
-        <ul className="flex flex-col gap-4 text-[12px]">
+      <div className="flex flex-col absolute w-[100px] bg-white border-spacing-1 mt-5 border border-gray">
+        <ul className="flex flex-col text-[12px]">
           {ticket.reselled ? (
-            <li
+            <div
               onClick={callGetBackFromResellTicket}
-              className="border-b cursor-pointer"
+              className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
             >
-              Get Back From Resell
-            </li>
+              <li>Get Back</li>
+            </div>
           ) : (
-            <li onClick={callResellTicket} className="border-b cursor-pointer">
-              Resell
-            </li>
+            <div
+              onClick={callResellTicket}
+              className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
+            >
+              <li>Resell</li>
+            </div>
           )}
+          <Link key={ticket.id} to={ticket.qrCode}>
+            <div className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100">
+              <li>View</li>
+            </div>
+          </Link>
         </ul>
         <Toaster position="bottom-right" />
       </div>

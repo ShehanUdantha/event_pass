@@ -101,7 +101,6 @@ export const StateContextProvider = ({ children }) => {
         deleted: event.deleted,
         paidOut: event.paidOut,
         refunded: event.refunded,
-        minted: event.minted,
       }));
 
       console.info("contract call success", data);
@@ -137,7 +136,6 @@ export const StateContextProvider = ({ children }) => {
         deleted: data.deleted,
         paidOut: data.paidOut,
         refunded: data.refunded,
-        minted: data.minted,
       };
 
       console.info("contract call success", data);
@@ -241,7 +239,6 @@ export const StateContextProvider = ({ children }) => {
         deleted: event.deleted,
         paidOut: event.paidOut,
         refunded: event.refunded,
-        minted: event.minted,
       }));
 
       console.info("contract call success", data);
@@ -292,6 +289,7 @@ export const StateContextProvider = ({ children }) => {
       parsedTickets = data.map((ticket, i) => ({
         id: convertBigNumberToInt(ticket.id),
         eventId: convertBigNumberToInt(ticket.eventId),
+        tokenId: convertBigNumberToInt(ticket.tokenId),
         owner: ticket.owner,
         ticketCost: ethers.utils.formatEther(ticket.ticketCost.toString()),
         timestamp: ticket.timestamp,
@@ -389,6 +387,7 @@ export const StateContextProvider = ({ children }) => {
       parsedTickets = data.map((ticket, i) => ({
         id: convertBigNumberToInt(ticket.id),
         eventId: convertBigNumberToInt(ticket.eventId),
+        tokenId: convertBigNumberToInt(ticket.tokenId),
         owner: ticket.owner,
         ticketCost: ethers.utils.formatEther(ticket.ticketCost.toString()),
         timestamp: ticket.timestamp,
@@ -425,6 +424,36 @@ export const StateContextProvider = ({ children }) => {
     return isSuccess;
   };
 
+  // 14. buy resell tickets
+  const { mutateAsync: buyReselledTicket, isBuyResellTicketLoading } =
+    useContractWrite(contract, "buyReselledTicket");
+
+  const callBuyResellTickets = async (
+    eventId,
+    ticketId,
+    newOwner,
+    tokenId,
+    ticketCost
+  ) => {
+    let isSuccess = false;
+
+    try {
+      const data = await buyReselledTicket({
+        args: [eventId, ticketId, newOwner, window.location.origin, tokenId],
+        overrides: {
+          gasLimit: 3000000, // override default gas limit
+          value: ethers.utils.parseEther(ticketCost.toString()),
+        },
+      });
+      isSuccess = true;
+      triggerSuccessToast("contract call success");
+      console.info("contract call success", data);
+    } catch (err) {
+      console.error("contract call failure", err);
+    }
+    return isSuccess;
+  };
+
   return (
     <StateContext.Provider
       value={{
@@ -446,6 +475,7 @@ export const StateContextProvider = ({ children }) => {
         resellTicket: callResellTicket,
         getResellTicketsByEventId,
         getBackResellTicket: callGetBackResellTicket,
+        buyReselledTicket: callBuyResellTickets,
       }}
     >
       {children}

@@ -29,12 +29,12 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     bool deleted;
     bool paidOut;
     bool refunded;
-    bool minted;
   }
 
   struct TicketStruct {
     uint256 id;
     uint256 eventId;
+    uint256 tokenId;
     address owner;
     uint256 ticketCost;
     uint256 timestamp;
@@ -45,7 +45,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     bool minted;
   }
 
-  uint256 public balance;
+  uint256 public balance = 0;
   uint256 public TOTAL_TICKETS_CAN_PURCHASE = 5;
 
   mapping(uint256 => EventStruct) events;
@@ -218,6 +218,12 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
           ticket.timestamp = currentTime();
           ticket.qrCode = string(abi.encodePacked(baseUrl, "/ticket-info/", Strings.toHexString(uint256(uint160(msg.sender)), 20), "/", Strings.toString(eventId), "/", Strings.toString(tickets[eventId].length)));
 
+          // mint ticket
+          _totalTokens.increment();
+          _mint(msg.sender, _totalTokens.current());
+          ticket.minted = true;
+          ticket.tokenId = _totalTokens.current();
+
           // push ticket to array
           tickets[eventId].push(ticket);
           myTickets[msg.sender].push(ticket);
@@ -288,7 +294,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     }
   }
 
-  function buyReselledTicket(uint256 eventId, uint256 ticketId, address newOwner, string memory baseUrl) public payable {
+  function buyReselledTicket(uint256 eventId, uint256 ticketId, address newOwner, string memory baseUrl, uint256 tokenId) public payable {
     require(eventExists[eventId], 'Event not found');
     require(tickets[eventId][ticketId].owner != newOwner, "You can't purchase this ticket");
     require(msg.value >= events[eventId].ticketCost, 'Insufficient amount');
@@ -301,13 +307,14 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
 
     payTo(tickets[eventId][ticketId].owner, tickets[eventId][ticketId].ticketCost);
 
-    // Transfer ownership of the ticket
-    _transfer(tickets[eventId][ticketId].owner, newOwner, ticketId);
+    // Transfer ownership of the ticket token
+    _transfer(tickets[eventId][ticketId].owner, newOwner, tokenId);
     
     removeTicketFromMyTickets(ticketId,tickets[eventId][ticketId].owner,eventId);
 
     tickets[eventId][ticketId].owner = newOwner;
     tickets[eventId][ticketId].qrCode = string(abi.encodePacked(baseUrl, "/ticket-info/", Strings.toHexString(uint256(uint160(msg.sender)), 20), "/", Strings.toString(eventId), "/", Strings.toString(tickets[eventId].length)));
+    tickets[eventId][ticketId].reselled = false;
     myTickets[newOwner].push(tickets[eventId][ticketId]);
   }
 
@@ -341,8 +348,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     require(!events[eventId].paidOut, 'Event already paid out');
     require(currentTime() > events[eventId].endsAt, 'Event still ongoing');
     require(events[eventId].owner == msg.sender || msg.sender == owner(), 'Unauthorized entity');
-    // minted all tickets
-    require(mintTickets(eventId), 'Event failed to mint');
 
     uint256 revenue = events[eventId].ticketCost * (events[eventId].ticketAmount - events[eventId].ticketRemain);
 
@@ -350,17 +355,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
 
     events[eventId].paidOut = true;
     balance -= revenue;
-  }
-
-  function mintTickets(uint256 eventId) internal returns (bool) {
-    for (uint i = 0; i < tickets[eventId].length; i++) {
-      _totalTokens.increment();
-      tickets[eventId][i].minted = true;
-      _mint(tickets[eventId][i].owner, _totalTokens.current());
-    }
-
-    events[eventId].minted = true;
-    return true;
   }
 
   function payTo(address to, uint256 amount) internal {

@@ -48,6 +48,7 @@ const TicketBuyModal = ({
   const somethingWentWrong = () => toast.error("Something went wrong!");
   const notifyOwnerCantPurchase = () =>
     toast.error("Event owner cannot purchase tickets");
+  const notifyConnectWallet = () => toast.error("Please connect your wallet");
 
   const {
     register,
@@ -98,6 +99,7 @@ const TicketBuyModal = ({
       } else {
         if (address == null) {
           connect();
+          notifyConnectWallet();
         }
         notifyUnAuthorized();
       }

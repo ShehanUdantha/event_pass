@@ -9,7 +9,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Loader from "./Loader";
 
 const EventForm = ({ event }) => {
-  const { createEvent, updateEvent, address } = useStateContext();
+  const { createEvent, updateEvent, address, connect } = useStateContext();
   const navigate = useNavigate();
 
   const notifyNotImage = () => toast.error("Provide valid image URL");
@@ -32,6 +32,7 @@ const EventForm = ({ event }) => {
       .required("Please enter the event total tickets"),
     ticketCost: yup
       .number("Ticket price must be a number")
+      .positive("Ticket cost must be a positive number")
       .typeError("Please enter the event ticket price")
       .required("Please enter the event ticket price"),
     startsAt: yup
@@ -92,45 +93,52 @@ const EventForm = ({ event }) => {
               updateTime(formDetails.startsAt, formDetails.startsAtTime)
             ).getTime()
           ) {
-            setIsLoading(true);
-
             if (event) {
-              if (address == event.owner) {
-                const response = await updateEvent({
-                  eventId: event.id,
-                  title: formDetails.title,
-                  description: formDetails.description,
-                  imageUrl: formDetails.imageUrl,
-                  ticketAmount: formDetails.ticketAmount,
-                  ticketRemain:
-                    formDetails.ticketAmount > formDetails.ticketPreviousAmount
-                      ? event.ticketRemain +
-                        (formDetails.ticketAmount -
-                          formDetails.ticketPreviousAmount)
-                      : event.ticketRemain -
-                        (formDetails.ticketPreviousAmount -
-                          formDetails.ticketAmount),
-                  ticketCost: ethers.utils.parseUnits(
-                    formDetails.ticketCost.toString(),
-                    "ether"
-                  ),
-                  startsAt: new Date(
-                    updateTime(formDetails.startsAt, formDetails.startsAtTime)
-                  ).getTime(),
-                  endsAt: new Date(
-                    updateTime(formDetails.endsAt, formDetails.endsAtTime)
-                  ).getTime(),
-                  location: formDetails.location,
-                  category: formDetails.category,
-                });
-                setIsLoading(false);
-                if (response) navigate("/");
+              if (address != null) {
+                if (address == event.owner) {
+                  setIsLoading(true);
+
+                  const response = await updateEvent({
+                    eventId: event.id,
+                    title: formDetails.title,
+                    description: formDetails.description,
+                    imageUrl: formDetails.imageUrl,
+                    ticketAmount: formDetails.ticketAmount,
+                    ticketRemain:
+                      formDetails.ticketAmount >
+                      formDetails.ticketPreviousAmount
+                        ? event.ticketRemain +
+                          (formDetails.ticketAmount -
+                            formDetails.ticketPreviousAmount)
+                        : event.ticketRemain -
+                          (formDetails.ticketPreviousAmount -
+                            formDetails.ticketAmount),
+                    ticketCost: ethers.utils.parseUnits(
+                      formDetails.ticketCost.toString(),
+                      "ether"
+                    ),
+                    startsAt: new Date(
+                      updateTime(formDetails.startsAt, formDetails.startsAtTime)
+                    ).getTime(),
+                    endsAt: new Date(
+                      updateTime(formDetails.endsAt, formDetails.endsAtTime)
+                    ).getTime(),
+                    location: formDetails.location,
+                    category: formDetails.category,
+                  });
+                  setIsLoading(false);
+                  if (response) navigate("/");
+                } else {
+                  notifyUnAuthorized();
+                }
               } else {
-                setIsLoading(false);
-                notifyUnAuthorized();
+                connect();
+                notifyConnectWallet();
               }
             } else {
               if (address != null) {
+                setIsLoading(true);
+
                 const response = await createEvent({
                   title: formDetails.title,
                   description: formDetails.description,
@@ -153,6 +161,7 @@ const EventForm = ({ event }) => {
                 setIsLoading(false);
                 if (response) navigate("/");
               } else {
+                connect();
                 notifyConnectWallet();
               }
             }

@@ -90,7 +90,7 @@ const ViewEvent = () => {
                     ? remainingTimes + " remaining"
                     : "Expired"}
                 </div>
-                <div className="text-[14px] text-[#b8b6b6] font-medium">
+                <div className="text-[14px] text-[#686666] font-medium mt-2 md:mt-0">
                   {event.ticketRemain} ticket's left
                 </div>
               </div>
