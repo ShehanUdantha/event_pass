@@ -51,11 +51,17 @@ const EventMoreMenu = ({ event }) => {
           >
             <li>Edit</li>
           </Link>
-          <div className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100">
-            <li onClick={callPayout}>Withdraw</li>
+          <div
+            onClick={callPayout}
+            className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
+          >
+            <li>Withdraw</li>
           </div>
-          <div className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100">
-            <li onClick={callEventDelete}>Delete</li>
+          <div
+            onClick={callEventDelete}
+            className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
+          >
+            <li>Delete</li>
           </div>
         </ul>
         <Toaster position="bottom-right" />

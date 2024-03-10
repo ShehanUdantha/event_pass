@@ -239,11 +239,15 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     return tickets[eventId];
   }
 
+  function getSingleTicket(uint256 eventId, uint256 ticketId) public view returns (TicketStruct memory) {
+    return tickets[eventId][ticketId];
+  }
+
   function getMyTickets(address myAddress) public view returns (TicketStruct[] memory Tickets) {
     return myTickets[myAddress];
   }
 
-  function getTicketInfo(address myAddress, uint256 ticketId) public view returns (TicketStruct memory) {
+  function getMySingleTicket(address myAddress, uint256 ticketId) public view returns (TicketStruct memory) {
     return myTickets[myAddress][ticketId];
   }
 

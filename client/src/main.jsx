@@ -17,7 +17,7 @@ import ViewEvent from "./pages/ViewEvent.jsx";
 import { StateContextProvider } from "./context";
 import EditEvent from "./pages/EditEvent.jsx";
 import NotFound from "./pages/NotFound.jsx";
-import TicketInfo from "./pages/TicketInfo.jsx";
+import ViewTicket from "./pages/ViewTicket.jsx";
 import Scanner from "./pages/Scanner.jsx";
 
 const router = createBrowserRouter([
@@ -43,8 +43,8 @@ const router = createBrowserRouter([
         element: <EditEvent />,
       },
       {
-        path: "/ticket-info/:address/:event/:id",
-        element: <TicketInfo />,
+        path: "/ticket-info/:ticketAddress/:ticketEvent/:id",
+        element: <ViewTicket />,
       },
       {
         path: "/scanner",

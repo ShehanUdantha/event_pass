@@ -332,26 +332,34 @@ export const StateContextProvider = ({ children }) => {
     return ticketVerificationInfo;
   };
 
-  // 10. payout
-  const { mutateAsync: payout, isPayoutLoading } = useContractWrite(
-    contract,
-    "payout"
-  );
-
-  const callPayout = async (eventId) => {
-    let isSuccess = false;
+  // 10. get single ticket details
+  const getSingleTicket = async (eventId, ticketId) => {
+    let parsedTicket = null;
 
     try {
-      const data = await payout({
-        args: [eventId],
-      });
-      isSuccess = true;
-      triggerSuccessToast("contract call success");
+      const data = await contract.call("getSingleTicket", [eventId, ticketId]);
+      console.log(data);
+
+      parsedTicket = {
+        id: convertBigNumberToInt(data.id),
+        eventId: convertBigNumberToInt(data.eventId),
+        tokenId: convertBigNumberToInt(data.tokenId),
+        owner: data.owner,
+        ticketCost: ethers.utils.formatEther(data.ticketCost.toString()),
+        timestamp: data.timestamp,
+        qrCode: data.qrCode,
+        verified: data.verified,
+        reselled: data.reselled,
+        refunded: data.refunded,
+        minted: data.minted,
+      };
+
       console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
-    return isSuccess;
+
+    return parsedTicket != null ? parsedTicket : { id: -1 };
   };
 
   // 11. resell ticket
@@ -454,6 +462,28 @@ export const StateContextProvider = ({ children }) => {
     return isSuccess;
   };
 
+  // 15. payout
+  const { mutateAsync: payout, isPayoutLoading } = useContractWrite(
+    contract,
+    "payout"
+  );
+
+  const callPayout = async (eventId) => {
+    let isSuccess = false;
+
+    try {
+      const data = await payout({
+        args: [eventId],
+      });
+      isSuccess = true;
+      triggerSuccessToast("contract call success");
+      console.info("contract call success", data);
+    } catch (err) {
+      console.error("contract call failure", err);
+    }
+    return isSuccess;
+  };
+
   return (
     <StateContext.Provider
       value={{
@@ -471,11 +501,12 @@ export const StateContextProvider = ({ children }) => {
         buyTickets: callBuyTickets,
         getMyTickets,
         verifyTicket,
-        payout: callPayout,
+        getSingleTicket,
         resellTicket: callResellTicket,
         getResellTicketsByEventId,
         getBackResellTicket: callGetBackResellTicket,
         buyReselledTicket: callBuyResellTickets,
+        payout: callPayout,
       }}
     >
       {children}
