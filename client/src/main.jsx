@@ -19,6 +19,7 @@ import EditEvent from "./pages/EditEvent.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import ViewTicket from "./pages/ViewTicket.jsx";
 import Scanner from "./pages/Scanner.jsx";
+import TicketHistory from "./pages/TicketHistory.jsx";
 
 const router = createBrowserRouter([
   {
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
         element: <Scanner />,
       },
       {
+        path: "/event/:id/ticket-history",
+        element: <TicketHistory />,
+      },
+      {
         path: "/*",
         element: <NotFound />,
       },
@@ -61,20 +66,20 @@ const router = createBrowserRouter([
 const container = document.getElementById("root");
 const root = createRoot(container);
 root.render(
-  <React.StrictMode>
-    <ThirdwebProvider
-      clientId={import.meta.env.VITE_TEMPLATE_CLIENT_ID}
-      activeChain={Sepolia}
-      switchToActiveChain={true}
-      supportedWallets={[
-        metamaskWallet({ recommended: true }),
-        coinbaseWallet(),
-        walletConnect(),
-      ]}
-    >
-      <StateContextProvider>
-        <RouterProvider router={router} />
-      </StateContextProvider>
-    </ThirdwebProvider>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <ThirdwebProvider
+    clientId={import.meta.env.VITE_TEMPLATE_CLIENT_ID}
+    activeChain={Sepolia}
+    switchToActiveChain={true}
+    supportedWallets={[
+      metamaskWallet({ recommended: true }),
+      coinbaseWallet(),
+      walletConnect(),
+    ]}
+  >
+    <StateContextProvider>
+      <RouterProvider router={router} />
+    </StateContextProvider>
+  </ThirdwebProvider>
+  // </React.StrictMode>
 );

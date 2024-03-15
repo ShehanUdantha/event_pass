@@ -18,6 +18,7 @@ const TicketDetailsSection = ({ event, ticket }) => {
                   <input
                     className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                     type="text"
+                    disabled="true"
                     value={event.title}
                   />
                 </div>
@@ -30,6 +31,7 @@ const TicketDetailsSection = ({ event, ticket }) => {
                   <input
                     className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                     type="text"
+                    disabled="true"
                     value={event.ticketCost}
                   />
                 </div>
@@ -45,6 +47,7 @@ const TicketDetailsSection = ({ event, ticket }) => {
                   <input
                     className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                     type="date"
+                    disabled="true"
                     value={
                       event.startsAt != null
                         ? startedDateObject.toISOString().split("T")[0]
@@ -54,6 +57,7 @@ const TicketDetailsSection = ({ event, ticket }) => {
                   <input
                     className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                     type="time"
+                    disabled="true"
                     value={
                       event.startsAt != null
                         ? separateTime(startedDateObject)
@@ -70,6 +74,7 @@ const TicketDetailsSection = ({ event, ticket }) => {
                   <input
                     className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                     type="date"
+                    disabled="true"
                     value={
                       event.endsAt != null
                         ? endedDateObject.toISOString().split("T")[0]
@@ -79,6 +84,7 @@ const TicketDetailsSection = ({ event, ticket }) => {
                   <input
                     className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                     type="time"
+                    disabled="true"
                     value={
                       event.endsAt != null ? separateTime(endedDateObject) : ""
                     }
@@ -94,6 +100,7 @@ const TicketDetailsSection = ({ event, ticket }) => {
                   <input
                     className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                     type="text"
+                    disabled="true"
                     value={event.location}
                   />
                 </div>
@@ -104,6 +111,7 @@ const TicketDetailsSection = ({ event, ticket }) => {
                   <input
                     className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                     type="text"
+                    disabled="true"
                     value={event.category}
                   />
                 </div>
@@ -117,6 +125,7 @@ const TicketDetailsSection = ({ event, ticket }) => {
                   <input
                     className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                     type="text"
+                    disabled="true"
                     value={ticket.owner}
                   />
                 </div>
@@ -127,6 +136,7 @@ const TicketDetailsSection = ({ event, ticket }) => {
                   <input
                     className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                     type="text"
+                    disabled="true"
                     value={ticket.verified ? "True" : "False"}
                   />
                 </div>

@@ -45,12 +45,13 @@ const EventMoreMenu = ({ event }) => {
       <div className="flex flex-col absolute w-[100px] bg-white border-spacing-1 right-[1.5rem] md:right-[3rem] border border-gray">
         <ul className="flex flex-col text-[12px]">
           <Link
-            key={event.id}
+            key={event.id + "edit"}
             to={"/event/" + event.id + "/edit"}
             className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
           >
             <li>Edit</li>
           </Link>
+
           <div
             onClick={callPayout}
             className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
@@ -63,6 +64,13 @@ const EventMoreMenu = ({ event }) => {
           >
             <li>Delete</li>
           </div>
+          <Link
+            key={event.id + "history"}
+            to={"/event/" + event.id + "/ticket-history"}
+            className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
+          >
+            <li>History</li>
+          </Link>
         </ul>
         <Toaster position="bottom-right" />
       </div>

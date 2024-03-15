@@ -271,7 +271,7 @@ export const StateContextProvider = ({ children }) => {
       });
       isSuccess = true;
       triggerSuccessToast("contract call success");
-      console.info("contract call success", data);
+      console.info("contract call success", data.transactionHash);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -332,7 +332,38 @@ export const StateContextProvider = ({ children }) => {
     return ticketVerificationInfo;
   };
 
-  // 10. get single ticket details
+  // 10. get all tickets by event
+  const getAllTicketsByEvent = async (eventId) => {
+    let parsedTickets = null;
+
+    try {
+      const data = await contract.call("getAllTicketsByEvent", [eventId]);
+      console.log(data);
+
+      parsedTickets = data.map((ticket, i) => ({
+        id: convertBigNumberToInt(ticket.id),
+        eventId: convertBigNumberToInt(ticket.eventId),
+        tokenId: convertBigNumberToInt(ticket.tokenId),
+        owner: ticket.owner,
+        ticketCost: ethers.utils.formatEther(ticket.ticketCost.toString()),
+        timestamp: ticket.timestamp,
+        qrCode: ticket.qrCode,
+        verified: ticket.verified,
+        reselled: ticket.reselled,
+        refunded: ticket.refunded,
+        minted: ticket.minted,
+      }));
+
+      console.info("contract call success", data);
+    } catch (err) {
+      triggerErrorToast(err);
+      console.error("contract call failure", err);
+    }
+
+    return parsedTickets != null ? parsedTickets : [];
+  };
+
+  // 11. get single ticket details
   const getSingleTicket = async (eventId, ticketId) => {
     let parsedTicket = null;
 
@@ -362,7 +393,7 @@ export const StateContextProvider = ({ children }) => {
     return parsedTicket != null ? parsedTicket : { id: -1 };
   };
 
-  // 11. resell ticket
+  // 12. resell ticket
   const { mutateAsync: resellTicket, isResellTicketLoading } = useContractWrite(
     contract,
     "resellTicket"
@@ -384,7 +415,7 @@ export const StateContextProvider = ({ children }) => {
     return isSuccess;
   };
 
-  // 12. get resell tickets by event id
+  // 13. get resell tickets by event id
   const getResellTicketsByEventId = async (eventId) => {
     let parsedTickets = null;
 
@@ -412,7 +443,7 @@ export const StateContextProvider = ({ children }) => {
     return parsedTickets != null ? parsedTickets : [];
   };
 
-  // 13. get back resell ticket
+  // 14. get back resell ticket
   const { mutateAsync: getBackResellTicket, isGetBackResellTicketLoading } =
     useContractWrite(contract, "getBackResellTicket");
 
@@ -432,7 +463,7 @@ export const StateContextProvider = ({ children }) => {
     return isSuccess;
   };
 
-  // 14. buy resell tickets
+  // 15. buy resell tickets
   const { mutateAsync: buyReselledTicket, isBuyResellTicketLoading } =
     useContractWrite(contract, "buyReselledTicket");
 
@@ -462,7 +493,26 @@ export const StateContextProvider = ({ children }) => {
     return isSuccess;
   };
 
-  // 15. payout
+  // 16. get event ticket history
+  const getEventTicketHistory = async (eventId, ticketId) => {
+    let parsedTicketHistory = null;
+    try {
+      const data = await contract.call("getEventTicketHistory", [
+        eventId,
+        ticketId,
+      ]);
+      console.log(data);
+      parsedTicketHistory = data;
+
+      console.info("contract call success", data);
+    } catch (err) {
+      console.error("contract call failure", err);
+    }
+
+    return parsedTicketHistory != null ? parsedTicketHistory : [];
+  };
+
+  // 17. payout
   const { mutateAsync: payout, isPayoutLoading } = useContractWrite(
     contract,
     "payout"
@@ -501,12 +551,14 @@ export const StateContextProvider = ({ children }) => {
         buyTickets: callBuyTickets,
         getMyTickets,
         verifyTicket,
+        getAllTicketsByEvent,
         getSingleTicket,
         resellTicket: callResellTicket,
         getResellTicketsByEventId,
         getBackResellTicket: callGetBackResellTicket,
         buyReselledTicket: callBuyResellTickets,
         payout: callPayout,
+        getEventTicketHistory,
       }}
     >
       {children}

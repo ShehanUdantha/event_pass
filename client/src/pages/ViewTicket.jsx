@@ -25,8 +25,8 @@ const ViewTicket = () => {
       fetchEvent(data.eventId);
     } else {
       setTicket({ id: -1 });
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const fetchEvent = async () => {

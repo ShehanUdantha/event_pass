@@ -112,7 +112,7 @@ const TicketBuyModal = ({
     <>
       {isLoading && <Loader />}
 
-      <div className="fixed inset-0 z-5 h-screen px-4 bg-[#000000b3] backdrop-blur-sm flex items-center justify-center">
+      <div className="fixed inset-0 z-30 h-screen px-4 bg-[#000000b3] backdrop-blur-sm flex items-center justify-center">
         <div className="w-[600px] flex flex-col bg-white p-6 rounded-xl">
           {/* modal close button */}
           <IoClose
