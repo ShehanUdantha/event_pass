@@ -218,6 +218,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
           ticket.ticketCost = events[eventId].ticketCost;
           ticket.timestamp = currentTime();
           ticket.qrCode = string(abi.encodePacked(baseUrl, "/ticket-info/", Strings.toHexString(uint256(uint160(msg.sender)), 20), "/", Strings.toString(eventId), "/", Strings.toString(tickets[eventId].length)));
+          ticket.verified = "Not Verified";
 
           // mint ticket
           _totalTokens.increment();
@@ -329,15 +330,20 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     return available;
   }
 
-  function verifyTicket(address myAddress, uint256 ticketId, uint256 eventId) public view returns (string memory) {
-    string memory isVerified = "Not verified";
+  function verifyTicket(address myAddress, uint256 ticketId, uint256 eventId) public returns (string memory) {
+    string memory isVerified = "Not Found";
     for (uint i = 0; i < tickets[eventId].length; i++) {
-      if(Strings.equal(tickets[eventId][i].verified,"Verified")){
+      if(keccak256(abi.encodePacked(tickets[eventId][i].verified)) == keccak256(abi.encodePacked("Verified"))){
         isVerified = "Already Verified";
         break;
       }else if (tickets[eventId][i].owner == myAddress && tickets[eventId][i].id == ticketId) {
+        tickets[eventId][i].verified = "Verified";
+        myTickets[myAddress][i].verified = "Verified";
         isVerified = "Verified";
         break;
+      }else if(keccak256(abi.encodePacked(tickets[eventId][i].verified)) == keccak256(abi.encodePacked("Not Verified"))){
+         isVerified = "Not Verified";
+         break;
       }
     }
     return isVerified;

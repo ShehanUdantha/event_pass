@@ -71,6 +71,13 @@ const EventMoreMenu = ({ event }) => {
           >
             <li>History</li>
           </Link>
+          <Link
+            key={event.id + "scanner"}
+            to={"/event/" + event.id + "/scanner"}
+            className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
+          >
+            <li>Scanner</li>
+          </Link>
         </ul>
         <Toaster position="bottom-right" />
       </div>

@@ -48,7 +48,7 @@ const router = createBrowserRouter([
         element: <ViewTicket />,
       },
       {
-        path: "/scanner",
+        path: "/event/:id/scanner",
         element: <Scanner />,
       },
       {

@@ -1,44 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
-import Spinner from "../../assets/images/spinning-dots.svg";
 import { useStateContext } from "../../context";
 import { getUrlParams } from "../../utils/index";
+import { RxReload } from "react-icons/rx";
+import Spinner from "../../assets/images/spinning-dots.svg";
 
 const ScanSection = () => {
   const { contract, verifyTicket } = useStateContext();
-  const [ticketInfo, setTicketInfo] = useState(false);
+  const [ticketInfo, setTicketInfo] = useState("");
+  const [ticketId, setTicketId] = useState();
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
+  const initScanner = () => {
     const scanner = new Html5QrcodeScanner("reader", {
       qrbox: { width: 200, height: 200 },
       fps: 5,
     });
-    const qrScannerStop = () => {
-      if (scanner && scanner.isScanning) {
-        scanner
-          .stop()
-          .then((ignore) => console.log("Scaner stop"))
-          .catch((err) => console.log("Scaner error"));
-      }
-    };
     scanner.render(success, error);
+
     function success(value) {
-      scanner.clear();
       fetchTicketInfo(value);
-      qrScannerStop();
+      scanner.clear();
     }
     function error(value) {
       console.log(value);
     }
-    return () => {
-      qrScannerStop();
-    };
+  };
+
+  useEffect(() => {
+    if (contract) initScanner();
   }, []);
 
   const fetchTicketInfo = async (value) => {
     setIsLoading(true);
     const response = getUrlParams(value);
+    setTicketId(response.ticketId);
 
     const data = await verifyTicket(
       response.address,
@@ -53,24 +49,39 @@ const ScanSection = () => {
   return (
     <section className="my-10">
       <div className="mx-auto max-w-7xl">
-        <div className="flex flex-wrap">
-          <div className="w-full flex justify-center items-center">
-            <div className="w-full flex items-center justify-center">
-              <div id="reader" className="w-2/5"></div>
-            </div>
-            <div className="w-full h-60 flex items-center justify-center">
-              {isLoading ? (
-                <div className="flex justify-center items-center text-[14px] h-[20rem]">
-                  <img
-                    src={Spinner}
-                    alt="spinner"
-                    className="w-[60px] h-[60px] object-contain"
-                  />
-                </div>
-              ) : (
-                <div>{ticketInfo}</div>
-              )}
-            </div>
+        <div className="w-full gap-0 md:gap-30 flex flex-col md:flex-row items-center justify-center">
+          <div className="w-full flex items-center justify-center h-[15rem]">
+            <div
+              id="reader"
+              className={`${ticketInfo === "" ? "w-[15rem]" : "w-0"}`}
+            ></div>
+            {ticketInfo != "" ? (
+              <div
+                onClick={() => {
+                  setTicketInfo("");
+                  initScanner();
+                }}
+                className="flex flex-col items-center justify-center w-[15rem] h-[5rem] bg-[#F6F6F6] rounded cursor-pointer"
+              >
+                <RxReload />
+                <p>Scan again</p>
+              </div>
+            ) : null}
+          </div>
+          <div className="w-full flex items-center justify-center md:h-[15rem]">
+            {isLoading ? (
+              <div className="flex justify-center items-center text-[14px]">
+                <img
+                  src={Spinner}
+                  alt="spinner"
+                  className="w-[60px] h-[60px] object-contain"
+                />
+              </div>
+            ) : ticketInfo ? (
+              <div className="font-bold text-[18px]">
+                Ticket {ticketId}: {ticketInfo}
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
