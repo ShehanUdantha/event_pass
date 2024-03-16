@@ -1,1 +1,13 @@
-export const CONTRACT_ADDRESS = '0xA25f6F5e5E5627aA24F7d9d032e85EE84d114675';
+export const CONTRACT_ADDRESS = '0x63c84Ca62A372dfeCC1b725aa5E1Ef0609312ba9';
+
+export const TOTAL_TICKET_CAN_PURCHASE = 5;
+
+export const navLinks = [
+  { path: "/", link: "Home" },
+  { path: "/create-event", link: "Create Event" },
+  { path: "/profile", link: "Profile" },
+];
+
+export const eventCategoryList = [
+  "Other", "Concerts", "Sports", "Festivals", "Expos",
+];
