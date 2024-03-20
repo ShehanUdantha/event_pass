@@ -14,17 +14,22 @@ const TicketMoreMenu = ({ event, ticket }) => {
   const notifyUnAuthorized = () => toast.error("Unauthorized entity");
   const notifyAlreadyResell = () => toast.error("Ticket already resell!");
   const notifyNotResell = () => toast.error("Ticket not resell!");
+  const notifyAlreadyVerified = () => toast.error("Ticket already verified!");
 
   const callResellTicket = async () => {
     if (address == ticket.owner) {
       if (calculateRemainingTime(event.startsAt) != "Expired") {
-        if (!ticket.reselled) {
-          setIsLoading(true);
-          const response = await resellTicket(event.id, ticket.id, address);
-          setIsLoading(false);
-          if (response) navigate("/event/" + event.id);
+        if (!ticket.verified) {
+          if (!ticket.reselled) {
+            setIsLoading(true);
+            const response = await resellTicket(event.id, ticket.id, address);
+            setIsLoading(false);
+            if (response) navigate("/event/" + event.id);
+          } else {
+            notifyAlreadyResell();
+          }
         } else {
-          notifyAlreadyResell();
+          notifyAlreadyVerified();
         }
       } else {
         notifyEventExpired();

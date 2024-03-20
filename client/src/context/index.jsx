@@ -101,6 +101,7 @@ export const StateContextProvider = ({ children }) => {
         deleted: event.deleted,
         paidOut: event.paidOut,
         refunded: event.refunded,
+        balance: convertBigNumberToInt(event.balance),
       }));
 
       console.info("contract call success", data);
@@ -136,6 +137,7 @@ export const StateContextProvider = ({ children }) => {
         deleted: data.deleted,
         paidOut: data.paidOut,
         refunded: data.refunded,
+        balance: convertBigNumberToInt(data.balance),
       };
 
       console.info("contract call success", data);
@@ -286,19 +288,25 @@ export const StateContextProvider = ({ children }) => {
       const data = await contract.call("getMyTickets", [address]);
       console.log(data);
 
-      parsedTickets = data.map((ticket, i) => ({
-        id: convertBigNumberToInt(ticket.id),
-        eventId: convertBigNumberToInt(ticket.eventId),
-        tokenId: convertBigNumberToInt(ticket.tokenId),
-        owner: ticket.owner,
-        ticketCost: ethers.utils.formatEther(ticket.ticketCost.toString()),
-        timestamp: ticket.timestamp,
-        qrCode: ticket.qrCode,
-        verified: ticket.verified,
-        reselled: ticket.reselled,
-        refunded: ticket.refunded,
-        minted: ticket.minted,
-      }));
+      parsedTickets = data.map((ticket, i) =>
+        !ticket.refunded
+          ? {
+              id: convertBigNumberToInt(ticket.id),
+              eventId: convertBigNumberToInt(ticket.eventId),
+              tokenId: convertBigNumberToInt(ticket.tokenId),
+              owner: ticket.owner,
+              ticketCost: ethers.utils.formatEther(
+                ticket.ticketCost.toString()
+              ),
+              timestamp: ticket.timestamp,
+              qrCode: ticket.qrCode,
+              verified: ticket.verified,
+              reselled: ticket.reselled,
+              refunded: ticket.refunded,
+              minted: ticket.minted,
+            }
+          : null
+      );
 
       console.info("contract call success", data);
     } catch (err) {
@@ -310,11 +318,26 @@ export const StateContextProvider = ({ children }) => {
   };
 
   // 9. verify ticket
-  const verifyTicket = async (myAddress, eventId, ticketId) => {
+  const { mutateAsync: verifyTicket, isVerifyLoading } = useContractWrite(
+    contract,
+    "verifyTicket"
+  );
+  const callVerifyTicket = async (myAddress, ticketId, eventId) => {
+    try {
+      const data = await verifyTicket({ args: [myAddress, ticketId, eventId] });
+
+      console.info("contract call success", data);
+    } catch (err) {
+      console.error("contract call failure", err);
+    }
+  };
+
+  // 10. check verification ticket
+  const checkVerificationStatus = async (myAddress, ticketId, eventId) => {
     let ticketVerificationInfo = "";
 
     try {
-      const data = await contract.call("verifyTicket", [
+      const data = await contract.call("checkVerificationStatus", [
         myAddress,
         ticketId,
         eventId,
@@ -325,14 +348,13 @@ export const StateContextProvider = ({ children }) => {
 
       console.info("contract call success", data);
     } catch (err) {
-      triggerErrorToast(err);
       console.error("contract call failure", err);
     }
 
     return ticketVerificationInfo;
   };
 
-  // 10. get all tickets by event
+  // 11. get all tickets by event
   const getAllTicketsByEvent = async (eventId) => {
     let parsedTickets = null;
 
@@ -363,7 +385,7 @@ export const StateContextProvider = ({ children }) => {
     return parsedTickets != null ? parsedTickets : [];
   };
 
-  // 11. get single ticket details
+  // 12. get single ticket details
   const getSingleTicket = async (eventId, ticketId) => {
     let parsedTicket = null;
 
@@ -393,7 +415,7 @@ export const StateContextProvider = ({ children }) => {
     return parsedTicket != null ? parsedTicket : { id: -1 };
   };
 
-  // 12. resell ticket
+  // 13. resell ticket
   const { mutateAsync: resellTicket, isResellTicketLoading } = useContractWrite(
     contract,
     "resellTicket"
@@ -415,7 +437,7 @@ export const StateContextProvider = ({ children }) => {
     return isSuccess;
   };
 
-  // 13. get resell tickets by event id
+  // 14. get resell tickets by event id
   const getResellTicketsByEventId = async (eventId) => {
     let parsedTickets = null;
 
@@ -443,7 +465,7 @@ export const StateContextProvider = ({ children }) => {
     return parsedTickets != null ? parsedTickets : [];
   };
 
-  // 14. get back resell ticket
+  // 15. get back resell ticket
   const { mutateAsync: getBackResellTicket, isGetBackResellTicketLoading } =
     useContractWrite(contract, "getBackResellTicket");
 
@@ -463,7 +485,7 @@ export const StateContextProvider = ({ children }) => {
     return isSuccess;
   };
 
-  // 15. buy resell tickets
+  // 16. buy resell tickets
   const { mutateAsync: buyReselledTicket, isBuyResellTicketLoading } =
     useContractWrite(contract, "buyReselledTicket");
 
@@ -493,7 +515,7 @@ export const StateContextProvider = ({ children }) => {
     return isSuccess;
   };
 
-  // 16. get event ticket history
+  // 17. get event ticket history
   const getEventTicketHistory = async (eventId, ticketId) => {
     let parsedTicketHistory = null;
     try {
@@ -512,7 +534,7 @@ export const StateContextProvider = ({ children }) => {
     return parsedTicketHistory != null ? parsedTicketHistory : [];
   };
 
-  // 17. payout
+  // 18. payout
   const { mutateAsync: payout, isPayoutLoading } = useContractWrite(
     contract,
     "payout"
@@ -550,7 +572,8 @@ export const StateContextProvider = ({ children }) => {
         getMyEvents,
         buyTickets: callBuyTickets,
         getMyTickets,
-        verifyTicket,
+        verifyTicket: callVerifyTicket,
+        checkVerificationStatus,
         getAllTicketsByEvent,
         getSingleTicket,
         resellTicket: callResellTicket,

@@ -1,3 +1,18 @@
+export const separateCurrentDateTime = () => {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const day = String(currentDate.getDate()).padStart(2, '0');
+  const hours = String(currentDate.getHours()).padStart(2, '0');
+  const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+
+  const separatedDateTime = {
+    date: `${year}-${month}-${day}`,
+    time: `${hours}:${minutes}`
+  };
+  return separatedDateTime;
+}
+
 export const calculateRemainingTime = (startedDate) => {
   const start = new Date();
   const end = new Date(startedDate);
@@ -98,3 +113,12 @@ export const getUrlParams = (url) => {
   };
 };
 
+export const convertWeiToEth = (weiValue) => {
+  const wei = parseFloat(weiValue);
+  if (!isNaN(wei)) {
+    const eth = wei / 10 ** 18; // 1 Ether = 10^18 Wei
+    return eth.toFixed(6);
+  } else {
+    return "0.0";
+  }
+};
