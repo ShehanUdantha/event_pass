@@ -288,25 +288,20 @@ export const StateContextProvider = ({ children }) => {
       const data = await contract.call("getMyTickets", [address]);
       console.log(data);
 
-      parsedTickets = data.map((ticket, i) =>
-        !ticket.refunded
-          ? {
-              id: convertBigNumberToInt(ticket.id),
-              eventId: convertBigNumberToInt(ticket.eventId),
-              tokenId: convertBigNumberToInt(ticket.tokenId),
-              owner: ticket.owner,
-              ticketCost: ethers.utils.formatEther(
-                ticket.ticketCost.toString()
-              ),
-              timestamp: ticket.timestamp,
-              qrCode: ticket.qrCode,
-              verified: ticket.verified,
-              reselled: ticket.reselled,
-              refunded: ticket.refunded,
-              minted: ticket.minted,
-            }
-          : null
-      );
+      parsedTickets = data.map((ticket, i) => ({
+        id: convertBigNumberToInt(ticket.id),
+        eventId: convertBigNumberToInt(ticket.eventId),
+        tokenId: convertBigNumberToInt(ticket.tokenId),
+        owner: ticket.owner,
+        ticketCost: ethers.utils.formatEther(ticket.ticketCost.toString()),
+        timestamp: ticket.timestamp,
+        qrCode: ticket.qrCode,
+        verified: ticket.verified,
+        reselled: ticket.reselled,
+        isWaitingForRefund: ticket.isWaitingForRefund,
+        refunded: ticket.refunded,
+        minted: ticket.minted,
+      }));
 
       console.info("contract call success", data);
     } catch (err) {
@@ -317,7 +312,70 @@ export const StateContextProvider = ({ children }) => {
     return parsedTickets != null ? parsedTickets : [];
   };
 
-  // 9. verify ticket
+  // 9. get all tickets by event
+  const getAllTicketsByEvent = async (eventId) => {
+    let parsedTickets = null;
+
+    try {
+      const data = await contract.call("getAllTicketsByEvent", [eventId]);
+      console.log(data);
+
+      parsedTickets = data.map((ticket, i) => ({
+        id: convertBigNumberToInt(ticket.id),
+        eventId: convertBigNumberToInt(ticket.eventId),
+        tokenId: convertBigNumberToInt(ticket.tokenId),
+        owner: ticket.owner,
+        ticketCost: ethers.utils.formatEther(ticket.ticketCost.toString()),
+        timestamp: ticket.timestamp,
+        qrCode: ticket.qrCode,
+        verified: ticket.verified,
+        reselled: ticket.reselled,
+        isWaitingForRefund: ticket.isWaitingForRefund,
+        refunded: ticket.refunded,
+        minted: ticket.minted,
+      }));
+
+      console.info("contract call success", data);
+    } catch (err) {
+      triggerErrorToast(err);
+      console.error("contract call failure", err);
+    }
+
+    return parsedTickets != null ? parsedTickets : [];
+  };
+
+  // 10. get single ticket details
+  const getSingleTicket = async (eventId, ticketId) => {
+    let parsedTicket = null;
+
+    try {
+      const data = await contract.call("getSingleTicket", [eventId, ticketId]);
+      console.log(data);
+
+      parsedTicket = {
+        id: convertBigNumberToInt(data.id),
+        eventId: convertBigNumberToInt(data.eventId),
+        tokenId: convertBigNumberToInt(data.tokenId),
+        owner: data.owner,
+        ticketCost: ethers.utils.formatEther(data.ticketCost.toString()),
+        timestamp: data.timestamp,
+        qrCode: data.qrCode,
+        verified: data.verified,
+        reselled: data.reselled,
+        isWaitingForRefund: data.isWaitingForRefund,
+        refunded: data.refunded,
+        minted: data.minted,
+      };
+
+      console.info("contract call success", data);
+    } catch (err) {
+      console.error("contract call failure", err);
+    }
+
+    return parsedTicket != null ? parsedTicket : { id: -1 };
+  };
+
+  // 11. verify ticket
   const { mutateAsync: verifyTicket, isVerifyLoading } = useContractWrite(
     contract,
     "verifyTicket"
@@ -332,7 +390,7 @@ export const StateContextProvider = ({ children }) => {
     }
   };
 
-  // 10. check verification ticket
+  // 12. check verification ticket
   const checkVerificationStatus = async (myAddress, ticketId, eventId) => {
     let ticketVerificationInfo = "";
 
@@ -352,67 +410,6 @@ export const StateContextProvider = ({ children }) => {
     }
 
     return ticketVerificationInfo;
-  };
-
-  // 11. get all tickets by event
-  const getAllTicketsByEvent = async (eventId) => {
-    let parsedTickets = null;
-
-    try {
-      const data = await contract.call("getAllTicketsByEvent", [eventId]);
-      console.log(data);
-
-      parsedTickets = data.map((ticket, i) => ({
-        id: convertBigNumberToInt(ticket.id),
-        eventId: convertBigNumberToInt(ticket.eventId),
-        tokenId: convertBigNumberToInt(ticket.tokenId),
-        owner: ticket.owner,
-        ticketCost: ethers.utils.formatEther(ticket.ticketCost.toString()),
-        timestamp: ticket.timestamp,
-        qrCode: ticket.qrCode,
-        verified: ticket.verified,
-        reselled: ticket.reselled,
-        refunded: ticket.refunded,
-        minted: ticket.minted,
-      }));
-
-      console.info("contract call success", data);
-    } catch (err) {
-      triggerErrorToast(err);
-      console.error("contract call failure", err);
-    }
-
-    return parsedTickets != null ? parsedTickets : [];
-  };
-
-  // 12. get single ticket details
-  const getSingleTicket = async (eventId, ticketId) => {
-    let parsedTicket = null;
-
-    try {
-      const data = await contract.call("getSingleTicket", [eventId, ticketId]);
-      console.log(data);
-
-      parsedTicket = {
-        id: convertBigNumberToInt(data.id),
-        eventId: convertBigNumberToInt(data.eventId),
-        tokenId: convertBigNumberToInt(data.tokenId),
-        owner: data.owner,
-        ticketCost: ethers.utils.formatEther(data.ticketCost.toString()),
-        timestamp: data.timestamp,
-        qrCode: data.qrCode,
-        verified: data.verified,
-        reselled: data.reselled,
-        refunded: data.refunded,
-        minted: data.minted,
-      };
-
-      console.info("contract call success", data);
-    } catch (err) {
-      console.error("contract call failure", err);
-    }
-
-    return parsedTicket != null ? parsedTicket : { id: -1 };
   };
 
   // 13. resell ticket

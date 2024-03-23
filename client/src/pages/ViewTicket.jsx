@@ -20,9 +20,16 @@ const ViewTicket = () => {
 
     if (!isNaN(+id)) {
       const data = await getSingleTicket(ticketEvent, id);
-      console.log(data);
-      setTicket(data);
-      fetchEvent(data.eventId);
+
+      if (
+        ticketAddress.trim().toLowerCase() === data.owner.trim().toLowerCase()
+      ) {
+        setTicket(data);
+        fetchEvent(data.eventId);
+      } else {
+        setTicket({ id: -1 });
+        setIsLoading(false);
+      }
     } else {
       setTicket({ id: -1 });
       setIsLoading(false);
