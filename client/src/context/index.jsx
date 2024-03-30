@@ -531,7 +531,63 @@ export const StateContextProvider = ({ children }) => {
     return parsedTicketHistory != null ? parsedTicketHistory : [];
   };
 
-  // 18. payout
+  // 18. request refund
+  const { mutateAsync: requestRefundTicket, isRequestRefundLoading } =
+    useContractWrite(contract, "requestRefundTicket");
+
+  const callRequestRefund = async (eventId, ticketId) => {
+    let isSuccess = false;
+
+    try {
+      const data = await requestRefundTicket({ args: [eventId, ticketId] });
+      isSuccess = true;
+      triggerSuccessToast("contract call success");
+      console.info("contract call success", data);
+    } catch (err) {
+      console.error("contract call failure", err);
+    }
+    return isSuccess;
+  };
+
+  // 19. cancel refund
+  const { mutateAsync: cancelRefundTicket, isCancelRefundLoading } =
+    useContractWrite(contract, "cancelRefundTicket");
+
+  const callCancelRefund = async (eventId, ticketId) => {
+    let isSuccess = false;
+
+    try {
+      const data = await cancelRefundTicket({ args: [eventId, ticketId] });
+      isSuccess = true;
+      triggerSuccessToast("contract call success");
+      console.info("contract call success", data);
+    } catch (err) {
+      console.error("contract call failure", err);
+    }
+    return isSuccess;
+  };
+
+  // 20. refund ticket
+  const { mutateAsync: refundTicket, isRefundLoading } = useContractWrite(
+    contract,
+    "refundTicket"
+  );
+
+  const callRefund = async (eventId, ticketId) => {
+    let isSuccess = false;
+
+    try {
+      const data = await refundTicket({ args: [eventId, ticketId] });
+      isSuccess = true;
+      triggerSuccessToast("contract call success");
+      console.info("contract call success", data);
+    } catch (err) {
+      console.error("contract call failure", err);
+    }
+    return isSuccess;
+  };
+
+  // 21. payout
   const { mutateAsync: payout, isPayoutLoading } = useContractWrite(
     contract,
     "payout"
@@ -577,8 +633,11 @@ export const StateContextProvider = ({ children }) => {
         getResellTicketsByEventId,
         getBackResellTicket: callGetBackResellTicket,
         buyReselledTicket: callBuyResellTickets,
-        payout: callPayout,
+        requestRefundTicket: callRequestRefund,
+        cancelRefundTicket: callCancelRefund,
+        refundTicket: callRefund,
         getEventTicketHistory,
+        payout: callPayout,
       }}
     >
       {children}

@@ -15,6 +15,7 @@ const EventForm = ({ event }) => {
   const notifyNotImage = () => toast.error("Provide valid image URL");
   const notifyEndDateMustBeHigher = () =>
     toast.error("End date must be greater than start date");
+  const notifyValidStartDate = () => toast.error("Provide valid start date");
   const notifyUnAuthorized = () => toast.error("Unauthorized entity");
   const notifyConnectWallet = () => toast.error("Please connect your wallet");
 
@@ -50,6 +51,8 @@ const EventForm = ({ event }) => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isValidImage, setIsValidImage] = useState(false);
 
   const [formDetails, setFormDetails] = useState({
     title: "",
@@ -71,6 +74,12 @@ const EventForm = ({ event }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    if (name == "imageUrl") {
+      checkIfImage(value, async (result) => {
+        setIsValidImage(result);
+      });
+    }
+
     setFormDetails({
       ...formDetails,
       [name]: value,
@@ -78,13 +87,27 @@ const EventForm = ({ event }) => {
   };
 
   const onSubmit = async (e) => {
+    console.log("clicked");
     e.preventDefault();
+
+    if (isSubmitting) {
+      // Prevent multiple submissions while the current one is in progress
+      return;
+    }
 
     try {
       await schema.validate(formDetails, { abortEarly: false });
-      // console.log("Form Submitted", formDetails);
-      checkIfImage(formDetails.imageUrl, async (exists) => {
-        if (exists) {
+      checkIfImage(formDetails.imageUrl, async (value) => {
+        setIsValidImage(value);
+      });
+
+      if (isValidImage) {
+        console.log("Form Submitted", formDetails);
+        if (
+          new Date(
+            updateTime(formDetails.startsAt, formDetails.startsAtTime)
+          ).getTime() > new Date().getTime()
+        ) {
           if (
             new Date(
               updateTime(formDetails.endsAt, formDetails.endsAtTime)
@@ -97,6 +120,7 @@ const EventForm = ({ event }) => {
               if (address != null) {
                 if (address == event.owner) {
                   setIsLoading(true);
+                  setIsSubmitting(true);
 
                   const response = await updateEvent({
                     eventId: event.id,
@@ -138,6 +162,7 @@ const EventForm = ({ event }) => {
             } else {
               if (address != null) {
                 setIsLoading(true);
+                setIsSubmitting(true);
 
                 const response = await createEvent({
                   title: formDetails.title,
@@ -159,6 +184,8 @@ const EventForm = ({ event }) => {
                 });
 
                 setIsLoading(false);
+                console.log("Adasd");
+
                 if (response) navigate("/");
               } else {
                 connect();
@@ -169,9 +196,11 @@ const EventForm = ({ event }) => {
             notifyEndDateMustBeHigher();
           }
         } else {
-          notifyNotImage();
+          notifyValidStartDate();
         }
-      });
+      } else {
+        notifyNotImage();
+      }
     } catch (error) {
       const newErrors = {};
 
@@ -180,6 +209,11 @@ const EventForm = ({ event }) => {
       });
 
       setErrors(newErrors);
+    } finally {
+      // Reset submitting state after 2 seconds
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, 2000); // 2000 milliseconds = 2 seconds
     }
   };
 
@@ -187,6 +221,10 @@ const EventForm = ({ event }) => {
   const setEventDetails = () => {
     const startedDateObject = new Date(event.startsAt);
     const endedDateObject = new Date(event.endsAt);
+
+    checkIfImage(event.imageUrl, async (result) => {
+      setIsValidImage(result);
+    });
 
     setFormDetails({
       title: event.title,
@@ -389,6 +427,7 @@ const EventForm = ({ event }) => {
           <input
             className="bg-[#4338ca] cursor-pointer px-10 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in"
             type="submit"
+            disabled={isSubmitting}
           />
         </div>
       </form>

@@ -328,9 +328,63 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
         }
     }
 
+    function requestRefundTicket(uint256 eventId, uint256 ticketId) public {
+        require(
+            currentTime() < events[eventId].startsAt,
+            "Event has already occurred"
+        );
+        for (uint256 i = 0; i < tickets[eventId].length; i++) {
+            if (
+                !tickets[eventId][i].refunded &&
+                tickets[eventId][i].id == ticketId
+            ) {
+                tickets[eventId][i].isWaitingForRefund = true;
+                break;
+            }
+        }
+    }
+
+    function cancelRefundTicket(uint256 eventId, uint256 ticketId) public {
+        for (uint256 i = 0; i < tickets[eventId].length; i++) {
+            if (
+                !tickets[eventId][i].refunded &&
+                tickets[eventId][i].id == ticketId
+            ) {
+                tickets[eventId][i].isWaitingForRefund = false;
+                break;
+            }
+        }
+    }
+
+    function refundTicket(uint256 eventId, uint256 ticketId) public {
+        require(eventExists[eventId], "Event not found");
+        require(
+            events[eventId].owner == msg.sender || msg.sender == owner(),
+            "Unauthorized entity"
+        );
+        require(!events[eventId].deleted, "Event already deleted");
+
+        for (uint256 i = 0; i < tickets[eventId].length; i++) {
+            if (tickets[eventId][i].id == ticketId) {
+                tickets[eventId][i].refunded = true;
+                tickets[eventId][i].isWaitingForRefund = false;
+                payTo(
+                    tickets[eventId][i].owner,
+                    tickets[eventId][i].ticketCost
+                );
+                events[eventId].balance = events[eventId].balance -= tickets[
+                    eventId
+                ][i].ticketCost;
+
+                break;
+            }
+        }
+    }
+
     function refundTickets(uint256 eventId) internal returns (bool) {
         for (uint i = 0; i < tickets[eventId].length; i++) {
             tickets[eventId][i].refunded = true;
+            tickets[eventId][i].isWaitingForRefund = false;
             payTo(tickets[eventId][i].owner, tickets[eventId][i].ticketCost);
             events[eventId].balance = events[eventId].balance -= tickets[
                 eventId
@@ -414,6 +468,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
             eventId,
             newOwner
         );
+
         require(
             userBoughtTickets <= TOTAL_TICKETS_CAN_PURCHASE,
             "Ticket purchase limit reached"
@@ -422,6 +477,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
             userBoughtTickets + 1 <= TOTAL_TICKETS_CAN_PURCHASE,
             "You cannot purchase this amount of tickets"
         );
+
         for (uint256 i = 0; i < tickets[eventId].length; i++) {
             if (
                 tickets[eventId][i].id == ticketId &&
@@ -443,7 +499,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
                         "/",
                         Strings.toString(eventId),
                         "/",
-                        Strings.toString(i)
+                        Strings.toString(tickets[eventId][i].id)
                     )
                 );
                 tickets[eventId][i].reselled = false;

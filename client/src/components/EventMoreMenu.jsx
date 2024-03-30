@@ -84,6 +84,15 @@ const EventMoreMenu = ({ event }) => {
           >
             <li>Withdraw</li>
           </div>
+
+          <Link
+            key={event.id + "refund"}
+            to={"/event/" + event.id + "/ticket-refund"}
+            className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
+          >
+            <li>Refund</li>
+          </Link>
+
           <div
             onClick={callEventDelete}
             className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"

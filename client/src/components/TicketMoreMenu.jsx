@@ -6,7 +6,13 @@ import Loader from "./Loader";
 import { Link, useNavigate } from "react-router-dom";
 
 const TicketMoreMenu = ({ event, ticket }) => {
-  const { resellTicket, getBackResellTicket, address } = useStateContext();
+  const {
+    resellTicket,
+    getBackResellTicket,
+    address,
+    requestRefundTicket,
+    cancelRefundTicket,
+  } = useStateContext();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -14,6 +20,7 @@ const TicketMoreMenu = ({ event, ticket }) => {
   const notifyUnAuthorized = () => toast.error("Unauthorized entity");
   const notifyAlreadyResell = () => toast.error("Ticket already resell!");
   const notifyNotResell = () => toast.error("Ticket not resell!");
+  const notifyAlreadyRefunded = () => toast.error("Ticket already refunded!");
   const notifyAlreadyVerified = () => toast.error("Ticket already verified!");
 
   const callResellTicket = async () => {
@@ -58,6 +65,36 @@ const TicketMoreMenu = ({ event, ticket }) => {
     }
   };
 
+  const callRequestRefundTicket = async () => {
+    if (address == ticket.owner) {
+      if (!ticket.refunded) {
+        setIsLoading(true);
+        const response = await requestRefundTicket(event.id, ticket.id);
+        window.location.reload(false);
+        setIsLoading(false);
+      } else {
+        notifyAlreadyRefunded();
+      }
+    } else {
+      notifyUnAuthorized();
+    }
+  };
+
+  const callCancelRefundTicket = async () => {
+    if (address == ticket.owner) {
+      if (!ticket.refunded) {
+        setIsLoading(true);
+        const response = await cancelRefundTicket(event.id, ticket.id);
+        window.location.reload(false);
+        setIsLoading(false);
+      } else {
+        notifyAlreadyRefunded();
+      }
+    } else {
+      notifyUnAuthorized();
+    }
+  };
+
   return (
     <>
       {isLoading && <Loader />}
@@ -78,6 +115,23 @@ const TicketMoreMenu = ({ event, ticket }) => {
               <li>Resell</li>
             </div>
           )}
+
+          {ticket.isWaitingForRefund ? (
+            <div
+              onClick={callCancelRefundTicket}
+              className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
+            >
+              <li>Cancel</li>
+            </div>
+          ) : (
+            <div
+              onClick={callRequestRefundTicket}
+              className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
+            >
+              <li>Req Refund</li>
+            </div>
+          )}
+
           <Link key={ticket.id} to={ticket.qrCode}>
             <div className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100">
               <li>View</li>
