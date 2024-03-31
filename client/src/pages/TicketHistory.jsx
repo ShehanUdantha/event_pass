@@ -14,12 +14,14 @@ const TicketHistory = () => {
     getSingleEvent,
     getAllTicketsByEvent,
     getEventTicketHistory,
+    getContractOwner,
   } = useStateContext();
   const [isLoading, setIsLoading] = useState(true);
   const [event, setEvent] = useState({});
   const [ticketHistory, setTicketHistory] = useState([]);
+  const [contractOwner, setContractOwner] = useState("");
 
-  const fetchEvent = async () => {
+  const fetchEvent = async (contractData) => {
     setIsLoading(true);
 
     if (!isNaN(+id)) {
@@ -27,7 +29,7 @@ const TicketHistory = () => {
       const data = await getSingleEvent(id);
       setEvent(data);
       setIsLoading(false);
-      if (data.owner == address) fetchTickets();
+      if (data.owner == address || contractData == address) fetchTickets();
     } else {
       setEvent({ id: 0 });
       setIsLoading(false);
@@ -69,13 +71,24 @@ const TicketHistory = () => {
   };
   console.log(ticketHistory.length);
 
+  const callToGetContractOwner = async () => {
+    setIsLoading(true);
+    const data = await getContractOwner();
+    setContractOwner(data);
+    fetchEvent(data);
+  };
+
   useEffect(() => {
     setTicketHistory([]);
-    if (contract && id) fetchEvent();
+    if (contract && id) {
+      callToGetContractOwner();
+    }
   }, [contract, address, id]);
 
   return (
     <>
+      {/* header section */}
+      <HeaderSection />
       {isLoading ? (
         <div className="flex justify-center items-center text-[14px] h-screen">
           <img
@@ -86,24 +99,23 @@ const TicketHistory = () => {
         </div>
       ) : (
         <>
-          {event.id == 0 ? (
-            <div className="flex justify-center items-center text-[14px] h-screen">
+          {event.id === 0 ||
+          (address != contractOwner ? event.owner != address : false) ? (
+            <div className="flex justify-center items-center text-[14px] h-[50svh]">
               <div className="text-3xl font-bold">Page Not Found</div>
             </div>
           ) : (
             <>
-              {/* header section */}
-              <HeaderSection />
               {/* ticket details section */}
               {isLoading ? null : (
                 <TicketHistoryListView ticketHistory={ticketHistory} />
               )}
-              {/* footer */}
-              {/* <Footer /> */}
             </>
           )}
         </>
       )}
+      {/* footer */}
+      {/* <Footer /> */}
     </>
   );
 };

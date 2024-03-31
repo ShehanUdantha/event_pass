@@ -12,13 +12,15 @@ import SecondaryMarketSection from "../sections/ViewEvent/SecondaryMarketSection
 const ViewEvent = () => {
   const { id } = useParams();
 
-  const { contract, address, getSingleEvent } = useStateContext();
+  const { contract, address, getSingleEvent, getContractOwner } =
+    useStateContext();
 
   const [event, setEvent] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [remainingTimes, setRemainingTimes] = useState(0);
   const [displayMoreMenu, setDisplayMoreMenu] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [contractOwner, setContractOwner] = useState("");
 
   const fetchEvent = async () => {
     setIsLoading(true);
@@ -34,8 +36,18 @@ const ViewEvent = () => {
     setIsLoading(false);
   };
 
+  const callToGetContractOwner = async () => {
+    setIsLoading(true);
+    const data = await getContractOwner();
+    setContractOwner(data);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    if (contract && id) fetchEvent();
+    if (contract && id) {
+      callToGetContractOwner();
+      fetchEvent();
+    }
   }, [contract, address]);
 
   console.log(event);
@@ -76,14 +88,17 @@ const ViewEvent = () => {
                         {event.title}
                       </h3>
                       {/* event more option button */}
-                      {event.owner == address ? (
+                      {event.owner == address || contractOwner == address ? (
                         <div>
                           <MdMoreVert
                             onClick={() => setDisplayMoreMenu(!displayMoreMenu)}
                             className="cursor-pointer text-lg"
                           />
                           {displayMoreMenu ? (
-                            <EventMoreMenu event={event} />
+                            <EventMoreMenu
+                              event={event}
+                              contractOwner={contractOwner}
+                            />
                           ) : null}
                         </div>
                       ) : null}

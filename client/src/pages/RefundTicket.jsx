@@ -9,11 +9,17 @@ import Spinner from "../assets/images/spinning-dots.svg";
 const RefundTicket = () => {
   const { id } = useParams();
 
-  const { contract, address, getSingleEvent, getAllTicketsByEvent } =
-    useStateContext();
+  const {
+    contract,
+    address,
+    getSingleEvent,
+    getAllTicketsByEvent,
+    getContractOwner,
+  } = useStateContext();
   const [event, setEvent] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [tickets, setTickets] = useState([]);
+  const [contractOwner, setContractOwner] = useState("");
 
   const fetchEvent = async () => {
     setIsLoading(true);
@@ -25,8 +31,8 @@ const RefundTicket = () => {
       fetchTicketsByEventId();
     } else {
       setEvent({ id: 0 });
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const fetchTicketsByEventId = async () => {
@@ -42,8 +48,17 @@ const RefundTicket = () => {
     setIsLoading(false);
   };
 
+  const callToGetContractOwner = async () => {
+    setIsLoading(true);
+    const data = await getContractOwner();
+    setContractOwner(data);
+    fetchEvent();
+  };
+
   useEffect(() => {
-    if (contract && id) fetchEvent();
+    if (contract && id) {
+      callToGetContractOwner();
+    }
   }, [contract, address]);
 
   return (
@@ -61,7 +76,8 @@ const RefundTicket = () => {
         </div>
       ) : (
         <>
-          {event.id === 0 || event.owner != address ? (
+          {event.id === 0 ||
+          (address != contractOwner ? event.owner != address : false) ? (
             <div className="flex justify-center items-center text-[14px] h-[50svh]">
               <div className="text-3xl font-bold">Page Not Found</div>
             </div>

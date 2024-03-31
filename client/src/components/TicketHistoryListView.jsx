@@ -26,7 +26,7 @@ const TicketHistoryListView = ({ ticketHistory }) => {
         </div>
       ) : (
         <div className="flex justify-center items-center text-[14px] h-[20rem]">
-          No Any Events Found!
+          No Any Event History Found!
         </div>
       )}
     </section>

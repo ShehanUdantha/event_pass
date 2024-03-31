@@ -11,7 +11,7 @@ import {
   separateCurrentDateTime,
 } from "../utils/index";
 
-const EventMoreMenu = ({ event }) => {
+const EventMoreMenu = ({ event, contractOwner }) => {
   const { address, deleteEvent, payout } = useStateContext();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +21,7 @@ const EventMoreMenu = ({ event }) => {
   const notifyEventAlreadyPaid = () => toast.error("Event already paid out");
 
   const callEventDelete = async () => {
-    if (address == event.owner) {
+    if (address == event.owner || address == contractOwner) {
       setIsLoading(true);
       const remainingTime = calculateRemainingTime(event.endsAt);
       const response = await deleteEvent(
@@ -70,20 +70,24 @@ const EventMoreMenu = ({ event }) => {
             <li>ETH {convertWeiToEth(event.balance)}</li>
           </div>
 
-          <Link
-            key={event.id + "edit"}
-            to={"/event/" + event.id + "/edit"}
-            className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
-          >
-            <li>Edit</li>
-          </Link>
+          {address == event.owner ? (
+            <Link
+              key={event.id + "edit"}
+              to={"/event/" + event.id + "/edit"}
+              className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
+            >
+              <li>Edit</li>
+            </Link>
+          ) : null}
 
-          <div
-            onClick={callPayout}
-            className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
-          >
-            <li>Withdraw</li>
-          </div>
+          {address == event.owner ? (
+            <div
+              onClick={callPayout}
+              className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
+            >
+              <li>Withdraw</li>
+            </div>
+          ) : null}
 
           <Link
             key={event.id + "refund"}
@@ -106,13 +110,15 @@ const EventMoreMenu = ({ event }) => {
           >
             <li>History</li>
           </Link>
-          <Link
-            key={event.id + "scanner"}
-            to={"/event/" + event.id + "/scanner"}
-            className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
-          >
-            <li>Scanner</li>
-          </Link>
+          {address == event.owner ? (
+            <Link
+              key={event.id + "scanner"}
+              to={"/event/" + event.id + "/scanner"}
+              className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
+            >
+              <li>Scanner</li>
+            </Link>
+          ) : null}
         </ul>
         <Toaster position="bottom-right" />
       </div>

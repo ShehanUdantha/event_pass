@@ -4,10 +4,7 @@ import {
   useContract,
   useMetamask,
   useContractWrite,
-  useContractRead,
-  useContractEvents,
   useDisconnect,
-  useConnectionStatus,
   useSigner,
 } from "@thirdweb-dev/react";
 import { ethers } from "ethers";
@@ -28,7 +25,6 @@ export const StateContextProvider = ({ children }) => {
   const address = useAddress();
   const connect = useMetamask();
   const disconnect = useDisconnect();
-  const connectionStatus = useConnectionStatus();
   const signer = useSigner();
 
   // contract functions
@@ -609,6 +605,21 @@ export const StateContextProvider = ({ children }) => {
     return isSuccess;
   };
 
+  // 22. get contract owner
+  const getContractOwner = async () => {
+    let contractOwner = null;
+    try {
+      const data = await contract.call("owner", []);
+      contractOwner = data;
+
+      console.info("contract call success", data);
+    } catch (err) {
+      console.error("contract call failure", err);
+    }
+
+    return contractOwner != null ? contractOwner : "";
+  };
+
   return (
     <StateContext.Provider
       value={{
@@ -638,6 +649,7 @@ export const StateContextProvider = ({ children }) => {
         refundTicket: callRefund,
         getEventTicketHistory,
         payout: callPayout,
+        getContractOwner,
       }}
     >
       {children}
