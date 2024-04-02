@@ -13,26 +13,26 @@ const EventCard = ({ event }) => {
         <img
           src={event.imageUrl}
           alt=""
-          className="w-full rounded-t-[1rem] md:h-[15rem]"
+          className="w-full rounded-t-[1rem] md:h-[11rem]"
         />
       </div>
 
-      <div className="p-5">
+      <div className="px-5 pb-3 mt-2">
         <div className="overflow-hidden">
-          <div className="flex items-center justify-between">
-            <div className="font-bold text-md md:text-lg text-ellipsis overflow-hidden md:w-3/5">
-              {event.title}
+          <div className="font-bold text-md md:text-[18px] md:leading-5 text-ellipsis overflow-hidden">
+            {event.title}
+          </div>
+
+          <div className="flex items-center justify-start mt-2">
+            <div className="p-1 bg-green-100 text-green-500 font-bold text-[10px] rounded-md mr-2">
+              ETH {event.ticketCost}
             </div>
-            <div className="flex items-center justify-end">
-              <div className="p-1 bg-green-100 text-green-500 font-bold text-[12px] rounded-md mr-2">
-                ETH {event.ticketCost}
-              </div>
-              <div className="p-1 bg-gray-100 text-gray-500 font-bold text-[12px] rounded-md">
-                {event.category}
-              </div>
+            <div className="p-1 bg-gray-100 text-gray-500 font-bold text-[10px] rounded-md">
+              {event.category}
             </div>
           </div>
-          <div className="text-[13px] text-gray-500 font-medium mt-1">
+
+          <div className="text-[13px] text-gray-500 font-medium mt-2">
             {formatDateAndTime(event.startsAt)}
           </div>
 
