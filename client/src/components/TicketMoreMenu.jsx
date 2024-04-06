@@ -98,7 +98,7 @@ const TicketMoreMenu = ({ event, ticket }) => {
   return (
     <>
       {isLoading && <Loader />}
-      <div className="flex flex-col absolute w-[100px] bg-white border-spacing-1 mt-5 border border-gray">
+      <div className="flex flex-col absolute w-[100px] bg-white border-spacing-1 mt-2 border border-gray right-[1.5rem]">
         <ul className="flex flex-col text-[12px]">
           {ticket.reselled ? (
             <div

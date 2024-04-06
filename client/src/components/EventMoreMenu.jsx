@@ -71,16 +71,6 @@ const EventMoreMenu = ({ event, contractOwner }) => {
           </div>
 
           {address == event.owner ? (
-            <Link
-              key={event.id + "edit"}
-              to={"/event/" + event.id + "/edit"}
-              className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
-            >
-              <li>Edit</li>
-            </Link>
-          ) : null}
-
-          {address == event.owner ? (
             <div
               onClick={callPayout}
               className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"

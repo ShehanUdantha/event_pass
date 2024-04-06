@@ -119,7 +119,7 @@ const TicketCard = ({ ticket, isSecondary }) => {
   return (
     <>
       {isBuyLoading && <Loader />}
-      <div className="shadow-md rounded-[1rem] cursor-pointer w-full">
+      <div className="cursor-pointer w-full">
         {isLoading ? (
           <div className="flex justify-center items-center text-[14px] h-[20rem]">
             <img
@@ -130,63 +130,87 @@ const TicketCard = ({ ticket, isSecondary }) => {
           </div>
         ) : (
           <div>
-            {isSecondary ? null : (
-              <div className="flex justify-end pl-5 pt-3">
-                <MdMoreVert
-                  onClick={() => setDisplayMoreMenu(!displayMoreMenu)}
-                  className="cursor-pointer text-lg"
-                />
-                {displayMoreMenu ? (
-                  <TicketMoreMenu event={event} ticket={ticket} />
-                ) : null}
-              </div>
-            )}
-            {isSecondary ? (
-              <div>
-                <img
-                  src={event.imageUrl}
-                  alt=""
-                  className="w-full rounded-t-[1rem] md:h-[8.5rem]"
-                />
-              </div>
-            ) : (
-              <div className="flex justify-center">
-                <QRCode className="w-[150px] h-[100px]" value={ticket.qrCode} />
-              </div>
-            )}
-            <div className="p-5 pt-2">
-              <div className="overflow-hidden">
-                <div className="font-bold text-md md:text-lg text-ellipsis overflow-hidden">
-                  {event.title}
-                </div>
-                <div className="flex items-center mt-2">
-                  <div className="p-1 bg-green-100 text-green-500 font-bold text-[12px] rounded-md mr-2">
-                    ETH {event.ticketCost}
-                  </div>
-                  <div className="p-1 bg-gray-100 text-gray-500 font-bold text-[12px] rounded-md">
-                    {event.category}
-                  </div>
-                </div>
-                {isSecondary ? (
-                  <div className="w-full text-[12px] text-gray-500 font-medium mt-2 text-ellipsis overflow-hidden">
-                    by {ticket.owner}
-                  </div>
-                ) : null}
-                <div className="text-[13px] text-gray-600 font-medium mt-1">
-                  {formatDateAndTime(event.startsAt)}
-                </div>
-
-                {isSecondary ? (
-                  remainingTimes != "Expired" ? (
-                    <div className="flex justify-center">
-                      <button
-                        onClick={() => buyResellTicket()}
-                        className="bg-[#4338ca] text-white text-[14px] px-5 py-1 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in mt-5"
-                      >
-                        Get Ticket
-                      </button>
+            <div className="max-w-md w-full h-full mx-auto z-10 rounded-3xl">
+              <div className="bg-white relative drop-shadow-xl rounded-3xl p-4 m-4 overflow-clip">
+                {/* top */}
+                <div className="w-full">
+                  <div className="w-full flex justify-between">
+                    <div className="font-medium text-md md:text-lg text-ellipsis overflow-hidden">
+                      {event.title}
                     </div>
-                  ) : null
+                    {isSecondary ? null : (
+                      <div>
+                        <MdMoreVert
+                          onClick={() => setDisplayMoreMenu(!displayMoreMenu)}
+                          className="cursor-pointer text-lg"
+                        />
+                        {displayMoreMenu ? (
+                          <TicketMoreMenu event={event} ticket={ticket} />
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center mt-2">
+                    <div className="p-[0.2rem] bg-green-100 text-green-500 font-bold text-[10px] rounded-md mr-2">
+                      ETH {event.ticketCost}
+                    </div>
+                    <div className="p-[0.2rem] bg-gray-100 text-gray-500 font-bold text-[10px] rounded-md">
+                      {event.category}
+                    </div>
+                  </div>
+                  {!isSecondary ? (
+                    <div className="flex justify-center mt-5">
+                      <QRCode
+                        className="w-[150px] h-[100px]"
+                        value={ticket.qrCode}
+                      />
+                    </div>
+                  ) : null}
+                </div>
+                {/* center border */}
+                <div className="border-dashed border-b-2 my-5 pt-2">
+                  <div className="absolute w-3 h-5 bg-[#4338ca] -mt-2 -left-[0] rounded-tr-full rounded-br-full"></div>
+                  <div className="absolute w-3 h-5 bg-[#4338ca] -mt-2 -right-[0] rounded-tl-full rounded-bl-full"></div>
+                </div>
+                {/* bottom */}
+                <div className="w-full">
+                  {isSecondary ? (
+                    <div className="w-full flex">
+                      <div className="text-[13px] font-medium mr-1">By:</div>
+                      <div className="w-full text-[12px] text-gray-500 font-medium text-ellipsis overflow-hidden">
+                        {ticket.owner}
+                      </div>
+                    </div>
+                  ) : null}
+                  <div className="w-full flex mt-1">
+                    <div className="text-[13px] font-medium mr-1">Venue:</div>
+                    <div className="text-[12px] text-gray-600 font-medium text-ellipsis overflow-hidden">
+                      {event.location}
+                    </div>
+                  </div>
+                  <div className="w-full flex mt-1">
+                    <div className="text-[13px] font-medium mr-1">
+                      Started at:
+                    </div>
+                    <div className="text-[12px] text-gray-600 font-medium text-ellipsis overflow-hidden">
+                      {formatDateAndTime(event.startsAt)}
+                    </div>
+                  </div>
+                </div>
+                {/* buy ticket */}
+                {isSecondary ? (
+                  <div className="flex flex-col py-5 justify-center text-sm">
+                    {remainingTimes != "Expired" ? (
+                      <div className="flex justify-center">
+                        <button
+                          onClick={() => buyResellTicket()}
+                          className="bg-[#4338ca] text-white text-[14px] px-5 py-1 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in mt-5"
+                        >
+                          Get Ticket
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
                 ) : null}
               </div>
             </div>

@@ -9,7 +9,7 @@ import { IoSearchOutline } from "react-icons/io5";
 
 const Home = () => {
   const { contract, address, getAllEvents } = useStateContext();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState([]);
 
   const [searchInput, setSearchInput] = useState("");
