@@ -16,7 +16,7 @@ const EventGridView = ({ events, isLoading }) => {
           />
         </div>
       ) : fetchedEvents != null && fetchedEvents.length > 0 ? (
-        <div className="mx-auto max-w-7xl px-4 grid md:grid-cols-3 grid-cols-1 gap-8">
+        <div className="mx-auto max-w-7xl px-4 grid md:grid-cols-4 grid-cols-1 gap-8">
           {fetchedEvents.map((event) => (
             <EventCard event={event} key={event.id} />
           ))}

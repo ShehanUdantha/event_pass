@@ -4,12 +4,18 @@ import { useStateContext } from "../../context";
 import { getUrlParams } from "../../utils/index";
 import { RxReload } from "react-icons/rx";
 import Spinner from "../../assets/images/spinning-dots.svg";
+import { useParams } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 const ScanSection = () => {
-  const { contract, verifyTicket } = useStateContext();
+  const { contract, verifyTicket, checkVerificationStatus } = useStateContext();
+  const { id } = useParams();
   const [ticketInfo, setTicketInfo] = useState("");
   const [ticketId, setTicketId] = useState();
   const [isLoading, setIsLoading] = useState(false);
+
+  const notifyWrongTicket = () =>
+    toast.error("Ticket does not match with this event");
 
   const initScanner = () => {
     const scanner = new Html5QrcodeScanner("reader", {
@@ -36,13 +42,39 @@ const ScanSection = () => {
     const response = getUrlParams(value);
     setTicketId(response.ticketId);
 
-    const data = await verifyTicket(
-      response.address,
-      response.eventId,
-      response.ticketId
-    );
-    console.log(data);
-    setTicketInfo(data);
+    if (response.eventId == id) {
+      console.log(response.address);
+      console.log(response.eventId);
+      console.log(response.ticketId);
+      await verifyTicket(response.address, response.ticketId, response.eventId);
+      setIsLoading(false);
+      checkTicketVerification(value);
+    } else {
+      notifyWrongTicket();
+    }
+    setIsLoading(false);
+  };
+
+  const checkTicketVerification = async (value) => {
+    setIsLoading(true);
+    const response = getUrlParams(value);
+    setTicketId(response.ticketId);
+
+    if (response.eventId == id) {
+      console.log(response.address);
+      console.log(response.eventId);
+      console.log(response.ticketId);
+      const data = await checkVerificationStatus(
+        response.address,
+        response.ticketId,
+        response.eventId
+      );
+      console.log(data);
+      setTicketInfo(data);
+      setIsLoading(false);
+    } else {
+      notifyWrongTicket();
+    }
     setIsLoading(false);
   };
 
@@ -85,6 +117,7 @@ const ScanSection = () => {
           </div>
         </div>
       </div>
+      <Toaster position="bottom-right" />
     </section>
   );
 };

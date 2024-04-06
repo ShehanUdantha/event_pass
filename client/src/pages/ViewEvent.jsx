@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { calculateRemainingTime, formatDateAndTime } from "../utils/index";
 import { useStateContext } from "../context";
 import { MdMoreVert } from "react-icons/md";
@@ -8,37 +8,63 @@ import Spinner from "../assets/images/spinning-dots.svg";
 import Footer from "../components/Footer";
 import TicketBuyModal from "../components/TicketBuyModal";
 import SecondaryMarketSection from "../sections/ViewEvent/SecondaryMarketSection";
+import { FaRegEdit } from "react-icons/fa";
 
 const ViewEvent = () => {
   const { id } = useParams();
-
-  const { contract, address, getSingleEvent } = useStateContext();
+  const { contract, address, getSingleEvent, getContractOwner } =
+    useStateContext();
 
   const [event, setEvent] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [remainingTimes, setRemainingTimes] = useState(0);
   const [displayMoreMenu, setDisplayMoreMenu] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-
-  const fetchEvent = async () => {
-    setIsLoading(true);
-
-    if (!isNaN(+id)) {
-      const data = await getSingleEvent(id);
-      console.log(data);
-      setEvent(data);
-      setRemainingTimes(calculateRemainingTime(data.startsAt));
-    } else {
-      setEvent({ id: 0 });
-    }
-    setIsLoading(false);
-  };
+  const [contractOwner, setContractOwner] = useState("");
 
   useEffect(() => {
-    if (contract && id) fetchEvent();
-  }, [contract, address]);
+    const fetchEventData = async () => {
+      setIsLoading(true);
+      try {
+        if (!isNaN(+id)) {
+          const data = await getSingleEvent(id);
+          setEvent(data);
 
-  console.log(event);
+          // Start the timer here
+          if (data.startsAt) {
+            const interval = setInterval(() => {
+              setRemainingTimes(calculateRemainingTime(data.startsAt));
+            }, 1000);
+
+            return () => clearInterval(interval);
+          }
+        } else {
+          setEvent({ id: 0 });
+        }
+      } catch (error) {
+        console.error("Error fetching event data: ", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const fetchContractOwner = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getContractOwner();
+        setContractOwner(data);
+      } catch (error) {
+        console.error("Error fetching contract owner: ", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (contract && id) {
+      fetchContractOwner();
+      fetchEventData();
+    }
+  }, [contract, address, getSingleEvent, getContractOwner, id]);
 
   return (
     <>
@@ -76,15 +102,35 @@ const ViewEvent = () => {
                         {event.title}
                       </h3>
                       {/* event more option button */}
-                      {event.owner == address ? (
-                        <div>
-                          <MdMoreVert
-                            onClick={() => setDisplayMoreMenu(!displayMoreMenu)}
-                            className="cursor-pointer text-lg"
-                          />
-                          {displayMoreMenu ? (
-                            <EventMoreMenu event={event} />
+                      {event.owner == address || contractOwner == address ? (
+                        <div className="flex">
+                          {address == event.owner ? (
+                            <div className="mr-2">
+                              <Link
+                                key={event.id + "edit"}
+                                to={"/event/" + event.id + "/edit"}
+                              >
+                                <FaRegEdit
+                                  onClick={() => setDisplayMoreMenu(false)}
+                                  className="cursor-pointer text-lg"
+                                />
+                              </Link>
+                            </div>
                           ) : null}
+                          <div>
+                            <MdMoreVert
+                              onClick={() =>
+                                setDisplayMoreMenu(!displayMoreMenu)
+                              }
+                              className="cursor-pointer text-lg"
+                            />
+                            {displayMoreMenu ? (
+                              <EventMoreMenu
+                                event={event}
+                                contractOwner={contractOwner}
+                              />
+                            ) : null}
+                          </div>
                         </div>
                       ) : null}
                     </div>
