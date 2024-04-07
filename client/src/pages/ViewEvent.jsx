@@ -5,7 +5,6 @@ import { useStateContext } from "../context";
 import { MdMoreVert } from "react-icons/md";
 import EventMoreMenu from "../components/EventMoreMenu";
 import Spinner from "../assets/images/spinning-dots.svg";
-import Footer from "../components/Footer";
 import TicketBuyModal from "../components/TicketBuyModal";
 import SecondaryMarketSection from "../sections/ViewEvent/SecondaryMarketSection";
 import { FaRegEdit } from "react-icons/fa";
@@ -23,6 +22,8 @@ const ViewEvent = () => {
   const [contractOwner, setContractOwner] = useState("");
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     const fetchEventData = async () => {
       setIsLoading(true);
       try {
@@ -202,8 +203,6 @@ const ViewEvent = () => {
               </div>
               {/* secondary market section */}
               <SecondaryMarketSection eventId={id} />
-              {/* footer */}
-              <Footer />
 
               {/* ticket buy modal */}
               {isVisible ? (

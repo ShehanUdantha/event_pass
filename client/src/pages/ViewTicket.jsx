@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import HeaderSection from "../sections/ViewTicket/HeaderSection";
-import Footer from "../components/Footer";
 import { useParams } from "react-router-dom";
 import { useStateContext } from "../context";
 import Spinner from "../assets/images/spinning-dots.svg";
@@ -50,6 +49,7 @@ const ViewTicket = () => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (contract && id) fetchTicket();
   }, [contract, address]);
 
@@ -75,8 +75,6 @@ const ViewTicket = () => {
               <HeaderSection />
               {/* ticket details section */}
               <TicketDetailsSection event={event} ticket={ticket} />
-              {/* footer */}
-              <Footer />
             </>
           )}
         </>

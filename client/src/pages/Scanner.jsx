@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Footer from "../components/Footer";
 import HeaderSection from "../sections/Scanner/HeaderSection";
 import ScanSection from "../sections/Scanner/ScanSection";
 import { useStateContext } from "../context";
@@ -27,6 +26,7 @@ const Scanner = () => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (contract && id) fetchEvent();
   }, [contract, address]);
 
@@ -56,8 +56,6 @@ const Scanner = () => {
           )}
         </>
       )}
-      {/* footer */}
-      <Footer />
     </div>
   );
 };

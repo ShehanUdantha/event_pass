@@ -3,7 +3,6 @@ import HeaderSection from "../sections/CreateEvent/HeaderSection";
 import FormSection from "../sections/CreateEvent/FormSection";
 import { useParams } from "react-router-dom";
 import { useStateContext } from "../context";
-import Footer from "../components/Footer";
 import Spinner from "../assets/images/spinning-dots.svg";
 
 const EditEvent = () => {
@@ -27,6 +26,7 @@ const EditEvent = () => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (contract && id) fetchEvent();
   }, [contract, address]);
 
@@ -48,8 +48,6 @@ const EditEvent = () => {
       ) : (
         <FormSection event={event} />
       )}
-      {/* footer */}
-      <Footer />
     </div>
   );
 };

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import HeaderSection from "../sections/TicketHistory/HeaderSection";
-import Footer from "../components/Footer";
 import { useParams } from "react-router-dom";
 import { useStateContext } from "../context";
 import Spinner from "../assets/images/spinning-dots.svg";
@@ -79,6 +78,7 @@ const TicketHistory = () => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     setTicketHistory([]);
     if (contract && id) {
       callToGetContractOwner();
@@ -114,8 +114,6 @@ const TicketHistory = () => {
           )}
         </>
       )}
-      {/* footer */}
-      {/* <Footer /> */}
     </>
   );
 };

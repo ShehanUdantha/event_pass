@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Hero from "../sections/Home/Hero";
 import GridView from "../components/EventGridView";
 import PaginationSection from "../sections/Home/PaginationSection";
-import Footer from "../components/Footer";
 import { useStateContext } from "../context";
 import { eventCategoryList } from "../constants/index";
 import { IoSearchOutline } from "react-icons/io5";
@@ -55,6 +54,7 @@ const Home = () => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (contract) fetchEvents();
   }, [contract, address]);
 
@@ -107,8 +107,6 @@ const Home = () => {
       <GridView events={filteredEvents} isLoading={isLoading} />
       {/* pagination section */}
       <PaginationSection />
-      {/* footer */}
-      <Footer />
     </div>
   );
 };

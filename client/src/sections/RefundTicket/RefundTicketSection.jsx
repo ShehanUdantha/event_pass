@@ -18,7 +18,7 @@ const RefundTicketSection = ({ waitingTickets }) => {
   return (
     <>
       {isLoading && <Loader />}
-      <div className="flex justify-center items-start mt-10 text-[14px] h-[50svh]">
+      <div className="flex justify-center items-start mt-10 text-[14px] min-h-60">
         <div className="flex mx-auto justify-center md:justify-start max-w-7xl w-full overflow-auto">
           {waitingTickets.length > 0 ? (
             <table className="text-sm text-left rtl:text-right w-full mx-6 md:mx-12">

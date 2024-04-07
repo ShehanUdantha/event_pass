@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import HeaderSection from "../sections/RefundTicket/HeaderSection";
-import Footer from "../components/Footer";
 import RefundTicketSection from "../sections/RefundTicket/RefundTicketSection";
 import { useParams } from "react-router-dom";
 import { useStateContext } from "../context";
@@ -56,6 +55,7 @@ const RefundTicket = () => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (contract && id) {
       callToGetContractOwner();
     }
@@ -86,8 +86,6 @@ const RefundTicket = () => {
           )}
         </>
       )}
-      {/* footer */}
-      <Footer />
     </div>
   );
 };

@@ -3,7 +3,7 @@ import { MdOutlineArrowRightAlt } from "react-icons/md";
 
 const TicketHistoryListView = ({ ticketHistory }) => {
   return (
-    <section className="my-10">
+    <section className="my-10 min-h-60">
       {ticketHistory != null && ticketHistory.length > 0 ? (
         <div className="mx-auto max-w-7xl px-4 flex flex-col">
           {ticketHistory.map((history, index) => (

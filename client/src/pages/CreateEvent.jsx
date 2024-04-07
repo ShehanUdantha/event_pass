@@ -1,17 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import HeaderSection from "../sections/CreateEvent/HeaderSection";
 import FormSection from "../sections/CreateEvent/FormSection";
-import Footer from "../components/Footer";
 
 const CreateEvent = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div>
       {/* header section */}
       <HeaderSection title={"Create"} />
       {/* form section */}
       <FormSection />
-      {/* footer */}
-      <Footer />
     </div>
   );
 };

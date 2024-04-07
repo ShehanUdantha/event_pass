@@ -3,8 +3,8 @@ import logo from "../assets/icons/logo-icon.png";
 
 const Footer = () => {
   return (
-    <footer className="border-t">
-      <div className="mx-auto max-w-7xl px-4 py-3 flex flex-col gap-1">
+    <footer className="bg-white border-t">
+      <div className="px-4 py-4 max-w-7xl mx-auto flex flex-col gap-1">
         {/* logo */}
         <div className="flex items-center justify-center md:justify-start">
           <img src={logo} alt="logo" width={30} height={25} />
