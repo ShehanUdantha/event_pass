@@ -5,8 +5,10 @@ import { NavLink } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { ConnectWallet } from "@thirdweb-dev/react";
+import { useStateContext } from "../context";
 
 const NavBar = () => {
+  const { address } = useStateContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -25,19 +27,37 @@ const NavBar = () => {
         </div>
         {/* nav items */}
         <ul className="md:flex gap-12 hidden text-md font-medium text-[#1e1b4b]">
-          {navLinks.map((item) => (
-            <li key={item.path}>
-              <NavLink
-                className={({ isActive, isPending }) =>
-                  isActive ? "active" : ""
-                }
-                to={item.path}
-                key={item.path}
-              >
-                {item.link}
-              </NavLink>
-            </li>
-          ))}
+          {navLinks.map((item) =>
+            item.path === "/create-event" ? (
+              address ? (
+                <li key={item.path}>
+                  <NavLink
+                    className={({ isActive, isPending }) =>
+                      isActive ? "active" : ""
+                    }
+                    onClick={toggleMenu}
+                    to={item.path}
+                    key={item.path}
+                  >
+                    {item.link}
+                  </NavLink>
+                </li>
+              ) : null
+            ) : (
+              <li key={item.path}>
+                <NavLink
+                  className={({ isActive, isPending }) =>
+                    isActive ? "active" : ""
+                  }
+                  onClick={toggleMenu}
+                  to={item.path}
+                  key={item.path}
+                >
+                  {item.link}
+                </NavLink>
+              </li>
+            )
+          )}
         </ul>
 
         {/* wallet connect button */}
@@ -77,20 +97,37 @@ const NavBar = () => {
               : "hidden"
           } `}
         >
-          {navLinks.map((item) => (
-            <li key={item.path}>
-              <NavLink
-                className={({ isActive, isPending }) =>
-                  isActive ? "active" : ""
-                }
-                onClick={toggleMenu}
-                to={item.path}
-                key={item.path}
-              >
-                {item.link}
-              </NavLink>
-            </li>
-          ))}
+          {navLinks.map((item) =>
+            item.path === "/create-event" ? (
+              address ? (
+                <li key={item.path}>
+                  <NavLink
+                    className={({ isActive, isPending }) =>
+                      isActive ? "active" : ""
+                    }
+                    onClick={toggleMenu}
+                    to={item.path}
+                    key={item.path}
+                  >
+                    {item.link}
+                  </NavLink>
+                </li>
+              ) : null
+            ) : (
+              <li key={item.path}>
+                <NavLink
+                  className={({ isActive, isPending }) =>
+                    isActive ? "active" : ""
+                  }
+                  onClick={toggleMenu}
+                  to={item.path}
+                  key={item.path}
+                >
+                  {item.link}
+                </NavLink>
+              </li>
+            )
+          )}
           {/* mobile view wallet */}
           <li key={"wallet"} className="flex justify-center">
             <ConnectWallet

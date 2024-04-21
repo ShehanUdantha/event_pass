@@ -5,7 +5,6 @@ import {
   ThirdwebProvider,
   metamaskWallet,
   coinbaseWallet,
-  walletConnect,
 } from "@thirdweb-dev/react";
 import { Sepolia } from "@thirdweb-dev/chains";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -71,20 +70,14 @@ const router = createBrowserRouter([
 const container = document.getElementById("root");
 const root = createRoot(container);
 root.render(
-  // <React.StrictMode>
   <ThirdwebProvider
     clientId={import.meta.env.VITE_TEMPLATE_CLIENT_ID}
     activeChain={Sepolia}
     switchToActiveChain={true}
-    supportedWallets={[
-      metamaskWallet({ recommended: true }),
-      coinbaseWallet(),
-      walletConnect(),
-    ]}
+    supportedWallets={[metamaskWallet({ recommended: true }), coinbaseWallet()]}
   >
     <StateContextProvider>
       <RouterProvider router={router} />
     </StateContextProvider>
   </ThirdwebProvider>
-  // </React.StrictMode>
 );

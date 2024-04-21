@@ -90,7 +90,7 @@ const TicketHistory = () => {
       {/* header section */}
       <HeaderSection />
       {isLoading ? (
-        <div className="flex justify-center items-center text-[14px] h-screen">
+        <div className="flex justify-center items-center text-[14px] h-[50svh]">
           <img
             src={Spinner}
             alt="spinner"

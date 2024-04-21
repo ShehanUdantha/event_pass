@@ -129,7 +129,7 @@ const TicketCard = ({ ticket, isSecondary }) => {
             />
           </div>
         ) : (
-          <div>
+          <div onContextMenu={(e) => e.preventDefault()}>
             <div className="max-w-md w-full h-full mx-auto z-10 rounded-3xl">
               <div className="bg-white relative drop-shadow-xl rounded-3xl p-4 m-4 overflow-clip">
                 {/* top */}

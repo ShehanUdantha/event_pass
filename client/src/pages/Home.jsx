@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Hero from "../sections/Home/Hero";
 import GridView from "../components/EventGridView";
 import PaginationSection from "../sections/Home/PaginationSection";
@@ -10,6 +10,7 @@ const Home = () => {
   const { contract, address, getAllEvents } = useStateContext();
   const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState([]);
+  const eventsRef = useRef(null);
 
   const [searchInput, setSearchInput] = useState("");
   const [filteredCategory, setFilteredCategory] = useState();
@@ -60,10 +61,14 @@ const Home = () => {
 
   console.log(events);
 
+  const scrollToEvents = () => {
+    eventsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <div>
       {/* hero section */}
-      <Hero />
+      <Hero scrollToEvents={scrollToEvents} />
       {/* filter section */}
       <section className="mt-10 md:mb-14 md:mt-16">
         <div className="mx-auto max-w-7xl px-4">
@@ -104,7 +109,9 @@ const Home = () => {
         </div>
       </section>
       {/* grid view */}
-      <GridView events={filteredEvents} isLoading={isLoading} />
+      <section ref={eventsRef}>
+        <GridView events={filteredEvents} isLoading={isLoading} />
+      </section>
       {/* pagination section */}
       <PaginationSection />
     </div>

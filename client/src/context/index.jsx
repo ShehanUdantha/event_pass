@@ -3,6 +3,7 @@ import {
   useAddress,
   useContract,
   useMetamask,
+  useCoinbaseWallet,
   useContractWrite,
   useDisconnect,
   useSigner,
@@ -23,7 +24,9 @@ export const StateContextProvider = ({ children }) => {
   // console.log(contract);
 
   const address = useAddress();
-  const connect = useMetamask();
+  let usedWallet = useMetamask();
+  usedWallet = useCoinbaseWallet();
+  const connect = usedWallet;
   const disconnect = useDisconnect();
   const signer = useSigner();
 

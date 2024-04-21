@@ -1,8 +1,7 @@
 import React from "react";
 import HeroBg from "../../assets/images/heroBg.png";
-import { Link } from "react-router-dom";
 
-const Hero = () => {
+const Hero = ({ scrollToEvents }) => {
   return (
     <section className="bg-[#F6F8FD] pt-32">
       <div className="flex flex-col md:flex-row mx-auto items-center justify-between max-w-7xl px-4">
@@ -25,11 +24,12 @@ const Hero = () => {
             </span>
           </div>
           <div className="flex text-white pt-4 justify-center md:justify-start mb-10">
-            <Link to="/">
-              <button className=" bg-[#4338ca] px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in">
-                Explore Now
-              </button>
-            </Link>
+            <button
+              className=" bg-[#4338ca] px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in"
+              onClick={scrollToEvents}
+            >
+              Explore Now
+            </button>
           </div>
         </div>
         {/* hero bg */}

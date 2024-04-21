@@ -79,7 +79,7 @@ const ScanSection = () => {
   };
 
   return (
-    <section className="my-10">
+    <section className="my-10 min-h-[50svh]">
       <div className="mx-auto max-w-7xl">
         <div className="w-full gap-0 md:gap-30 flex flex-col md:flex-row items-center justify-center">
           <div className="w-full flex items-center justify-center h-[15rem]">

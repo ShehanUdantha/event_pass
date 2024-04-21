@@ -15,7 +15,10 @@ const TicketGridView = ({ tickets, isLoading, isSecondary }) => {
           />
         </div>
       ) : fetchedTickets != null && fetchedTickets.length > 0 ? (
-        <div className="mx-auto max-w-7xl px-4 grid md:grid-cols-4 grid-cols-1 gap-8">
+        <div
+          className="mx-auto max-w-7xl px-4 grid md:grid-cols-4 grid-cols-1 gap-8"
+          onContextMenu={(e) => e.preventDefault()}
+        >
           {fetchedTickets.map((ticket) => (
             <TicketCard
               key={ticket.id}
