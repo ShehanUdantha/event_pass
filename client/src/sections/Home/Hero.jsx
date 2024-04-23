@@ -8,13 +8,13 @@ const Hero = ({ scrollToEvents }) => {
         {/* hero title and description */}
         <div className="text-center md:text-start">
           <span className="max-w-sm font-bold text-[32px] leading-none tracking-tight md:text-[54px]">
-            Host, Connect, <br />
-            Celebrate Your Events, <br />
-            Our Platform
+            Enhance, Secure <br />
+            & Celebrate with <br />
+            Our Guaranteed way.
           </span>
           <br />
           <div className="pt-5 justify-center md:justify-start">
-            <span className="max-w-sm text-5xl lg:text-7xl text-gray-light/80 tracking-tight">
+            <span className="max-w-sm text-[1.1rem] leading-none text-gray-light/80 tracking-tight">
               Explore the limitless possibilities of event hosting with our
               platform,
               <br />

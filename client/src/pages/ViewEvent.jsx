@@ -8,6 +8,7 @@ import Spinner from "../assets/images/spinning-dots.svg";
 import TicketBuyModal from "../components/TicketBuyModal";
 import SecondaryMarketSection from "../sections/ViewEvent/SecondaryMarketSection";
 import { FaRegEdit } from "react-icons/fa";
+import Loader from "../components/Loader";
 
 const ViewEvent = () => {
   const { id } = useParams();
@@ -16,6 +17,7 @@ const ViewEvent = () => {
 
   const [event, setEvent] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoaderLoading, setIsLoaderLoading] = useState(false);
   const [remainingTimes, setRemainingTimes] = useState(0);
   const [displayMoreMenu, setDisplayMoreMenu] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -25,7 +27,6 @@ const ViewEvent = () => {
     window.scrollTo(0, 0);
 
     const fetchEventData = async () => {
-      setIsLoading(true);
       try {
         if (!isNaN(+id)) {
           const data = await getSingleEvent(id);
@@ -43,32 +44,58 @@ const ViewEvent = () => {
           setEvent({ id: 0 });
         }
       } catch (error) {
-        console.error("Error fetching event data: ", error);
-      } finally {
         setIsLoading(false);
+        console.error("Error fetching event data: ", error);
       }
     };
 
     const fetchContractOwner = async () => {
-      setIsLoading(true);
       try {
         const data = await getContractOwner();
         setContractOwner(data);
       } catch (error) {
-        console.error("Error fetching contract owner: ", error);
-      } finally {
         setIsLoading(false);
+        console.error("Error fetching contract owner: ", error);
       }
     };
 
-    if (contract && id) {
+    if (contract && id && !isLoaderLoading) {
+      setIsLoading(true);
       fetchContractOwner();
       fetchEventData();
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 2000);
     }
   }, [contract, address, getSingleEvent, getContractOwner, id]);
 
+  const fetchEventDataNormally = async () => {
+    try {
+      if (!isNaN(+id)) {
+        const data = await getSingleEvent(id);
+        setEvent(data);
+
+        // Start the timer here
+        if (data.startsAt) {
+          const interval = setInterval(() => {
+            setRemainingTimes(calculateRemainingTime(data.startsAt));
+          }, 1000);
+
+          return () => clearInterval(interval);
+        }
+      } else {
+        setEvent({ id: 0 });
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error fetching event data: ", error);
+    }
+  };
+
   return (
     <>
+      {isLoaderLoading && <Loader />}
+
       {isLoading ? (
         <div className="flex justify-center items-center text-[14px] h-screen">
           <img
@@ -143,7 +170,7 @@ const ViewEvent = () => {
                           : "Expired"}
                       </div>
                       <div className="text-[14px] text-[#686666] font-medium mt-2 md:mt-0">
-                        {event.ticketRemain} ticket's left
+                        {event.ticketRemain} tickets left
                       </div>
                     </div>
                     {/* event ticket price and event owner */}
@@ -214,9 +241,18 @@ const ViewEvent = () => {
                   isVisible={isVisible}
                   onClose={() => {
                     setIsVisible(false);
+                    setIsLoaderLoading(false);
                   }}
                   onCallBack={() => {
-                    if (contract && id && address) fetchEvent();
+                    if (contract && id && address) {
+                      fetchEventDataNormally();
+                    }
+                  }}
+                  onLoading={(value) => {
+                    setIsLoaderLoading(value);
+                    if (value === false) {
+                      setIsVisible(false);
+                    }
                   }}
                 />
               ) : null}

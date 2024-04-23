@@ -43,6 +43,21 @@ const NavBar = () => {
                   </NavLink>
                 </li>
               ) : null
+            ) : item.path === "/profile" ? (
+              address ? (
+                <li key={item.path}>
+                  <NavLink
+                    className={({ isActive, isPending }) =>
+                      isActive ? "active" : ""
+                    }
+                    onClick={toggleMenu}
+                    to={item.path}
+                    key={item.path}
+                  >
+                    {item.link}
+                  </NavLink>
+                </li>
+              ) : null
             ) : (
               <li key={item.path}>
                 <NavLink
@@ -99,6 +114,21 @@ const NavBar = () => {
         >
           {navLinks.map((item) =>
             item.path === "/create-event" ? (
+              address ? (
+                <li key={item.path}>
+                  <NavLink
+                    className={({ isActive, isPending }) =>
+                      isActive ? "active" : ""
+                    }
+                    onClick={toggleMenu}
+                    to={item.path}
+                    key={item.path}
+                  >
+                    {item.link}
+                  </NavLink>
+                </li>
+              ) : null
+            ) : item.path === "/profile" ? (
               address ? (
                 <li key={item.path}>
                   <NavLink

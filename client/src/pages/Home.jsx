@@ -5,6 +5,8 @@ import PaginationSection from "../sections/Home/PaginationSection";
 import { useStateContext } from "../context";
 import { eventCategoryList } from "../constants/index";
 import { IoSearchOutline } from "react-icons/io5";
+import HowItWorksSection from "../sections/Home/HowItWorksSection";
+import ChatWootWidget from "../components/ChatWootWidget";
 
 const Home = () => {
   const { contract, address, getAllEvents } = useStateContext();
@@ -70,10 +72,10 @@ const Home = () => {
       {/* hero section */}
       <Hero scrollToEvents={scrollToEvents} />
       {/* filter section */}
-      <section className="mt-10 md:mb-14 md:mt-16">
+      <section className="mt-10 md:mb-14 md:mt-16" ref={eventsRef}>
         <div className="mx-auto max-w-7xl px-4">
           {/* section title */}
-          <h2 className="font-bold text-[26px] leading-none tracking-tight">
+          <h2 className="font-bold text-3xl leading-none tracking-tight">
             All Events
           </h2>
 
@@ -109,11 +111,13 @@ const Home = () => {
         </div>
       </section>
       {/* grid view */}
-      <section ref={eventsRef}>
-        <GridView events={filteredEvents} isLoading={isLoading} />
-      </section>
+      <GridView events={filteredEvents} isLoading={isLoading} />
       {/* pagination section */}
       <PaginationSection />
+      {/* how it works section */}
+      <HowItWorksSection />
+      {/* chatwoot */}
+      <ChatWootWidget />
     </div>
   );
 };

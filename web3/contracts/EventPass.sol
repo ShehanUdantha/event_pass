@@ -534,7 +534,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
                 tickets[eventId][i].id == ticketId &&
                 tickets[eventId][i].owner == myAddress
             ) {
-                tickets[eventId][i].verified = false;
+                tickets[eventId][i].verified = true;
                 break;
             }
         }
@@ -546,24 +546,27 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
         uint256 eventId
     ) public view returns (string memory status) {
         require(eventExists[eventId], "Event does not exist");
-
-        for (uint256 i = 0; i < tickets[eventId].length; i++) {
-            if (
-                tickets[eventId][i].id == ticketId &&
-                tickets[eventId][i].owner == myAddress &&
-                tickets[eventId][i].eventId == eventId
-            ) {
-                if (tickets[eventId][i].verified) {
-                    status = "Verified";
-                    break;
-                } else {
-                    status = "Not Verified";
-                    break;
+        if (tickets[eventId].length == 0) {
+            status = "Not Found";
+        } else {
+            for (uint256 i = 0; i < tickets[eventId].length; i++) {
+                if (
+                    tickets[eventId][i].id == ticketId &&
+                    tickets[eventId][i].owner == myAddress &&
+                    tickets[eventId][i].eventId == eventId
+                ) {
+                    if (tickets[eventId][i].verified) {
+                        status = "Verified";
+                        break;
+                    } else {
+                        status = "Not Verified";
+                        break;
+                    }
+                } else if (i == tickets[eventId].length - 1) {
+                    status = "Not Found";
                 }
             }
         }
-
-        status = "Not Found";
     }
 
     function getEventTicketHistory(

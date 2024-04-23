@@ -119,7 +119,7 @@ const TicketCard = ({ ticket, isSecondary }) => {
   return (
     <>
       {isBuyLoading && <Loader />}
-      <div className="cursor-pointer w-full">
+      <div className="w-full">
         {isLoading ? (
           <div className="flex justify-center items-center text-[14px] h-[20rem]">
             <img
@@ -130,8 +130,8 @@ const TicketCard = ({ ticket, isSecondary }) => {
           </div>
         ) : (
           <div onContextMenu={(e) => e.preventDefault()}>
-            <div className="max-w-md w-full h-full mx-auto z-10 rounded-3xl">
-              <div className="bg-white relative drop-shadow-xl rounded-3xl p-4 m-4 overflow-clip">
+            <div className="max-w-md w-full h-full mx-auto z-10 rounded-3xl cursor-pointer transition-all duration-500 hover:scale-105">
+              <div className="bg-white relative drop-shadow-md rounded-3xl p-4 m-4 overflow-clip">
                 {/* top */}
                 <div className="w-full">
                   <div className="w-full flex justify-between">

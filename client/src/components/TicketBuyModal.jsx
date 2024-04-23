@@ -7,7 +7,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useStateContext } from "../context";
 import toast, { Toaster } from "react-hot-toast";
 import { ethers } from "ethers";
-import Loader from "./Loader";
 import { calculateRemainingTime } from "../utils/index";
 
 const TicketBuyModal = ({
@@ -18,6 +17,7 @@ const TicketBuyModal = ({
   isVisible,
   onClose,
   onCallBack,
+  onLoading,
 }) => {
   if (!isVisible) return null;
 
@@ -58,7 +58,6 @@ const TicketBuyModal = ({
     resolver: yupResolver(schema),
   });
 
-  const [isLoading, setIsLoading] = useState(false);
   const [userBalance, setUserBalance] = useState("0.0");
 
   const getBalance = async () => {
@@ -74,19 +73,19 @@ const TicketBuyModal = ({
         if (calculateRemainingTime(startsAt) != "Expired") {
           if (address != eventOwner) {
             if (userBalance > ticketCost * data.ticketAmount) {
-              setIsLoading(true);
+              onLoading(true);
               const response = await buyTickets({
                 eventId: eventId,
                 numOfTicket: data.ticketAmount,
                 ticketCost: ticketCost,
               });
               if (response) {
-                onClose();
                 onCallBack();
+                onClose();
               } else {
                 somethingWentWrong();
               }
-              setIsLoading(false);
+              onLoading(false);
             } else {
               InsufficientAmount();
             }
@@ -110,8 +109,6 @@ const TicketBuyModal = ({
 
   return (
     <>
-      {isLoading && <Loader />}
-
       <div className="fixed inset-0 z-30 h-screen px-4 bg-[#000000b3] backdrop-blur-sm flex items-center justify-center">
         <div className="w-[600px] flex flex-col bg-white p-6 rounded-xl">
           {/* modal close button */}

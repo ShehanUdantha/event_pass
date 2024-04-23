@@ -5,7 +5,7 @@ import { formatDateAndTime } from "../utils/index";
 const EventCard = ({ event }) => {
   return (
     <Link
-      className="shadow-md rounded-[1rem] cursor-pointer w-full"
+      className="shadow-md rounded-[1rem] cursor-pointer w-full transition-all duration-500 hover:scale-105"
       key={event.id}
       to={"/event/" + event.id}
     >

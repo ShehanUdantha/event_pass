@@ -20,6 +20,7 @@ import ViewTicket from "./pages/ViewTicket.jsx";
 import Scanner from "./pages/Scanner.jsx";
 import TicketHistory from "./pages/TicketHistory.jsx";
 import RefundTicket from "./pages/RefundTicket.jsx";
+import { About } from "./pages/About.jsx";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
       {
         path: "/create-event",
         element: <CreateEvent />,
+      },
+      {
+        path: "/about",
+        element: <About />,
       },
       {
         path: "/profile",
