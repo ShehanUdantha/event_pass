@@ -25,7 +25,7 @@ const RefundTicket = () => {
 
     if (!isNaN(+id)) {
       const data = await getSingleEvent(id);
-      console.log(data);
+      // console.log(data);
       setEvent(data);
       fetchTicketsByEventId();
     } else {
@@ -38,11 +38,11 @@ const RefundTicket = () => {
     setIsLoading(true);
 
     const data = await getAllTicketsByEvent(id);
-    console.log(data);
+    // console.log(data);
     let filteredTickets = data.filter((ticket, i) => {
       return !ticket.refunded && ticket.isWaitingForRefund;
     });
-    console.log(filteredTickets.length);
+    // console.log(filteredTickets.length);
     setTickets(filteredTickets);
     setIsLoading(false);
   };

@@ -10,7 +10,7 @@ const RefundTicketSection = ({ waitingTickets }) => {
     if (contract && address) {
       setIsLoading(true);
       const data = await refundTicket(ticket.eventId, ticket.id);
-      console.log(data);
+      // console.log(data);
       window.location.reload(false);
       setIsLoading(false);
     }

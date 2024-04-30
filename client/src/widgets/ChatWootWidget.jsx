@@ -4,10 +4,9 @@ export default function ChatWootWidget() {
   useEffect(() => {
     // Add Chatwoot Settings
     window.chatwootSettings = {
-      hideMessageBubble: false,
-      position: "right", // This can be left or right
-      locale: "en", // Language to be set
-      type: "standard", // [standard, expanded_bubble]
+      position: "right",
+      type: "expanded_bubble",
+      launcherTitle: "Chat with us",
     };
   });
 

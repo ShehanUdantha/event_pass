@@ -68,8 +68,8 @@ export const StateContextProvider = ({ children }) => {
         ],
       });
       isSuccess = true;
-      triggerSuccessToast("contract call success");
-      console.info("contract call success", data);
+      triggerSuccessToast("event created successfully!");
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -103,10 +103,10 @@ export const StateContextProvider = ({ children }) => {
         balance: convertBigNumberToInt(event.balance),
       }));
 
-      console.info("contract call success", data);
+      // console.info("contract call success", data);
     } catch (err) {
       triggerErrorToast(err);
-      console.error("contract call failure", err);
+      // console.error("contract call failure", err);
     }
 
     return parsedEvents != null ? parsedEvents : [];
@@ -139,10 +139,10 @@ export const StateContextProvider = ({ children }) => {
         balance: convertBigNumberToInt(data.balance),
       };
 
-      console.info("contract call success", data);
+      // console.info("contract call success", data);
     } catch (err) {
       triggerErrorToast(err);
-      console.error("contract call failure", err);
+      // console.error("contract call failure", err);
     }
 
     return parsedEvent != null ? parsedEvent : {};
@@ -188,8 +188,8 @@ export const StateContextProvider = ({ children }) => {
         ],
       });
       isSuccess = true;
-      triggerSuccessToast("contract call success");
-      console.info("contract call success", data);
+      triggerSuccessToast("event updated successfully!");
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -207,8 +207,8 @@ export const StateContextProvider = ({ children }) => {
     try {
       const data = await deleteEvent({ args: [eventId, isRefunded] });
       isSuccess = true;
-      triggerSuccessToast("contract call success");
-      console.info("contract call success", data);
+      triggerSuccessToast("event deleted successfully!");
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -221,7 +221,7 @@ export const StateContextProvider = ({ children }) => {
 
     try {
       const data = await contract.call("getMyEvents", [address]);
-      console.log(data);
+      // console.log(data);
 
       parsedEvents = data.map((event, i) => ({
         id: convertBigNumberToInt(event.id),
@@ -242,10 +242,10 @@ export const StateContextProvider = ({ children }) => {
         refunded: event.refunded,
       }));
 
-      console.info("contract call success", data);
+      // console.info("contract call success", data);
     } catch (err) {
       triggerErrorToast(err);
-      console.error("contract call failure", err);
+      // console.error("contract call failure", err);
     }
 
     return parsedEvents != null ? parsedEvents : [];
@@ -271,8 +271,8 @@ export const StateContextProvider = ({ children }) => {
         },
       });
       isSuccess = true;
-      triggerSuccessToast("contract call success");
-      console.info("contract call success", data.transactionHash);
+      triggerSuccessToast("tickets purchased successfully!");
+      // console.info("contract call success", data.transactionHash);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -285,7 +285,7 @@ export const StateContextProvider = ({ children }) => {
 
     try {
       const data = await contract.call("getMyTickets", [address]);
-      console.log(data);
+      // console.log(data);
 
       parsedTickets = data.map((ticket, i) => ({
         id: convertBigNumberToInt(ticket.id),
@@ -302,10 +302,10 @@ export const StateContextProvider = ({ children }) => {
         minted: ticket.minted,
       }));
 
-      console.info("contract call success", data);
+      // console.info("contract call success", data);
     } catch (err) {
       triggerErrorToast(err);
-      console.error("contract call failure", err);
+      // console.error("contract call failure", err);
     }
 
     return parsedTickets != null ? parsedTickets : [];
@@ -317,7 +317,7 @@ export const StateContextProvider = ({ children }) => {
 
     try {
       const data = await contract.call("getAllTicketsByEvent", [eventId]);
-      console.log(data);
+      // console.log(data);
 
       parsedTickets = data.map((ticket, i) => ({
         id: convertBigNumberToInt(ticket.id),
@@ -334,10 +334,10 @@ export const StateContextProvider = ({ children }) => {
         minted: ticket.minted,
       }));
 
-      console.info("contract call success", data);
+      // console.info("contract call success", data);
     } catch (err) {
       triggerErrorToast(err);
-      console.error("contract call failure", err);
+      // console.error("contract call failure", err);
     }
 
     return parsedTickets != null ? parsedTickets : [];
@@ -349,7 +349,7 @@ export const StateContextProvider = ({ children }) => {
 
     try {
       const data = await contract.call("getSingleTicket", [eventId, ticketId]);
-      console.log(data);
+      // console.log(data);
 
       parsedTicket = {
         id: convertBigNumberToInt(data.id),
@@ -366,7 +366,7 @@ export const StateContextProvider = ({ children }) => {
         minted: data.minted,
       };
 
-      console.info("contract call success", data);
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -383,7 +383,7 @@ export const StateContextProvider = ({ children }) => {
     try {
       const data = await verifyTicket({ args: [myAddress, ticketId, eventId] });
 
-      console.info("contract call success", data);
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -399,11 +399,11 @@ export const StateContextProvider = ({ children }) => {
         ticketId,
         eventId,
       ]);
-      console.log(data);
+      // console.log(data);
 
       ticketVerificationInfo = data;
 
-      console.info("contract call success", data);
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -425,8 +425,8 @@ export const StateContextProvider = ({ children }) => {
         args: [eventId, ticketId, myAddress],
       });
       isSuccess = true;
-      triggerSuccessToast("contract call success");
-      console.info("contract call success", data);
+      triggerSuccessToast("ticket reselled successfully!");
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -439,7 +439,7 @@ export const StateContextProvider = ({ children }) => {
 
     try {
       const data = await contract.call("getResellTicketsByEventId", [eventId]);
-      console.log(data);
+      // console.log(data);
 
       parsedTickets = data.map((ticket, i) => ({
         id: convertBigNumberToInt(ticket.id),
@@ -453,7 +453,7 @@ export const StateContextProvider = ({ children }) => {
         minted: ticket.minted,
       }));
 
-      console.info("contract call success", data);
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -473,8 +473,8 @@ export const StateContextProvider = ({ children }) => {
         args: [eventId, ticketId, myAddress],
       });
       isSuccess = true;
-      triggerSuccessToast("contract call success");
-      console.info("contract call success", data);
+      triggerSuccessToast("requested resell ticket removed successfully!");
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -503,8 +503,8 @@ export const StateContextProvider = ({ children }) => {
         },
       });
       isSuccess = true;
-      triggerSuccessToast("contract call success");
-      console.info("contract call success", data);
+      triggerSuccessToast("resell ticket purchased successfully!");
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -519,10 +519,10 @@ export const StateContextProvider = ({ children }) => {
         eventId,
         ticketId,
       ]);
-      console.log(data);
+      // console.log(data);
       parsedTicketHistory = data;
 
-      console.info("contract call success", data);
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -540,8 +540,8 @@ export const StateContextProvider = ({ children }) => {
     try {
       const data = await requestRefundTicket({ args: [eventId, ticketId] });
       isSuccess = true;
-      triggerSuccessToast("contract call success");
-      console.info("contract call success", data);
+      triggerSuccessToast("ticket refund requested successfully!");
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -558,8 +558,8 @@ export const StateContextProvider = ({ children }) => {
     try {
       const data = await cancelRefundTicket({ args: [eventId, ticketId] });
       isSuccess = true;
-      triggerSuccessToast("contract call success");
-      console.info("contract call success", data);
+      triggerSuccessToast("requested ticket refund canceled successfully!");
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -578,8 +578,8 @@ export const StateContextProvider = ({ children }) => {
     try {
       const data = await refundTicket({ args: [eventId, ticketId] });
       isSuccess = true;
-      triggerSuccessToast("contract call success");
-      console.info("contract call success", data);
+      triggerSuccessToast("requested ticket refund successfully!");
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -600,8 +600,8 @@ export const StateContextProvider = ({ children }) => {
         args: [eventId],
       });
       isSuccess = true;
-      triggerSuccessToast("contract call success");
-      console.info("contract call success", data);
+      triggerSuccessToast("event salary withdraw successfully!");
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -615,7 +615,7 @@ export const StateContextProvider = ({ children }) => {
       const data = await contract.call("owner", []);
       contractOwner = data;
 
-      console.info("contract call success", data);
+      // console.info("contract call success", data);
     } catch (err) {
       console.error("contract call failure", err);
     }
@@ -656,7 +656,7 @@ export const StateContextProvider = ({ children }) => {
       }}
     >
       {children}
-      <Toaster position="bottom-right" />
+      <Toaster position="bottom-center" />
     </StateContext.Provider>
   );
 };

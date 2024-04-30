@@ -24,7 +24,6 @@ const TicketHistory = () => {
     setIsLoading(true);
 
     if (!isNaN(+id)) {
-      console.log("called0");
       const data = await getSingleEvent(id);
       setEvent(data);
       setIsLoading(false);
@@ -39,11 +38,10 @@ const TicketHistory = () => {
     setIsLoading(true);
 
     if (!isNaN(+id)) {
-      console.log("called1");
       const data = await getAllTicketsByEvent(id);
-      for (let x = 0; x < data.length; x++) {
-        console.log("ticket data" + data[x].id);
-      }
+      // for (let x = 0; x < data.length; x++) {
+      //   console.log("ticket data" + data[x].id);
+      // }
       setIsLoading(false);
       fetchTicketHistory(data);
     } else {
@@ -52,15 +50,15 @@ const TicketHistory = () => {
   };
 
   const fetchTicketHistory = async (ticketsData) => {
-    console.log("called");
+    // console.log("called");
     setIsLoading(true);
-    console.log("ticket length" + ticketsData.length);
+    // console.log("ticket length" + ticketsData.length);
 
     for (let i = 0; i < ticketsData.length; i++) {
-      console.log("ticket length:" + i);
-      console.log("ticketid", ticketsData[i].id);
+      // console.log("ticket length:" + i);
+      // console.log("ticketid", ticketsData[i].id);
       const data = await getEventTicketHistory(id, ticketsData[i].id);
-      console.log("data" + " " + data);
+      // console.log("data" + " " + data);
       setTicketHistory((prevHistory) => [
         ...prevHistory,
         { id: ticketsData[i].id, owners: data },
@@ -68,7 +66,7 @@ const TicketHistory = () => {
     }
     setIsLoading(false);
   };
-  console.log(ticketHistory.length);
+  // console.log(ticketHistory.length);
 
   const callToGetContractOwner = async () => {
     setIsLoading(true);

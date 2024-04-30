@@ -40,7 +40,7 @@ const ViewTicket = () => {
 
     if (!isNaN(+ticketEvent)) {
       const data = await getSingleEvent(ticketEvent);
-      console.log(data);
+      // console.log(data);
       setEvent(data);
     } else {
       setEvent({ id: 0 });

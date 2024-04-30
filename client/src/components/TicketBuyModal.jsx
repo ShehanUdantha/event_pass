@@ -147,7 +147,7 @@ const TicketBuyModal = ({
             </div>
           </form>
         </div>
-        <Toaster position="bottom-right" />
+        <Toaster position="bottom-center" />
       </div>
     </>
   );

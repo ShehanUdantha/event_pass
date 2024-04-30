@@ -7,7 +7,6 @@ import Spinner from "../assets/images/spinning-dots.svg";
 
 const EditEvent = () => {
   const { id } = useParams();
-  console.log(id);
   const { contract, address, getSingleEvent } = useStateContext();
 
   const [event, setEvent] = useState({});
@@ -30,7 +29,7 @@ const EditEvent = () => {
     if (contract && id) fetchEvent();
   }, [contract, address]);
 
-  console.log(event);
+  // console.log(event);
 
   return (
     <div>

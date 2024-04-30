@@ -17,7 +17,7 @@ const Scanner = () => {
 
     if (!isNaN(+id)) {
       const data = await getSingleEvent(id);
-      console.log(data);
+      // console.log(data);
       setEvent(data);
     } else {
       setEvent({ id: 0 });

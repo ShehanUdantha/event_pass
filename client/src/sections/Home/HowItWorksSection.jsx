@@ -13,12 +13,12 @@ const HowItWorksSection = () => {
         <h2 className="font-bold text-3xl leading-none tracking-tight mb-8">
           How it Works?
         </h2>
-        <div className="mx-auto max-w-7xl px-4 grid md:grid-cols-4 grid-cols-1 gap-6">
+        <div className="mx-auto max-w-7xl px-2 md:px-4 grid md:grid-cols-4 grid-cols-1 gap-3 md:gap-6">
           <WorkProgressCard
             icon={<BsWallet2 />}
             title={"Set up your Wallet"}
             description={
-              "Start with creating your account at the Metamask Wallet"
+              "Start with creating your account using the Metamask Wallet"
             }
           />
           <WorkProgressCard
@@ -39,7 +39,7 @@ const HowItWorksSection = () => {
             icon={<BsShopWindow />}
             title={"Enjoy!"}
             description={
-              "Go to the event and activate tickets directly in your account"
+              "Go to the event and verify tickets directly in your account"
             }
           />
         </div>

@@ -6,7 +6,7 @@ import { useStateContext } from "../context";
 import { eventCategoryList } from "../constants/index";
 import { IoSearchOutline } from "react-icons/io5";
 import HowItWorksSection from "../sections/Home/HowItWorksSection";
-import ChatWootWidget from "../components/ChatWootWidget";
+import ChatWootWidget from "../widgets/ChatWootWidget";
 
 const Home = () => {
   const { contract, address, getAllEvents } = useStateContext();
@@ -61,7 +61,7 @@ const Home = () => {
     if (contract) fetchEvents();
   }, [contract, address]);
 
-  console.log(events);
+  // console.log(events);
 
   const scrollToEvents = () => {
     eventsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });

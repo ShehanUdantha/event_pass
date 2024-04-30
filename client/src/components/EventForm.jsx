@@ -87,7 +87,7 @@ const EventForm = ({ event }) => {
   };
 
   const onSubmit = async (e) => {
-    console.log("clicked");
+    // console.log("clicked");
     e.preventDefault();
 
     if (isSubmitting) {
@@ -102,7 +102,7 @@ const EventForm = ({ event }) => {
       });
 
       if (isValidImage) {
-        console.log("Form Submitted", formDetails);
+        // console.log("Form Submitted", formDetails);
         if (
           new Date(
             updateTime(formDetails.startsAt, formDetails.startsAtTime)
@@ -184,7 +184,6 @@ const EventForm = ({ event }) => {
                 });
 
                 setIsLoading(false);
-                console.log("Adasd");
 
                 if (response) navigate("/");
               } else {
@@ -341,8 +340,10 @@ const EventForm = ({ event }) => {
                 onChange={handleChange}
               />
             </div>
-            <p className="text-[12px] text-red-500">{errors.startsAt}</p>
-            <p className="text-[12px] text-red-500">{errors.startsAtTime}</p>
+            <div className="w-full flex flex-col md:flex-row justify-start items-start md:items-center md:gap-5">
+              <p className="text-[12px] text-red-500">{errors.startsAt}</p>
+              <p className="text-[12px] text-red-500">{errors.startsAtTime}</p>
+            </div>
           </div>
           <div className="w-full">
             <p className="text-[14px] font-medium mb-1 mt-3 md:mt-0">
@@ -366,8 +367,10 @@ const EventForm = ({ event }) => {
                 onChange={handleChange}
               />
             </div>
-            <p className="text-[12px] text-red-500">{errors.endsAt}</p>
-            <p className="text-[12px] text-red-500">{errors.endsAtTime}</p>
+            <div className="w-full flex flex-col md:flex-row justify-start items-start md:items-center md:gap-5">
+              <p className="text-[12px] text-red-500">{errors.endsAt}</p>
+              <p className="text-[12px] text-red-500">{errors.endsAtTime}</p>
+            </div>
           </div>
         </div>
         {/* event location and category */}
@@ -431,7 +434,7 @@ const EventForm = ({ event }) => {
           />
         </div>
       </form>
-      <Toaster position="bottom-right" />
+      <Toaster position="bottom-center" />
     </div>
   );
 };

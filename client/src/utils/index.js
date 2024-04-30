@@ -100,7 +100,7 @@ export function convertBigNumberToInt(bigNumber) {
 }
 
 export const getUrlParams = (url) => {
-  console.log(url);
+  // console.log(url);
   const urlParts = url.toString().split('/');
   const address = urlParts[4];
   const eventId = parseInt(urlParts[5]);

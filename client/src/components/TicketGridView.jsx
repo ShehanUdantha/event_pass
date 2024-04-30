@@ -2,7 +2,7 @@ import React from "react";
 import Spinner from "../assets/images/spinning-dots.svg";
 import TicketCard from "./TicketCard";
 
-const TicketGridView = ({ tickets, isLoading, isSecondary }) => {
+const TicketGridView = ({ tickets, isLoading, isSecondary, onLoading }) => {
   const fetchedTickets = tickets;
   return (
     <section className="mt-10 md:mt-10">
@@ -24,6 +24,7 @@ const TicketGridView = ({ tickets, isLoading, isSecondary }) => {
               key={ticket.id}
               ticket={ticket}
               isSecondary={isSecondary}
+              onLoading={onLoading}
             />
           ))}
         </div>

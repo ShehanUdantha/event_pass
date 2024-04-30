@@ -10,7 +10,7 @@ import { ethers } from "ethers";
 import toast, { Toaster } from "react-hot-toast";
 import Loader from "./Loader";
 
-const TicketCard = ({ ticket, isSecondary }) => {
+const TicketCard = ({ ticket, isSecondary, onLoading }) => {
   const {
     contract,
     address,
@@ -23,7 +23,7 @@ const TicketCard = ({ ticket, isSecondary }) => {
 
   const [event, setEvent] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [isBuyLoading, setIsBuyLoading] = useState(false);
+  const [isLoaderLoading, setIsLoaderLoading] = useState(false);
   const [displayMoreMenu, setDisplayMoreMenu] = useState(false);
   const [remainingTimes, setRemainingTimes] = useState(0);
   const [userBalance, setUserBalance] = useState("0.0");
@@ -42,7 +42,7 @@ const TicketCard = ({ ticket, isSecondary }) => {
   const fetchEvent = async () => {
     setIsLoading(true);
     const data = await getSingleEvent(ticket.eventId);
-    console.log(data);
+    // console.log(data);
     setEvent(data);
     setRemainingTimes(calculateRemainingTime(data.startsAt));
     setIsLoading(false);
@@ -64,8 +64,8 @@ const TicketCard = ({ ticket, isSecondary }) => {
     );
   };
 
-  console.log(userBalance);
-  console.log(ticket.tokenId);
+  // console.log(userBalance);
+  // console.log(ticket.tokenId);
 
   const buyResellTicket = async () => {
     if (
@@ -78,7 +78,7 @@ const TicketCard = ({ ticket, isSecondary }) => {
           if (address != event.owner) {
             if (address != ticket.owner) {
               if (userBalance > event.ticketCost) {
-                setIsBuyLoading(true);
+                onLoading(true);
                 const response = await buyReselledTicket(
                   ticket.eventId,
                   ticket.id,
@@ -91,7 +91,7 @@ const TicketCard = ({ ticket, isSecondary }) => {
                 } else {
                   somethingWentWrong();
                 }
-                setIsBuyLoading(false);
+                onLoading(false);
               } else {
                 InsufficientAmount();
               }
@@ -118,7 +118,7 @@ const TicketCard = ({ ticket, isSecondary }) => {
 
   return (
     <>
-      {isBuyLoading && <Loader />}
+      {isLoaderLoading && <Loader />}
       <div className="w-full">
         {isLoading ? (
           <div className="flex justify-center items-center text-[14px] h-[20rem]">
@@ -145,7 +145,16 @@ const TicketCard = ({ ticket, isSecondary }) => {
                           className="cursor-pointer text-lg"
                         />
                         {displayMoreMenu ? (
-                          <TicketMoreMenu event={event} ticket={ticket} />
+                          <TicketMoreMenu
+                            event={event}
+                            ticket={ticket}
+                            onLoading={(value) => {
+                              setIsLoaderLoading(value);
+                              if (value === false) {
+                                setDisplayMoreMenu(false);
+                              }
+                            }}
+                          />
                         ) : null}
                       </div>
                     )}
@@ -216,7 +225,7 @@ const TicketCard = ({ ticket, isSecondary }) => {
             </div>
           </div>
         )}
-        <Toaster position="bottom-right" />
+        <Toaster position="bottom-center" />
       </div>
     </>
   );

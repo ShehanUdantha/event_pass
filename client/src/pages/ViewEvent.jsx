@@ -229,7 +229,12 @@ const ViewEvent = () => {
                 </div>
               </div>
               {/* secondary market section */}
-              <SecondaryMarketSection eventId={id} />
+              <SecondaryMarketSection
+                eventId={id}
+                onLoading={(value) => {
+                  setIsLoaderLoading(value);
+                }}
+              />
 
               {/* ticket buy modal */}
               {isVisible ? (

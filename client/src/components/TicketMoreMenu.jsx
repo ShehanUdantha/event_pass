@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { useStateContext } from "../context";
 import toast, { Toaster } from "react-hot-toast";
 import { calculateRemainingTime } from "../utils/index";
-import Loader from "./Loader";
 import { Link, useNavigate } from "react-router-dom";
 
-const TicketMoreMenu = ({ event, ticket }) => {
+const TicketMoreMenu = ({ event, ticket, onLoading }) => {
   const {
     resellTicket,
     getBackResellTicket,
@@ -13,7 +12,7 @@ const TicketMoreMenu = ({ event, ticket }) => {
     requestRefundTicket,
     cancelRefundTicket,
   } = useStateContext();
-  const [isLoading, setIsLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const notifyEventExpired = () => toast.error("Event expired!");
@@ -28,9 +27,9 @@ const TicketMoreMenu = ({ event, ticket }) => {
       if (calculateRemainingTime(event.startsAt) != "Expired") {
         if (!ticket.verified) {
           if (!ticket.reselled) {
-            setIsLoading(true);
+            onLoading(true);
             const response = await resellTicket(event.id, ticket.id, address);
-            setIsLoading(false);
+            onLoading(false);
             if (response) navigate("/event/" + event.id);
           } else {
             notifyAlreadyResell();
@@ -49,13 +48,13 @@ const TicketMoreMenu = ({ event, ticket }) => {
   const callGetBackFromResellTicket = async () => {
     if (address == ticket.owner) {
       if (ticket.reselled) {
-        setIsLoading(true);
+        onLoading(true);
         const response = await getBackResellTicket(
           event.id,
           ticket.id,
           address
         );
-        setIsLoading(false);
+        onLoading(false);
         if (response) navigate("/event/" + event.id);
       } else {
         notifyNotResell();
@@ -68,10 +67,10 @@ const TicketMoreMenu = ({ event, ticket }) => {
   const callRequestRefundTicket = async () => {
     if (address == ticket.owner) {
       if (!ticket.refunded) {
-        setIsLoading(true);
+        onLoading(true);
         const response = await requestRefundTicket(event.id, ticket.id);
         window.location.reload(false);
-        setIsLoading(false);
+        onLoading(false);
       } else {
         notifyAlreadyRefunded();
       }
@@ -83,10 +82,10 @@ const TicketMoreMenu = ({ event, ticket }) => {
   const callCancelRefundTicket = async () => {
     if (address == ticket.owner) {
       if (!ticket.refunded) {
-        setIsLoading(true);
+        onLoading(true);
         const response = await cancelRefundTicket(event.id, ticket.id);
         window.location.reload(false);
-        setIsLoading(false);
+        onLoading(false);
       } else {
         notifyAlreadyRefunded();
       }
@@ -97,7 +96,6 @@ const TicketMoreMenu = ({ event, ticket }) => {
 
   return (
     <>
-      {isLoading && <Loader />}
       <div className="flex flex-col absolute w-[100px] bg-white border-spacing-1 mt-2 border border-gray right-[1.5rem]">
         <ul className="flex flex-col text-[12px]">
           {ticket.reselled ? (
@@ -138,7 +136,7 @@ const TicketMoreMenu = ({ event, ticket }) => {
             </div>
           </Link>
         </ul>
-        <Toaster position="bottom-right" />
+        <Toaster position="bottom-center" />
       </div>
     </>
   );

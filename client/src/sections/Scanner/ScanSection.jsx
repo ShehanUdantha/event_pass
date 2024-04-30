@@ -43,9 +43,9 @@ const ScanSection = () => {
     setTicketId(response.ticketId);
 
     if (response.eventId == id) {
-      console.log(response.address);
-      console.log(response.eventId);
-      console.log(response.ticketId);
+      // console.log(response.address);
+      // console.log(response.eventId);
+      // console.log(response.ticketId);
       await verifyTicket(response.address, response.ticketId, response.eventId);
       setIsLoading(false);
       checkTicketVerification(value);
@@ -61,15 +61,15 @@ const ScanSection = () => {
     setTicketId(response.ticketId);
 
     if (response.eventId == id) {
-      console.log(response.address);
-      console.log(response.eventId);
-      console.log(response.ticketId);
+      // console.log(response.address);
+      // console.log(response.eventId);
+      // console.log(response.ticketId);
       const data = await checkVerificationStatus(
         response.address,
         response.ticketId,
         response.eventId
       );
-      console.log(data);
+      // console.log(data);
       setTicketInfo(data);
       setIsLoading(false);
     } else {
@@ -117,7 +117,7 @@ const ScanSection = () => {
           </div>
         </div>
       </div>
-      <Toaster position="bottom-right" />
+      <Toaster position="bottom-center" />
     </section>
   );
 };

@@ -48,7 +48,7 @@ const EventMoreMenu = ({ event, contractOwner }) => {
         if (!event.paidOut) {
           setIsLoading(true);
           const response = await payout(event.id);
-          console.log(response);
+          // console.log(response);
           setIsLoading(false);
         } else {
           notifyEventAlreadyPaid();
@@ -110,7 +110,7 @@ const EventMoreMenu = ({ event, contractOwner }) => {
             </Link>
           ) : null}
         </ul>
-        <Toaster position="bottom-right" />
+        <Toaster position="bottom-center" />
       </div>
     </>
   );
