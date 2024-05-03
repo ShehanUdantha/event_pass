@@ -6,9 +6,11 @@ import { MdMoreVert } from "react-icons/md";
 import EventMoreMenu from "../components/EventMoreMenu";
 import Spinner from "../assets/images/spinning-dots.svg";
 import TicketBuyModal from "../components/TicketBuyModal";
+import SocialMediaShareModal from "../components/SocialMediaShareModal";
 import SecondaryMarketSection from "../sections/ViewEvent/SecondaryMarketSection";
 import { FaRegEdit } from "react-icons/fa";
 import Loader from "../components/Loader";
+import { IoShareSocialSharp } from "react-icons/io5";
 
 const ViewEvent = () => {
   const { id } = useParams();
@@ -20,7 +22,8 @@ const ViewEvent = () => {
   const [isLoaderLoading, setIsLoaderLoading] = useState(false);
   const [remainingTimes, setRemainingTimes] = useState(0);
   const [displayMoreMenu, setDisplayMoreMenu] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisibleBuy, setIsVisibleBuy] = useState(false);
+  const [isVisibleShare, setIsVisibleShare] = useState(false);
   const [contractOwner, setContractOwner] = useState("");
 
   useEffect(() => {
@@ -129,22 +132,31 @@ const ViewEvent = () => {
                       <h3 className="font-bold text-2xl md:text-3xl md:leading-12">
                         {event.title}
                       </h3>
-                      {/* event more option button */}
-                      {event.owner == address || contractOwner == address ? (
-                        <div className="flex">
-                          {address == event.owner ? (
-                            <div className="mr-2">
-                              <Link
-                                key={event.id + "edit"}
-                                to={"/event/" + event.id + "/edit"}
-                              >
-                                <FaRegEdit
-                                  onClick={() => setDisplayMoreMenu(false)}
-                                  className="cursor-pointer text-lg"
-                                />
-                              </Link>
-                            </div>
-                          ) : null}
+                      <div className="flex">
+                        {/* event share option */}
+                        <IoShareSocialSharp
+                          onClick={() => {
+                            setIsVisibleShare(true);
+                            setIsVisibleBuy(false);
+                          }}
+                          className="cursor-pointer text-lg"
+                        />
+                        {/* event edit option */}
+                        {address == event.owner ? (
+                          <div className="ml-5 mr-3">
+                            <Link
+                              key={event.id + "edit"}
+                              to={"/event/" + event.id + "/edit"}
+                            >
+                              <FaRegEdit
+                                onClick={() => setDisplayMoreMenu(false)}
+                                className="cursor-pointer text-lg"
+                              />
+                            </Link>
+                          </div>
+                        ) : null}
+                        {/* event more option button */}
+                        {event.owner == address || contractOwner == address ? (
                           <div>
                             <MdMoreVert
                               onClick={() =>
@@ -159,8 +171,8 @@ const ViewEvent = () => {
                               />
                             ) : null}
                           </div>
-                        </div>
-                      ) : null}
+                        ) : null}
+                      </div>
                     </div>
                     {/* event remaining and tickets left */}
                     <div className="flex flex-col md:flex-row items-start md:items-center mt-1 justify-start">
@@ -189,7 +201,10 @@ const ViewEvent = () => {
                     {/* buy ticket button */}
                     {remainingTimes != "Expired" ? (
                       <button
-                        onClick={() => setIsVisible(true)}
+                        onClick={() => {
+                          setIsVisibleBuy(true);
+                          setIsVisibleShare(false);
+                        }}
                         className="bg-[#4338ca] text-white px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in mt-5"
                       >
                         Get Tickets
@@ -237,15 +252,15 @@ const ViewEvent = () => {
               />
 
               {/* ticket buy modal */}
-              {isVisible ? (
+              {isVisibleBuy ? (
                 <TicketBuyModal
                   eventId={event.id}
                   eventOwner={event.owner}
                   ticketCost={event.ticketCost}
                   startsAt={event.startsAt}
-                  isVisible={isVisible}
+                  isVisible={isVisibleBuy}
                   onClose={() => {
-                    setIsVisible(false);
+                    setIsVisibleBuy(false);
                     setIsLoaderLoading(false);
                   }}
                   onCallBack={() => {
@@ -256,8 +271,18 @@ const ViewEvent = () => {
                   onLoading={(value) => {
                     setIsLoaderLoading(value);
                     if (value === false) {
-                      setIsVisible(false);
+                      setIsVisibleBuy(false);
                     }
+                  }}
+                />
+              ) : null}
+
+              {/* event share modal */}
+              {isVisibleShare ? (
+                <SocialMediaShareModal
+                  url={window.location.href}
+                  onClose={() => {
+                    setIsVisibleShare(false);
                   }}
                 />
               ) : null}

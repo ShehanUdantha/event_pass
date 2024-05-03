@@ -13,7 +13,7 @@ const Footer = () => {
           </a>
         </div>
         {/* description */}
-        <p className="flex justify-center md:justify-start text-[16px] text-center">
+        <p className="flex justify-center md:justify-start text-[14.5px] text-center">
           2024 EventPass. All Rights Reserved.
         </p>
       </div>
