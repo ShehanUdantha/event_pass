@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useStorageUpload } from "@thirdweb-dev/react";
 import * as yup from "yup";
 import { eventCategoryList } from "../constants/index";
 import { ethers } from "ethers";
 import { useStateContext } from "../context";
-import { checkIfImage, updateTime, separateTime } from "../utils";
+import { updateTime, separateTime } from "../utils";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import Loader from "./Loader";
@@ -11,8 +12,8 @@ import Loader from "./Loader";
 const EventForm = ({ event }) => {
   const { createEvent, updateEvent, address, connect } = useStateContext();
   const navigate = useNavigate();
+  const { mutateAsync: upload } = useStorageUpload();
 
-  const notifyNotImage = () => toast.error("Provide valid image URL");
   const notifyEndDateMustBeHigher = () =>
     toast.error("End date must be greater than start date");
   const notifyValidStartDate = () => toast.error("Provide valid start date");
@@ -52,7 +53,8 @@ const EventForm = ({ event }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isValidImage, setIsValidImage] = useState(false);
+  const [pickImage, setPickImage] = useState("");
+  const [trackImage, setTrackImage] = useState("");
 
   const [formDetails, setFormDetails] = useState({
     title: "",
@@ -75,19 +77,20 @@ const EventForm = ({ event }) => {
     const { name, value } = e.target;
 
     if (name == "imageUrl") {
-      checkIfImage(value, async (result) => {
-        setIsValidImage(result);
+      setFormDetails({
+        ...formDetails,
+        [name]: e.target.files[0].name,
+      });
+      setPickImage(e.target.files[0]);
+    } else {
+      setFormDetails({
+        ...formDetails,
+        [name]: value,
       });
     }
-
-    setFormDetails({
-      ...formDetails,
-      [name]: value,
-    });
   };
 
   const onSubmit = async (e) => {
-    // console.log("clicked");
     e.preventDefault();
 
     if (isSubmitting) {
@@ -97,36 +100,55 @@ const EventForm = ({ event }) => {
 
     try {
       await schema.validate(formDetails, { abortEarly: false });
-      checkIfImage(formDetails.imageUrl, async (value) => {
-        setIsValidImage(value);
-      });
 
-      if (isValidImage) {
-        // console.log("Form Submitted", formDetails);
+      if (
+        new Date(
+          updateTime(formDetails.startsAt, formDetails.startsAtTime)
+        ).getTime() > new Date().getTime()
+      ) {
         if (
           new Date(
+            updateTime(formDetails.endsAt, formDetails.endsAtTime)
+          ).getTime() >
+          new Date(
             updateTime(formDetails.startsAt, formDetails.startsAtTime)
-          ).getTime() > new Date().getTime()
+          ).getTime()
         ) {
-          if (
-            new Date(
-              updateTime(formDetails.endsAt, formDetails.endsAtTime)
-            ).getTime() >
-            new Date(
-              updateTime(formDetails.startsAt, formDetails.startsAtTime)
-            ).getTime()
-          ) {
-            if (event) {
-              if (address != null) {
-                if (address == event.owner) {
-                  setIsLoading(true);
-                  setIsSubmitting(true);
+          if (event) {
+            if (address != null) {
+              if (address == event.owner) {
+                setIsLoading(true);
+                setIsSubmitting(true);
 
+                let uploadUrl;
+                if (trackImage !== pickImage && pickImage !== "") {
+                  try {
+                    const tempUrl = await upload({
+                      data: [pickImage],
+                      options: {
+                        uploadWithGatewayUrl: true,
+                        uploadWithoutDirectory: true,
+                      },
+                    });
+                    uploadUrl = tempUrl[0];
+                  } catch (error) {
+                    console.error("Error uploading image:", error);
+                    setIsLoading(false);
+                    setIsSubmitting(false);
+                    return;
+                  }
+                } else {
+                  uploadUrl = formDetails.imageUrl;
+                }
+
+                // console.log("track" + pickImage);
+                // console.log(uploadUrl);
+                try {
                   const response = await updateEvent({
                     eventId: event.id,
                     title: formDetails.title,
                     description: formDetails.description,
-                    imageUrl: formDetails.imageUrl,
+                    imageUrl: uploadUrl,
                     ticketAmount: formDetails.ticketAmount,
                     ticketRemain:
                       formDetails.ticketAmount >
@@ -152,22 +174,44 @@ const EventForm = ({ event }) => {
                   });
                   setIsLoading(false);
                   if (response) navigate("/");
-                } else {
-                  notifyUnAuthorized();
+                } catch (error) {
+                  console.error("Error updating event:", error);
+                  setIsLoading(false);
                 }
               } else {
-                connect();
-                notifyConnectWallet();
+                notifyUnAuthorized();
               }
             } else {
-              if (address != null) {
-                setIsLoading(true);
-                setIsSubmitting(true);
+              connect();
+              notifyConnectWallet();
+            }
+          } else {
+            if (address != null) {
+              setIsLoading(true);
+              setIsSubmitting(true);
 
+              let uploadUrl;
+              try {
+                const tempUrl = await upload({
+                  data: [pickImage],
+                  options: {
+                    uploadWithGatewayUrl: true,
+                    uploadWithoutDirectory: true,
+                  },
+                });
+                uploadUrl = tempUrl[0];
+              } catch (error) {
+                console.error("Error uploading image:", error);
+                setIsLoading(false);
+                setIsSubmitting(false);
+                return;
+              }
+
+              try {
                 const response = await createEvent({
                   title: formDetails.title,
                   description: formDetails.description,
-                  imageUrl: formDetails.imageUrl,
+                  imageUrl: uploadUrl,
                   ticketAmount: formDetails.ticketAmount,
                   ticketCost: ethers.utils.parseUnits(
                     formDetails.ticketCost.toString(),
@@ -186,19 +230,20 @@ const EventForm = ({ event }) => {
                 setIsLoading(false);
 
                 if (response) navigate("/");
-              } else {
-                connect();
-                notifyConnectWallet();
+              } catch (error) {
+                console.error("Error creating event:", error);
+                setIsLoading(false);
               }
+            } else {
+              connect();
+              notifyConnectWallet();
             }
-          } else {
-            notifyEndDateMustBeHigher();
           }
         } else {
-          notifyValidStartDate();
+          notifyEndDateMustBeHigher();
         }
       } else {
-        notifyNotImage();
+        notifyValidStartDate();
       }
     } catch (error) {
       const newErrors = {};
@@ -220,10 +265,7 @@ const EventForm = ({ event }) => {
   const setEventDetails = () => {
     const startedDateObject = new Date(event.startsAt);
     const endedDateObject = new Date(event.endsAt);
-
-    checkIfImage(event.imageUrl, async (result) => {
-      setIsValidImage(result);
-    });
+    setTrackImage(event.imageUrl);
 
     setFormDetails({
       title: event.title,
@@ -266,19 +308,26 @@ const EventForm = ({ event }) => {
             </div>
             <p className="text-[12px] text-red-500">{errors.title}</p>
           </div>
+          {/* event image */}
           <div className="w-full">
             <p className="text-[14px] font-medium mb-1 mt-3 md:mt-0">
               Event Image
             </p>
-            <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2">
+            <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2 flex justify-between items-center">
               <input
                 className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
-                type="text"
-                placeholder="Enter event image Url"
+                type="file"
                 name="imageUrl"
-                value={formDetails.imageUrl}
+                accept="image/*"
                 onChange={handleChange}
               />
+              {trackImage !== pickImage && pickImage !== "" ? null : (
+                <input
+                  className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
+                  type="text"
+                  value={formDetails.imageUrl}
+                />
+              )}
             </div>
             <p className="text-[12px] text-red-500">{errors.imageUrl}</p>
           </div>

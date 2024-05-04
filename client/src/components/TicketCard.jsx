@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useStateContext } from "../context";
-import { formatDateAndTime, calculateRemainingTime } from "../utils/index";
+import {
+  formatDateAndTime,
+  calculateRemainingTime,
+  calculateTimeAgo,
+} from "../utils/index";
 import Spinner from "../assets/images/spinning-dots.svg";
 import QRCode from "react-qr-code";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { MdMoreVert } from "react-icons/md";
 import TicketMoreMenu from "./TicketMoreMenu";
 import { ethers } from "ethers";
@@ -191,6 +195,14 @@ const TicketCard = ({ ticket, isSecondary, onLoading }) => {
                       </div>
                     </div>
                   ) : null}
+                  <div className="w-full flex mt-1">
+                    <div className="text-[13px] font-medium mr-1">
+                      Purchased in:
+                    </div>
+                    <div className="text-[12px] text-gray-600 font-medium text-ellipsis overflow-hidden">
+                      {calculateTimeAgo(ticket.timestamp)}
+                    </div>
+                  </div>
                   <div className="w-full flex mt-1">
                     <div className="text-[13px] font-medium mr-1">Venue:</div>
                     <div className="text-[12px] text-gray-600 font-medium text-ellipsis overflow-hidden">

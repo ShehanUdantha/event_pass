@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract EventPass is Ownable, ReentrancyGuard, ERC721 {
+contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _totalEvents;
     Counters.Counter private _totalTickets;
@@ -48,7 +48,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
         bool minted;
     }
 
-    uint256 private constant TOTAL_TICKETS_CAN_PURCHASE = 5;
+    uint256 private constant TOTAL_TICKETS_CAN_PURCHASE = 4;
 
     mapping(uint256 => EventStruct) private events;
     mapping(uint256 => TicketStruct[]) private tickets;
@@ -277,7 +277,8 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     function buyTickets(
         uint256 eventId,
         uint256 numOfTicket,
-        string memory baseUrl
+        string memory baseUrl,
+        string[] memory tokenURIs
     ) public payable {
         require(eventExists[eventId], "Event not found");
         require(
@@ -331,7 +332,8 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
 
                 // mint ticket
                 _totalTokens.increment();
-                _mint(msg.sender, _totalTokens.current());
+                _safeMint(msg.sender, _totalTokens.current());
+                _setTokenURI(_totalTokens.current(), tokenURIs[i]);
                 ticket.minted = true;
                 ticket.tokenId = _totalTokens.current();
 

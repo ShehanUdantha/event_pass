@@ -3,6 +3,7 @@ import { useStateContext } from "../context";
 import toast, { Toaster } from "react-hot-toast";
 import { calculateRemainingTime } from "../utils/index";
 import { Link, useNavigate } from "react-router-dom";
+import { openSeaUrl } from "../constants/index";
 
 const TicketMoreMenu = ({ event, ticket, onLoading }) => {
   const {
@@ -132,7 +133,17 @@ const TicketMoreMenu = ({ event, ticket, onLoading }) => {
 
           <Link key={ticket.id} to={ticket.qrCode}>
             <div className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100">
-              <li>View</li>
+              <li>View Info</li>
+            </div>
+          </Link>
+
+          <Link
+            key={ticket.tokenId}
+            to={openSeaUrl + ticket.tokenId}
+            target="_blank"
+          >
+            <div className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100">
+              <li>View NFT</li>
             </div>
           </Link>
         </ul>

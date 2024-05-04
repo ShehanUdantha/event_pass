@@ -128,7 +128,7 @@ const TicketBuyModal = ({
                   type="number"
                   min={1}
                   max={TOTAL_TICKET_CAN_PURCHASE}
-                  placeholder="Enter the number between 1 to 5"
+                  placeholder={`Enter the number between 1 to ${TOTAL_TICKET_CAN_PURCHASE}`}
                   name="ticketAmount"
                   {...register("ticketAmount")}
                 />

@@ -41,16 +41,6 @@ export const formatDateAndTime = (inputDate) => {
   return formattedDateTime;
 }
 
-export const checkIfImage = (url, callback) => {
-  const img = new Image();
-  img.src = url;
-
-  if (img.complete) callback(true);
-
-  img.onload = () => callback(true);
-  img.onerror = () => callback(false);
-};
-
 export const updateTime = (date, time) => {
   const updatedTime = time + ":00";
   const [hours, minutes, seconds] = updatedTime.split(':');
@@ -120,5 +110,31 @@ export const convertWeiToEth = (weiValue) => {
     return eth.toFixed(6);
   } else {
     return "0.0";
+  }
+};
+
+export const calculateTimeAgo = (timestamp) => {
+  const currentTime = new Date();
+  const previousTime = new Date(parseInt(timestamp, 10));
+  const timeDifference = currentTime - previousTime;
+  const minutes = Math.floor(timeDifference / 60000);
+
+  if (minutes < 1) {
+    return 'Just now';
+  } else if (minutes < 60) {
+    return `${minutes}m ago`;
+  } else {
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+      return `${hours}h ago`;
+    } else {
+      const days = Math.floor(hours / 24);
+      if (days < 7) {
+        return `${days}d ago`;
+      } else {
+        const weeks = Math.floor(days / 7);
+        return `${weeks}w ago`;
+      }
+    }
   }
 };

@@ -8,12 +8,12 @@ const Footer = () => {
         {/* logo */}
         <div className="flex items-center justify-center md:justify-start">
           <img src={logo} alt="logo" width={30} height={25} />
-          <a href="/" className="font-bold text-xl pl-1">
+          <a href="/" className="font-bold text-[18px] leading-[24.38px] pl-1">
             EventPass
           </a>
         </div>
         {/* description */}
-        <p className="flex justify-center md:justify-start text-[14.5px] text-center">
+        <p className="flex justify-center md:justify-start text-[14px] text-center">
           2024 EventPass. All Rights Reserved.
         </p>
       </div>

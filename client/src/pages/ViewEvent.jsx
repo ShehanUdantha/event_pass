@@ -143,7 +143,7 @@ const ViewEvent = () => {
                         />
                         {/* event edit option */}
                         {address == event.owner ? (
-                          <div className="ml-5 mr-3">
+                          <div className="ml-5">
                             <Link
                               key={event.id + "edit"}
                               to={"/event/" + event.id + "/edit"}
@@ -162,7 +162,7 @@ const ViewEvent = () => {
                               onClick={() =>
                                 setDisplayMoreMenu(!displayMoreMenu)
                               }
-                              className="cursor-pointer text-lg"
+                              className="cursor-pointer text-lg ml-3"
                             />
                             {displayMoreMenu ? (
                               <EventMoreMenu
