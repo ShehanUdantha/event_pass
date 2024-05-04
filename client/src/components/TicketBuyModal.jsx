@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from "react";
+import { useStorageUpload } from "@thirdweb-dev/react";
 import { IoClose } from "react-icons/io5";
-import { TOTAL_TICKET_CAN_PURCHASE } from "../constants";
+import {
+  TOTAL_TICKET_CAN_PURCHASE,
+  nftImageGenerateInput,
+  imageGenerateModel,
+} from "../constants";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useStateContext } from "../context";
 import toast, { Toaster } from "react-hot-toast";
 import { ethers } from "ethers";
-import { calculateRemainingTime } from "../utils/index";
+import {
+  calculateRemainingTime,
+  dataURItoBlob,
+  generateJson,
+} from "../utils/index";
+import { HfInference } from "@huggingface/inference";
 
 const TicketBuyModal = ({
   eventId,
@@ -22,6 +32,7 @@ const TicketBuyModal = ({
   if (!isVisible) return null;
 
   const { buyTickets, contract, address, connect, signer } = useStateContext();
+  const { mutateAsync: upload } = useStorageUpload();
 
   useEffect(() => {
     if (address) {
@@ -74,15 +85,38 @@ const TicketBuyModal = ({
           if (address != eventOwner) {
             if (userBalance > ticketCost * data.ticketAmount) {
               onLoading(true);
-              const response = await buyTickets({
-                eventId: eventId,
-                numOfTicket: data.ticketAmount,
-                ticketCost: ticketCost,
-              });
-              if (response) {
-                onCallBack();
-                onClose();
-              } else {
+              const generatedJsonArray = [];
+              try {
+                for (let i = 0; i < data.ticketAmount; i++) {
+                  const result = await generateArt();
+                  const uploadedImage = await uploadToIPFS(result, true);
+                  const generatedJson = generateJson(uploadedImage);
+                  const uploadedJson = await uploadToIPFS(generatedJson, false);
+
+                  // console.log(uploadedImage);
+                  // console.log(generatedJson);
+                  // console.log(uploadedJson);
+                  generatedJsonArray.push(uploadedJson);
+                }
+
+                if (generatedJsonArray.length === data.ticketAmount) {
+                  const response = await buyTickets({
+                    eventId: eventId,
+                    numOfTicket: data.ticketAmount,
+                    ticketCost: ticketCost,
+                    tokenURIs: generatedJsonArray,
+                  });
+
+                  if (response) {
+                    onCallBack();
+                    onClose();
+                  } else {
+                    somethingWentWrong();
+                  }
+                }
+              } catch (error) {
+                console.error("Error generating art or buying tickets:", error);
+                onLoading(false);
                 somethingWentWrong();
               }
               onLoading(false);
@@ -104,6 +138,65 @@ const TicketBuyModal = ({
       }
     } else {
       notifyEventNotFound();
+    }
+  };
+
+  const generateArt = async () => {
+    const huggingFace = new HfInference(import.meta.env.VITE_IMG_API_KEY);
+
+    try {
+      const response = await huggingFace.textToImage({
+        data: nftImageGenerateInput,
+        model: imageGenerateModel,
+      });
+
+      const reader = new FileReader();
+
+      return new Promise((resolve, reject) => {
+        reader.onload = () => {
+          const myDataUrl = reader.result;
+          resolve(myDataUrl);
+        };
+
+        reader.onerror = (error) => {
+          reject(error);
+        };
+
+        reader.readAsDataURL(response);
+      });
+    } catch (error) {
+      console.error("Error making API request:", error);
+      somethingWentWrong();
+      onLoading(false);
+      return null;
+    }
+  };
+
+  const uploadToIPFS = async (url, isImage) => {
+    let uploadUrl;
+    try {
+      let tempValue;
+
+      if (isImage === true) {
+        const blob = dataURItoBlob(url);
+        const file = new File([blob], "image.jpg", { type: "image/jpeg" });
+        tempValue = file;
+      } else {
+        tempValue = url;
+      }
+
+      const tempUrl = await upload({
+        data: [tempValue],
+        options: {
+          uploadWithGatewayUrl: true,
+          uploadWithoutDirectory: true,
+        },
+      });
+      uploadUrl = tempUrl[0];
+      return uploadUrl;
+    } catch (error) {
+      console.error("Error uploading to IPFS:", error);
+      return;
     }
   };
 

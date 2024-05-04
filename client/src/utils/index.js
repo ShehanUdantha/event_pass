@@ -138,3 +138,36 @@ export const calculateTimeAgo = (timestamp) => {
     }
   }
 };
+
+export const dataURItoBlob = (dataURI) => {
+  const byteString = atob(dataURI.split(',')[1]);
+  const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+  const arrayBuffer = new ArrayBuffer(byteString.length);
+  const uintArray = new Uint8Array(arrayBuffer);
+
+  for (let i = 0; i < byteString.length; i++) {
+    uintArray[i] = byteString.charCodeAt(i);
+  }
+
+  return new Blob([arrayBuffer], { type: mimeString });
+};
+
+export const generateJson = (url) => {
+  return {
+    "name": "Sketch Robot",
+    "description": "A unique NFT featuring a sketched image of a robot with intricate design details, created by an EventPass.",
+    "image": url,
+    "attributes": [
+      {
+        "trait_type": "Style",
+        "value": "Sketch"
+      },
+      {
+        "trait_type": "Complexity",
+        "value": "Detailed"
+      }
+    ]
+  };;
+};
+
+

@@ -46,6 +46,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         bool isWaitingForRefund;
         bool refunded;
         bool minted;
+        string tokenImageUrl;
     }
 
     uint256 private constant TOTAL_TICKETS_CAN_PURCHASE = 4;
@@ -55,33 +56,8 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
     mapping(uint256 => mapping(uint256 => address[])) private ticketHistory;
     mapping(uint256 => bool) private eventExists;
 
-    event EventCreated(
-        uint256 eventId,
-        string title,
-        address owner,
-        uint256 ticketCost,
-        uint256 ticketAmount
-    );
-    event TicketsPurchased(
-        uint256 eventId,
-        address buyer,
-        uint256 numOfTickets
-    );
-
     constructor() ERC721("EventPass", "EP") {}
 
-    /**
-     * @dev Creates a new event with the specified details.
-     * @param title The title of the event.
-     * @param description The description of the event.
-     * @param imageUrl The URL of the image associated with the event.
-     * @param ticketAmount The total number of tickets available for the event.
-     * @param ticketCost The cost of each ticket for the event.
-     * @param startsAt The starting timestamp of the event.
-     * @param endsAt The ending timestamp of the event.
-     * @param location The location where the event will take place.
-     * @param category The category of the event.
-     */
     function createEvent(
         string memory title,
         string memory description,
@@ -122,30 +98,8 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
 
         eventExists[newEvent.id] = true;
         events[newEvent.id] = newEvent;
-
-        emit EventCreated(
-            newEvent.id,
-            title,
-            msg.sender,
-            ticketCost,
-            ticketAmount
-        );
     }
 
-    /**
-     * @dev Update the details of an existing event
-     * @param eventId The ID of the event to be updated
-     * @param title The new title of the event
-     * @param description The new description of the event
-     * @param imageUrl The new image URL of the event
-     * @param ticketAmount The new total ticket amount for the event
-     * @param ticketRemain The updated remaining ticket amount for the event
-     * @param ticketCost The new cost of each ticket for the event
-     * @param startsAt The new start timestamp of the event
-     * @param endsAt The new end timestamp of the event
-     * @param location The new location of the event
-     * @param category The new category of the event
-     */
     function updateEvent(
         uint256 eventId,
         string memory title,
@@ -183,11 +137,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         events[eventId].category = category;
     }
 
-    /**
-     * @dev Deletes an event and optionally refunds the tickets.
-     * @param eventId The ID of the event to delete.
-     * @param isRefunded Flag to indicate if the tickets should be refunded.
-     */
     function deleteEvent(uint256 eventId, bool isRefunded) public {
         require(eventExists[eventId], "Event not found");
         require(
@@ -204,10 +153,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         }
     }
 
-    /**
-     * @dev Get all events in the contract.
-     * @return Events An array of EventStruct containing all available events.
-     */
     function getAllEvents() public view returns (EventStruct[] memory Events) {
         uint256 available = 0;
         for (uint256 i = 1; i <= _totalEvents.current(); i++) {
@@ -225,55 +170,12 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         }
     }
 
-    /**
-     * @dev Gets all events created by a specific address.
-     * @param myAddress The address of the user.
-     * @return Events An array of EventStruct objects representing the events created by the user.
-     */
-    function getMyEvents(
-        address myAddress
-    ) public view returns (EventStruct[] memory Events) {
-        uint256 available = 0;
-        for (uint256 i = 1; i <= _totalEvents.current(); i++) {
-            if (!events[i].deleted && events[i].owner == myAddress) {
-                available++;
-            }
-        }
-        Events = new EventStruct[](available);
-        uint256 index = 0;
-        for (uint256 i = 1; i <= _totalEvents.current(); i++) {
-            if (!events[i].deleted && events[i].owner == myAddress) {
-                Events[index++] = events[i];
-            }
-        }
-    }
-
-    /**
-     * @dev Get details of a single event by eventId
-     * @param eventId The id of the event to fetch details for
-     * @return EventStruct Details of the event
-     */
     function getSingleEvent(
         uint256 eventId
     ) public view returns (EventStruct memory) {
         return events[eventId];
     }
 
-    /**
-     * @dev Allows a user to purchase tickets for a specific event.
-     * @param eventId The ID of the event for which tickets are being purchased.
-     * @param numOfTicket The number of tickets to purchase.
-     * @param baseUrl The base URL for generating the QR code for the ticket.
-     * Requirements:
-     * - The event must exist.
-     * - The user cannot be the owner of the event.
-     * - The user must send sufficient Ether to cover the cost of the tickets.
-     * - The event must have enough tickets remaining.
-     * - The user must not exceed the total number of tickets they can purchase.
-     * Effects:
-     * - Creates ticket objects for the user and deducts the ticket cost from their balance.
-     * - Updates the ticket remaining count for the event.
-     */
     function buyTickets(
         uint256 eventId,
         uint256 numOfTicket,
@@ -329,6 +231,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
                         Strings.toString(currentTicketId)
                     )
                 );
+                ticket.tokenImageUrl = tokenURIs[i];
 
                 // mint ticket
                 _totalTokens.increment();
@@ -347,28 +250,15 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
 
             events[eventId].ticketRemain -= numOfTicket;
             events[eventId].balance = events[eventId].balance += msg.value;
-
-            emit TicketsPurchased(eventId, msg.sender, numOfTicket);
         }
     }
 
-    /**
-     * @dev Get all tickets for a specific event.
-     * @param eventId The ID of the event to get tickets for.
-     * @return Tickets An array of TicketStruct containing all tickets for the specified event.
-     */
     function getAllTicketsByEvent(
         uint256 eventId
     ) public view returns (TicketStruct[] memory Tickets) {
         return tickets[eventId];
     }
 
-    /**
-     * @dev Retrieves information about a single ticket for a specific event.
-     * @param eventId The unique identifier of the event.
-     * @param ticketId The unique identifier of the ticket.
-     * @return TicketStruct The details of the ticket.
-     */
     function getSingleTicket(
         uint256 eventId,
         uint256 ticketId
@@ -394,15 +284,11 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
                 false,
                 false,
                 false,
-                false
+                false,
+                ""
             );
     }
 
-    /**
-     * @dev Get all the tickets owned by a specific address
-     * @param myAddress The address of the owner of the tickets
-     * @return Tickets An array of TicketStruct representing the tickets owned by the address
-     */
     function getMyTickets(
         address myAddress
     ) public view returns (TicketStruct[] memory Tickets) {
@@ -429,11 +315,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         }
     }
 
-    /**
-     * @dev Allows a user to request a refund for a specific ticket for an event.
-     * @param eventId The ID of the event for which the ticket was purchased.
-     * @param ticketId The ID of the ticket for which a refund is being requested.
-     */
     function requestRefundTicket(uint256 eventId, uint256 ticketId) public {
         require(
             currentTime() < events[eventId].startsAt,
@@ -450,11 +331,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         }
     }
 
-    /**
-     * @dev Cancels the refund request for a specific ticket in an event.
-     * @param eventId The ID of the event.
-     * @param ticketId The ID of the ticket to cancel the refund request for.
-     */
     function cancelRefundTicket(uint256 eventId, uint256 ticketId) public {
         for (uint256 i = 0; i < tickets[eventId].length; i++) {
             if (
@@ -467,18 +343,12 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         }
     }
 
-    /**
-     * @dev Refunds a specific ticket to the owner of the ticket
-     * @param eventId The ID of the event to which the ticket belongs
-     * @param ticketId The ID of the ticket to be refunded
-     */
     function refundTicket(uint256 eventId, uint256 ticketId) public {
         require(eventExists[eventId], "Event not found");
         require(
             events[eventId].owner == msg.sender || msg.sender == owner(),
             "Unauthorized entity"
         );
-        require(!events[eventId].deleted, "Event already deleted");
 
         for (uint256 i = 0; i < tickets[eventId].length; i++) {
             if (tickets[eventId][i].id == ticketId) {
@@ -498,11 +368,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         }
     }
 
-    /**
-     * @dev Refund all tickets for a specific event
-     * @param eventId The ID of the event to refund tickets for
-     * @return true if all tickets were successfully refunded
-     */
     function refundTickets(uint256 eventId) internal returns (bool) {
         for (uint i = 0; i < tickets[eventId].length; i++) {
             tickets[eventId][i].refunded = true;
@@ -518,12 +383,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         return true;
     }
 
-    /**
-     * @dev Allows a user to resell a ticket for an event
-     * @param eventId The ID of the event for which the ticket is being resold
-     * @param ticketId The ID of the ticket that is being resold
-     * @param myAddress The address of the user reselling the ticket
-     */
     function resellTicket(
         uint256 eventId,
         uint256 ticketId,
@@ -545,12 +404,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         }
     }
 
-    /**
-     * @dev Cancel the ticket resell status for a specific ticket.
-     * @param eventId The ID of the event where the ticket belongs.
-     * @param ticketId The ID of the ticket to cancel the resell status for.
-     * @param myAddress The address of the current ticket owner.
-     */
     function getBackResellTicket(
         uint256 eventId,
         uint256 ticketId,
@@ -568,11 +421,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         }
     }
 
-    /**
-     * @dev Get all resold tickets for a specific event
-     * @param eventId The ID of the event
-     * @return Tickets An array of TicketStruct representing the resold tickets for the event
-     */
     function getResellTicketsByEventId(
         uint256 eventId
     ) public view returns (TicketStruct[] memory Tickets) {
@@ -592,19 +440,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         }
     }
 
-    /**
-     * @dev Allows a user to buy a resold ticket for a specific event.
-     * @param eventId The ID of the event for which the ticket is being purchased.
-     * @param ticketId The ID of the ticket being purchased.
-     * @param newOwner The address of the new owner of the ticket.
-     * @param baseUrl The base URL used to generate the QR code for the ticket.
-     * @param tokenId The token ID of the ticket being purchased.
-     * @notice Requires that the event exists, the user has provided enough funds, and the event has not yet occurred.
-     * @notice Checks the ticket purchase limit for the user.
-     * @notice Cancels the resale of the ticket once purchased.
-     * @dev Updates the ticket owner, generates a new QR code, and transfers ownership of the ticket token.
-     * @dev Pays the ticket cost to the new owner.
-     */
     function buyReselledTicket(
         uint256 eventId,
         uint256 ticketId,
@@ -626,10 +461,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         require(
             userBoughtTickets <= TOTAL_TICKETS_CAN_PURCHASE,
             "Ticket purchase limit reached"
-        );
-        require(
-            userBoughtTickets + 1 <= TOTAL_TICKETS_CAN_PURCHASE,
-            "You cannot purchase this amount of tickets"
         );
 
         for (uint256 i = 0; i < tickets[eventId].length; i++) {
@@ -658,19 +489,11 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
                 );
                 // Transfer ownership of the ticket token
                 _transfer(tickets[eventId][i].owner, newOwner, tokenId);
-
-                emit TicketsPurchased(eventId, msg.sender, 1);
                 break;
             }
         }
     }
 
-    /**
-     * @dev Returns the number of tickets owned by a specific user for a given event.
-     * @param eventId The ID of the event.
-     * @param myAddress The address of the user.
-     * @return The number of tickets owned by the user for the event.
-     */
     function getNumberOfTicketUserByFromEvent(
         uint256 eventId,
         address myAddress
@@ -684,12 +507,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         return available;
     }
 
-    /**
-     * @dev Verifies a ticket for a specific event.
-     * @param myAddress The address of the user verifying the ticket.
-     * @param ticketId The ID of the ticket to be verified.
-     * @param eventId The ID of the event related to the ticket.
-     */
     function verifyTicket(
         address myAddress,
         uint256 ticketId,
@@ -708,13 +525,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         }
     }
 
-    /**
-     * @notice Check the verification status of a ticket for a specific address in an event
-     * @param myAddress The address of the ticket owner
-     * @param ticketId The ID of the ticket to check
-     * @param eventId The ID of the event associated with the ticket
-     * @return status The verification status of the ticket (Verified, Not Verified, Not Found)
-     */
     function checkVerificationStatus(
         address myAddress,
         uint256 ticketId,
@@ -744,12 +554,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         }
     }
 
-    /**
-     * @dev Get the ticket history for a specific event and ticket ID
-     * @param eventId The ID of the event
-     * @param ticketId The ID of the ticket
-     * @return An array of addresses representing the history of the ticket (ownership transfer)
-     */
     function getEventTicketHistory(
         uint256 eventId,
         uint256 ticketId
@@ -757,11 +561,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         return ticketHistory[eventId][ticketId];
     }
 
-    /**
-     * @notice Allows the owner of the event to withdraw the balance accumulated from ticket sales
-     * @dev The event must have ended and the balance must be positive to initiate the payout
-     * @param eventId The ID of the event for which the payout is requested
-     */
     function payout(uint256 eventId) public {
         require(eventExists[eventId], "Event not found");
         require(!events[eventId].paidOut, "Event already paid out");
@@ -776,17 +575,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         payTo(events[eventId].owner, events[eventId].balance);
     }
 
-    /**
-     * @notice Transfer the specified amount of funds to the specified address
-     * @param to The address to which the funds will be transferred
-     * @param amount The amount of funds to transfer
-     * @dev Ensures that the contract has sufficient balance before transferring funds
-     * @dev Emits a Payment event if the payment is successful
-     */
     function payTo(address to, uint256 amount) internal {
-        uint256 balance = address(this).balance;
-        require(balance >= amount, "Insufficient balance");
-
         (bool success, ) = payable(to).call{value: amount}("");
         require(success, "Payment failed");
     }

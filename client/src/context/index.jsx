@@ -220,27 +220,28 @@ export const StateContextProvider = ({ children }) => {
     let parsedEvents = null;
 
     try {
-      const data = await contract.call("getMyEvents", [address]);
-      // console.log(data);
+      const data = await contract.call("getAllEvents");
 
-      parsedEvents = data.map((event, i) => ({
-        id: convertBigNumberToInt(event.id),
-        title: event.title,
-        description: event.description,
-        imageUrl: event.imageUrl,
-        ticketAmount: convertBigNumberToInt(event.ticketAmount),
-        ticketRemain: convertBigNumberToInt(event.ticketRemain),
-        ticketCost: ethers.utils.formatEther(event.ticketCost.toString()),
-        startsAt: convertBigNumberToDate(event.startsAt),
-        endsAt: convertBigNumberToDate(event.endsAt),
-        location: event.location,
-        category: event.category,
-        owner: event.owner,
-        timestamp: event.timestamp,
-        deleted: event.deleted,
-        paidOut: event.paidOut,
-        refunded: event.refunded,
-      }));
+      parsedEvents = data
+        .filter((event) => event.owner === address)
+        .map((event, i) => ({
+          id: convertBigNumberToInt(event.id),
+          title: event.title,
+          description: event.description,
+          imageUrl: event.imageUrl,
+          ticketAmount: convertBigNumberToInt(event.ticketAmount),
+          ticketRemain: convertBigNumberToInt(event.ticketRemain),
+          ticketCost: ethers.utils.formatEther(event.ticketCost.toString()),
+          startsAt: convertBigNumberToDate(event.startsAt),
+          endsAt: convertBigNumberToDate(event.endsAt),
+          location: event.location,
+          category: event.category,
+          owner: event.owner,
+          timestamp: event.timestamp,
+          deleted: event.deleted,
+          paidOut: event.paidOut,
+          refunded: event.refunded,
+        }));
 
       // console.info("contract call success", data);
     } catch (err) {
@@ -257,12 +258,17 @@ export const StateContextProvider = ({ children }) => {
     "buyTickets"
   );
 
-  const callBuyTickets = async ({ eventId, numOfTicket, ticketCost }) => {
+  const callBuyTickets = async ({
+    eventId,
+    numOfTicket,
+    ticketCost,
+    tokenURIs,
+  }) => {
     let isSuccess = false;
 
     try {
       const data = await buyTickets({
-        args: [eventId, numOfTicket, window.location.origin],
+        args: [eventId, numOfTicket, window.location.origin, tokenURIs],
         overrides: {
           gasLimit: 3000000, // override default gas limit
           value: ethers.utils.parseEther(
