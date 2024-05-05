@@ -9,6 +9,7 @@ import HowItWorksSection from "../sections/Home/HowItWorksSection";
 import ChatWootWidget from "../widgets/ChatWootWidget";
 import ReactPlayer from "react-player";
 import { videoUrl } from "../constants";
+ReactPlayer.default;
 
 const Home = () => {
   const { contract, address, getAllEvents } = useStateContext();
@@ -132,6 +133,7 @@ const Home = () => {
             controls={true}
             playing={true}
             muted={true}
+            style={{ borderRadius: "20px", overflow: "hidden" }}
           />
         </div>
       ) : null}
