@@ -167,7 +167,65 @@ export const generateJson = (url) => {
         "value": "Detailed"
       }
     ]
-  };;
+  };
 };
+
+export const calculatePercentage = (ticketAmount, ticketSold) => {
+  ticketAmount = Number(ticketAmount);
+  ticketSold = Number(ticketSold);
+
+  const percentage = (ticketSold / ticketAmount) * 100;
+
+  return percentage;
+}
+
+export const getDateList = () => {
+  const dateList = [];
+  const today = new Date();
+
+  // Loop from today to 7 days ahead
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    dateList.push(date.toISOString().slice(0, 10)); // Push date in YYYY-MM-DD format
+  }
+
+  return dateList;
+}
+
+export const formatDate = (date) => {
+  return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+}
+export const countTicketsByDate = (tickets) => {
+  const dateList = getDateList();
+
+  // Create an array to store the count of tickets for each date
+  const ticketCounts = [];
+
+  // Loop through each date in dateList
+  for (let i = 0; i < dateList.length; i++) {
+    const date = new Date(dateList[i]);
+
+    // Count the tickets within the date range
+    const count = tickets.filter(ticket => {
+      const ticketBigNumberDate = convertBigNumberToDate(ticket.timestamp);
+      // console.log(ticketBigNumberDate);
+      const ticketDate = new Date(ticketBigNumberDate);
+      const ticketDateString = formatDate(ticketDate);
+      const dateString = formatDate(date);
+
+      // console.log(ticketDateString);
+      // console.log(dateString);
+      // console.log(endDateString);
+      // console.log(ticketDateString === dateString);
+      return ticketDateString === dateString;
+    }).length;
+
+    // Add the count to ticketCounts array
+    ticketCounts.push(count);
+  }
+
+  return ticketCounts;
+}
 
 

@@ -2,13 +2,10 @@ import React, { Fragment, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { calculateRemainingTime, formatDateAndTime } from "../utils/index";
 import { useStateContext } from "../context";
-import { MdMoreVert } from "react-icons/md";
-import EventMoreMenu from "../components/EventMoreMenu";
 import Spinner from "../assets/images/spinning-dots.svg";
 import TicketBuyModal from "../components/TicketBuyModal";
 import SocialMediaShareModal from "../components/SocialMediaShareModal";
 import SecondaryMarketSection from "../sections/ViewEvent/SecondaryMarketSection";
-import { FaRegEdit } from "react-icons/fa";
 import Loader from "../components/Loader";
 import { IoShareSocialSharp } from "react-icons/io5";
 
@@ -21,7 +18,6 @@ const ViewEvent = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoaderLoading, setIsLoaderLoading] = useState(false);
   const [remainingTimes, setRemainingTimes] = useState(0);
-  const [displayMoreMenu, setDisplayMoreMenu] = useState(false);
   const [isVisibleBuy, setIsVisibleBuy] = useState(false);
   const [isVisibleShare, setIsVisibleShare] = useState(false);
   const [contractOwner, setContractOwner] = useState("");
@@ -132,7 +128,7 @@ const ViewEvent = () => {
                       <h3 className="font-bold text-2xl md:text-3xl md:leading-12">
                         {event.title}
                       </h3>
-                      <div className="flex">
+                      <div className="flex items-center justify-between gap-3">
                         {/* event share option */}
                         <IoShareSocialSharp
                           onClick={() => {
@@ -141,36 +137,15 @@ const ViewEvent = () => {
                           }}
                           className="cursor-pointer text-lg"
                         />
-                        {/* event edit option */}
-                        {address == event.owner ? (
-                          <div className="ml-5">
-                            <Link
-                              key={event.id + "edit"}
-                              to={"/event/" + event.id + "/edit"}
-                            >
-                              <FaRegEdit
-                                onClick={() => setDisplayMoreMenu(false)}
-                                className="cursor-pointer text-lg"
-                              />
-                            </Link>
-                          </div>
-                        ) : null}
-                        {/* event more option button */}
+                        {/* event manage button */}
                         {event.owner == address || contractOwner == address ? (
-                          <div>
-                            <MdMoreVert
-                              onClick={() =>
-                                setDisplayMoreMenu(!displayMoreMenu)
-                              }
-                              className="cursor-pointer text-lg ml-3"
-                            />
-                            {displayMoreMenu ? (
-                              <EventMoreMenu
-                                event={event}
-                                contractOwner={contractOwner}
-                              />
-                            ) : null}
-                          </div>
+                          <Link
+                            key={event.id + "dashboard"}
+                            to={"/event/" + event.id + "/dashboard"}
+                            className="text-[#4338ca] bg-[#ecebf3] text-[14px] px-[1.2rem] py-[0.4rem] font-medium rounded hover:bg-[#c9caf3] transition-all duration-200 ease-in"
+                          >
+                            Manage
+                          </Link>
                         ) : null}
                       </div>
                     </div>

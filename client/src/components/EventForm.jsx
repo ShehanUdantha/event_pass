@@ -350,7 +350,7 @@ const EventForm = ({ event }) => {
           </div>
           <div className="w-full">
             <p className="text-[14px] font-medium mb-1 mt-3 md:mt-0">
-              Event Ticket Price
+              Event Ticket Price (ETH)
             </p>
             <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2">
               <input

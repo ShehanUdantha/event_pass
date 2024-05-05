@@ -46,7 +46,8 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         bool isWaitingForRefund;
         bool refunded;
         bool minted;
-        string tokenImageUrl;
+        uint256 verifiedTimestamp;
+        uint256 refundTimestamp;
     }
 
     uint256 private constant TOTAL_TICKETS_CAN_PURCHASE = 4;
@@ -231,7 +232,6 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
                         Strings.toString(currentTicketId)
                     )
                 );
-                ticket.tokenImageUrl = tokenURIs[i];
 
                 // mint ticket
                 _totalTokens.increment();
@@ -285,7 +285,8 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
                 false,
                 false,
                 false,
-                ""
+                0,
+                0
             );
     }
 
@@ -326,6 +327,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
                 tickets[eventId][i].id == ticketId
             ) {
                 tickets[eventId][i].isWaitingForRefund = true;
+                tickets[eventId][i].refundTimestamp = currentTime();
                 break;
             }
         }
@@ -338,6 +340,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
                 tickets[eventId][i].id == ticketId
             ) {
                 tickets[eventId][i].isWaitingForRefund = false;
+                tickets[eventId][i].refundTimestamp = 0;
                 break;
             }
         }
@@ -354,6 +357,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
             if (tickets[eventId][i].id == ticketId) {
                 tickets[eventId][i].refunded = true;
                 tickets[eventId][i].isWaitingForRefund = false;
+                tickets[eventId][i].refundTimestamp = currentTime();
 
                 events[eventId].balance = events[eventId].balance -= tickets[
                     eventId
@@ -372,6 +376,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
         for (uint i = 0; i < tickets[eventId].length; i++) {
             tickets[eventId][i].refunded = true;
             tickets[eventId][i].isWaitingForRefund = false;
+            tickets[eventId][i].refundTimestamp = currentTime();
             events[eventId].balance = events[eventId].balance -= tickets[
                 eventId
             ][i].ticketCost;
@@ -520,6 +525,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
                 tickets[eventId][i].owner == myAddress
             ) {
                 tickets[eventId][i].verified = true;
+                tickets[eventId][i].verifiedTimestamp = currentTime();
                 break;
             }
         }

@@ -18,8 +18,7 @@ import EditEvent from "./pages/EditEvent.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import ViewTicket from "./pages/ViewTicket.jsx";
 import Scanner from "./pages/Scanner.jsx";
-import TicketHistory from "./pages/TicketHistory.jsx";
-import RefundTicket from "./pages/RefundTicket.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
 import { About } from "./pages/About.jsx";
 
 const router = createBrowserRouter([
@@ -57,12 +56,8 @@ const router = createBrowserRouter([
         element: <Scanner />,
       },
       {
-        path: "/event/:id/ticket-history",
-        element: <TicketHistory />,
-      },
-      {
-        path: "/event/:id/ticket-refund",
-        element: <RefundTicket />,
+        path: "/event/:id/dashboard",
+        element: <Dashboard />,
       },
       {
         path: "/*",
