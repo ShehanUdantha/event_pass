@@ -43,11 +43,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 }
 
-.react-player {
-  border-radius: 20px;
-  overflow: hidden;
-}
-
 .animate-spin {
   animation-name: rotate;
   animation-duration: 25s;
