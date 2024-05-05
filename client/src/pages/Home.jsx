@@ -132,7 +132,6 @@ const Home = () => {
             controls={true}
             playing={true}
             muted={true}
-            style={{ borderRadius: "20px", overflow: "hidden" }}
           />
         </div>
       ) : null}
