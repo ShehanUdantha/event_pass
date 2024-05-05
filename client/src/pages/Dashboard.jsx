@@ -10,6 +10,7 @@ import {
   separateCurrentDateTime,
   getDateList,
   countTicketsByDate,
+  calculateTimeAgo,
 } from "../utils";
 import Spinner from "../assets/images/spinning-dots.svg";
 import { FaRegEdit } from "react-icons/fa";
@@ -100,16 +101,20 @@ const Dashboard = () => {
       setVerifiedTicketsCount(parsedVerified.length);
       setWaitingForRefundTickets(parsedWaitingForRefund);
 
-      const filteredDateRageTicket = countTicketsByDate(data);
+      const filteredDateRageTicket = countTicketsByDate(data, 1);
       setDateRageTickets(filteredDateRageTicket);
 
+      const filteredDateRageVerifiedTicket = countTicketsByDate(
+        parsedVerified,
+        2
+      );
+      setDateRageVerifiedTickets(filteredDateRageVerifiedTicket);
+
       const filteredDateRageRefundRequestedTicket = countTicketsByDate(
-        parsedWaitingForRefund
+        parsedWaitingForRefund,
+        3
       );
       setDateRageRefundRequestedTickets(filteredDateRageRefundRequestedTicket);
-
-      const filteredDateRageVerifiedTicket = countTicketsByDate(parsedVerified);
-      setDateRageVerifiedTickets(filteredDateRageVerifiedTicket);
 
       setIsSectionLoading(false);
       fetchTicketHistory(data);
@@ -452,6 +457,9 @@ const Dashboard = () => {
                               <th class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
                                 Ticket Id
                               </th>
+                              <th class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+                                Requested
+                              </th>
                               <th class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
                                 Buyer
                               </th>
@@ -473,6 +481,11 @@ const Dashboard = () => {
                                       {ticket.id}
                                     </span>
                                   </div>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                  <span class="text-[13px] font-medium text-gray-400">
+                                    {calculateTimeAgo(ticket.refundTimestamp)}
+                                  </span>
                                 </td>
                                 <td class="py-2 px-4 border-b border-b-gray-50">
                                   <span class="text-[13px] font-medium text-gray-400">

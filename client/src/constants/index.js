@@ -18,3 +18,5 @@ export const imageGenerateModel = 'Lykon/art-diffusion-xl-0.9';
 export const defaultImageUrl = 'https://d391b93f5f62d9c15f67142e43841acc.ipfscdn.io/ipfs/bafybeihjpeaqbd5r2cpoe7wy4xvulr3kuznpxo4lvqtbk556tl5ndlefki/a7ed2263-3cb4-480a-9659-26415b42514c.jpg';
 
 export const openSeaUrl = 'https://testnets.opensea.io/assets/sepolia/' + CONTRACT_ADDRESS + '/';
+
+export const videoUrl = 'https://firebasestorage.googleapis.com/v0/b/chat-app-ed9cc.appspot.com/o/0505.mp4?alt=media&token=16734167-dff6-4b7d-bf4c-b176cff14c25';

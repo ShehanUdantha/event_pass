@@ -7,6 +7,8 @@ import { eventCategoryList } from "../constants/index";
 import { IoSearchOutline } from "react-icons/io5";
 import HowItWorksSection from "../sections/Home/HowItWorksSection";
 import ChatWootWidget from "../widgets/ChatWootWidget";
+import ReactPlayer from "react-player";
+import { videoUrl } from "../constants";
 
 const Home = () => {
   const { contract, address, getAllEvents } = useStateContext();
@@ -21,6 +23,7 @@ const Home = () => {
     "All",
     ...eventCategoryList,
   ]);
+  const [open, setOpen] = React.useState(false);
 
   const fetchEvents = async () => {
     setIsLoading(true);
@@ -70,7 +73,7 @@ const Home = () => {
   return (
     <div>
       {/* hero section */}
-      <Hero scrollToEvents={scrollToEvents} />
+      <Hero scrollToEvents={scrollToEvents} onCallBack={() => setOpen(!open)} />
       {/* filter section */}
       <section className="mt-10 md:mb-14 md:mt-16" ref={eventsRef}>
         <div className="mx-auto max-w-7xl px-4">
@@ -118,6 +121,21 @@ const Home = () => {
       <HowItWorksSection />
       {/* chatwoot */}
       <ChatWootWidget />
+      {/* video player */}
+      {open ? (
+        <div
+          className="fixed inset-0 z-30 h-screen px-4 bg-[#000000b3] backdrop-blur-sm flex items-center justify-center"
+          onClick={() => setOpen(false)}
+        >
+          <ReactPlayer
+            url={videoUrl}
+            controls={true}
+            playing={true}
+            muted={true}
+            className="react-player"
+          />
+        </div>
+      ) : null}
     </div>
   );
 };

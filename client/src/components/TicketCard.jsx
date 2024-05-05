@@ -197,7 +197,7 @@ const TicketCard = ({ ticket, isSecondary, onLoading }) => {
                   ) : null}
                   <div className="w-full flex mt-1">
                     <div className="text-[13px] font-medium mr-1">
-                      Purchased in:
+                      Purchased:
                     </div>
                     <div className="text-[12px] text-gray-600 font-medium text-ellipsis overflow-hidden">
                       {calculateTimeAgo(ticket.timestamp)}

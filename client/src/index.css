@@ -42,3 +42,24 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: none;
   }
 }
+
+.react-player {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.animate-spin {
+  animation-name: rotate;
+  animation-duration: 25s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(-360deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

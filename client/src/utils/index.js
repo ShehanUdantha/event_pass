@@ -196,7 +196,7 @@ export const getDateList = () => {
 export const formatDate = (date) => {
   return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
 }
-export const countTicketsByDate = (tickets) => {
+export const countTicketsByDate = (tickets, type) => {
   const dateList = getDateList();
 
   // Create an array to store the count of tickets for each date
@@ -208,16 +208,12 @@ export const countTicketsByDate = (tickets) => {
 
     // Count the tickets within the date range
     const count = tickets.filter(ticket => {
-      const ticketBigNumberDate = convertBigNumberToDate(ticket.timestamp);
-      // console.log(ticketBigNumberDate);
+      const getTimestamp = type === 1 ? ticket.timestamp : type === 2 ? ticket.verifiedTimestamp : type === 3 ? ticket.refundTimestamp : ticket.timestamp;
+      const ticketBigNumberDate = convertBigNumberToDate(getTimestamp);
       const ticketDate = new Date(ticketBigNumberDate);
       const ticketDateString = formatDate(ticketDate);
       const dateString = formatDate(date);
 
-      // console.log(ticketDateString);
-      // console.log(dateString);
-      // console.log(endDateString);
-      // console.log(ticketDateString === dateString);
       return ticketDateString === dateString;
     }).length;
 

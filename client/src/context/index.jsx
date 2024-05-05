@@ -306,6 +306,8 @@ export const StateContextProvider = ({ children }) => {
         isWaitingForRefund: ticket.isWaitingForRefund,
         refunded: ticket.refunded,
         minted: ticket.minted,
+        verifiedTimestamp: ticket.verifiedTimestamp,
+        refundTimestamp: ticket.refundTimestamp,
       }));
 
       // console.info("contract call success", data);
@@ -338,6 +340,8 @@ export const StateContextProvider = ({ children }) => {
         isWaitingForRefund: ticket.isWaitingForRefund,
         refunded: ticket.refunded,
         minted: ticket.minted,
+        verifiedTimestamp: ticket.verifiedTimestamp,
+        refundTimestamp: ticket.refundTimestamp,
       }));
 
       // console.info("contract call success", data);
@@ -370,6 +374,8 @@ export const StateContextProvider = ({ children }) => {
         isWaitingForRefund: data.isWaitingForRefund,
         refunded: data.refunded,
         minted: data.minted,
+        verifiedTimestamp: data.verifiedTimestamp,
+        refundTimestamp: data.refundTimestamp,
       };
 
       // console.info("contract call success", data);
@@ -457,6 +463,8 @@ export const StateContextProvider = ({ children }) => {
         qrCode: ticket.qrCode,
         refunded: ticket.refunded,
         minted: ticket.minted,
+        verifiedTimestamp: ticket.verifiedTimestamp,
+        refundTimestamp: ticket.refundTimestamp,
       }));
 
       // console.info("contract call success", data);
