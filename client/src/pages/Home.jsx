@@ -3,13 +3,11 @@ import Hero from "../sections/Home/Hero";
 import GridView from "../components/EventGridView";
 import PaginationSection from "../sections/Home/PaginationSection";
 import { useStateContext } from "../context";
-import { eventCategoryList } from "../constants/index";
+import { eventCategoryList, videoPublicId } from "../constants/index";
 import { IoSearchOutline } from "react-icons/io5";
 import HowItWorksSection from "../sections/Home/HowItWorksSection";
 import ChatWootWidget from "../widgets/ChatWootWidget";
-import ReactPlayer from "react-player";
-import { videoUrl } from "../constants";
-ReactPlayer.default;
+import VideoPlayer from "../components/VideoPlayer";
 
 const Home = () => {
   const { contract, address, getAllEvents } = useStateContext();
@@ -126,14 +124,18 @@ const Home = () => {
       {open ? (
         <div
           className="fixed inset-0 z-30 h-screen px-4 bg-[#000000b3] backdrop-blur-sm flex items-center justify-center"
-          onClick={() => setOpen(false)}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              // Check if the clicked element is the div itself
+              setOpen(false);
+            }
+          }}
         >
-          <ReactPlayer
-            url={videoUrl}
-            controls={true}
-            playing={true}
-            muted={true}
-            style={{ borderRadius: "20px", overflow: "hidden" }}
+          <VideoPlayer
+            id="blockchain-player"
+            publicId={videoPublicId}
+            width="1280"
+            height="720"
           />
         </div>
       ) : null}

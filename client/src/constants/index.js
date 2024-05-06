@@ -19,4 +19,4 @@ export const defaultImageUrl = 'https://d391b93f5f62d9c15f67142e43841acc.ipfscdn
 
 export const openSeaUrl = 'https://testnets.opensea.io/assets/sepolia/' + CONTRACT_ADDRESS + '/';
 
-export const videoUrl = 'https://firebasestorage.googleapis.com/v0/b/chat-app-ed9cc.appspot.com/o/0505.mp4?alt=media&token=16734167-dff6-4b7d-bf4c-b176cff14c25';
+export const videoPublicId = '0505_jpwk4u';
