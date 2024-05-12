@@ -27,7 +27,7 @@ const SecondaryMarketSection = ({ eventId, onLoading }) => {
   return (
     <>
       {tickets.length > 0 ? (
-        <section className="pt-10 pb-16 h-screen">
+        <section className="pt-10 pb-16 h-screen bg-white mb-10">
           <div className="mx-auto max-w-7xl px-4">
             {/* section title */}
             <h2 className="font-bold text-[26px] leading-none tracking-tight">

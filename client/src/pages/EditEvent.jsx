@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import HeaderSection from "../sections/CreateEvent/HeaderSection";
-import FormSection from "../sections/CreateEvent/FormSection";
+import Header from "../components/Header";
+import FormSection from "../sections/Event/FormSection";
 import { useParams } from "react-router-dom";
 import { useStateContext } from "../context";
 import Spinner from "../assets/images/spinning-dots.svg";
@@ -34,7 +34,7 @@ const EditEvent = () => {
   return (
     <div>
       {/* header section */}
-      <HeaderSection title={"Edit"} />
+      <Header title={"Edit Event"} />
       {/* form section */}
       {isLoading ? (
         <div className="flex justify-center items-center text-[14px] h-[20rem]">

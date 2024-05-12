@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import HeaderSection from "../sections/About/HeaderSection";
+import Header from "../components/Header";
 import InfoSection from "../sections/About/InfoSection";
 
-export const About = () => {
+const About = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -10,9 +10,11 @@ export const About = () => {
   return (
     <div>
       {/* header section */}
-      <HeaderSection />
+      <Header title={"About Us"} />
       {/* info section */}
       <InfoSection />
     </div>
   );
 };
+
+export default About;

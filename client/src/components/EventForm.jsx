@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useStorageUpload } from "@thirdweb-dev/react";
 import * as yup from "yup";
 import { eventCategoryList } from "../constants/index";
 import { ethers } from "ethers";
 import { useStateContext } from "../context";
 import { updateTime, separateTime } from "../utils";
+import { uploadFileToIPFS } from "../services/pinata";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import Loader from "./Loader";
@@ -12,13 +12,13 @@ import Loader from "./Loader";
 const EventForm = ({ event }) => {
   const { createEvent, updateEvent, address, connect } = useStateContext();
   const navigate = useNavigate();
-  const { mutateAsync: upload } = useStorageUpload();
 
   const notifyEndDateMustBeHigher = () =>
     toast.error("End date must be greater than start date");
   const notifyValidStartDate = () => toast.error("Provide valid start date");
   const notifyUnAuthorized = () => toast.error("Unauthorized entity");
   const notifyConnectWallet = () => toast.error("Please connect your wallet");
+  const notifySomethingWrong = () => toast.error("Something went wrong!");
 
   useEffect(() => {
     if (event) setEventDetails();
@@ -26,7 +26,7 @@ const EventForm = ({ event }) => {
 
   const schema = yup.object().shape({
     title: yup.string().required("Please enter the event title"),
-    imageUrl: yup.string().required("Please enter the event image url"),
+    imageUrl: yup.string().required("Please select the image"),
     ticketAmount: yup
       .number("Ticket amount must be a number")
       .typeError("Please enter the event total tickets")
@@ -93,147 +93,37 @@ const EventForm = ({ event }) => {
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    if (isSubmitting) {
-      // Prevent multiple submissions while the current one is in progress
-      return;
-    }
+    // If submitting, do nothing
+    if (isSubmitting) return;
+
+    // Start submitting
+    setIsSubmitting(true);
 
     try {
+      // Validation
       await schema.validate(formDetails, { abortEarly: false });
 
-      if (
-        new Date(
-          updateTime(formDetails.startsAt, formDetails.startsAtTime)
-        ).getTime() > new Date().getTime()
-      ) {
-        if (
-          new Date(
-            updateTime(formDetails.endsAt, formDetails.endsAtTime)
-          ).getTime() >
-          new Date(
-            updateTime(formDetails.startsAt, formDetails.startsAtTime)
-          ).getTime()
-        ) {
+      // Check if start date is valid
+      const startDate = new Date(
+        updateTime(formDetails.startsAt, formDetails.startsAtTime)
+      ).getTime();
+      const endDate = new Date(
+        updateTime(formDetails.endsAt, formDetails.endsAtTime)
+      ).getTime();
+
+      if (startDate > new Date().getTime()) {
+        if (endDate > startDate) {
           if (event) {
-            if (address != null) {
-              if (address == event.owner) {
-                setIsLoading(true);
-                setIsSubmitting(true);
-
-                let uploadUrl;
-                if (trackImage !== pickImage && pickImage !== "") {
-                  try {
-                    const tempUrl = await upload({
-                      data: [pickImage],
-                      options: {
-                        uploadWithGatewayUrl: true,
-                        uploadWithoutDirectory: true,
-                      },
-                    });
-                    uploadUrl = tempUrl[0];
-                  } catch (error) {
-                    console.error("Error uploading image:", error);
-                    setIsLoading(false);
-                    setIsSubmitting(false);
-                    return;
-                  }
-                } else {
-                  uploadUrl = formDetails.imageUrl;
-                }
-
-                // console.log("track" + pickImage);
-                // console.log(uploadUrl);
-                try {
-                  const response = await updateEvent({
-                    eventId: event.id,
-                    title: formDetails.title,
-                    description: formDetails.description,
-                    imageUrl: uploadUrl,
-                    ticketAmount: formDetails.ticketAmount,
-                    ticketRemain:
-                      formDetails.ticketAmount >
-                      formDetails.ticketPreviousAmount
-                        ? event.ticketRemain +
-                          (formDetails.ticketAmount -
-                            formDetails.ticketPreviousAmount)
-                        : event.ticketRemain -
-                          (formDetails.ticketPreviousAmount -
-                            formDetails.ticketAmount),
-                    ticketCost: ethers.utils.parseUnits(
-                      formDetails.ticketCost.toString(),
-                      "ether"
-                    ),
-                    startsAt: new Date(
-                      updateTime(formDetails.startsAt, formDetails.startsAtTime)
-                    ).getTime(),
-                    endsAt: new Date(
-                      updateTime(formDetails.endsAt, formDetails.endsAtTime)
-                    ).getTime(),
-                    location: formDetails.location,
-                    category: formDetails.category,
-                  });
-                  setIsLoading(false);
-                  if (response) navigate("/");
-                } catch (error) {
-                  console.error("Error updating event:", error);
-                  setIsLoading(false);
-                }
-              } else {
-                notifyUnAuthorized();
-              }
+            // Update existing event
+            if (event && address !== null && address === event.owner) {
+              await handleEventSubmission(startDate, endDate, "update");
             } else {
-              connect();
-              notifyConnectWallet();
+              notifyUnAuthorized();
             }
           } else {
-            if (address != null) {
-              setIsLoading(true);
-              setIsSubmitting(true);
-
-              let uploadUrl;
-              try {
-                const tempUrl = await upload({
-                  data: [pickImage],
-                  options: {
-                    uploadWithGatewayUrl: true,
-                    uploadWithoutDirectory: true,
-                  },
-                });
-                uploadUrl = tempUrl[0];
-              } catch (error) {
-                console.error("Error uploading image:", error);
-                setIsLoading(false);
-                setIsSubmitting(false);
-                return;
-              }
-
-              try {
-                const response = await createEvent({
-                  title: formDetails.title,
-                  description: formDetails.description,
-                  imageUrl: uploadUrl,
-                  ticketAmount: formDetails.ticketAmount,
-                  ticketCost: ethers.utils.parseUnits(
-                    formDetails.ticketCost.toString(),
-                    "ether"
-                  ),
-                  startsAt: new Date(
-                    updateTime(formDetails.startsAt, formDetails.startsAtTime)
-                  ).getTime(),
-                  endsAt: new Date(
-                    updateTime(formDetails.endsAt, formDetails.endsAtTime)
-                  ).getTime(),
-                  location: formDetails.location,
-                  category: formDetails.category,
-                });
-
-                setIsLoading(false);
-
-                if (response) navigate("/");
-              } catch (error) {
-                console.error("Error creating event:", error);
-                setIsLoading(false);
-              }
+            // Create new event
+            if (address !== null) {
+              await handleEventSubmission(startDate, endDate, "add");
             } else {
               connect();
               notifyConnectWallet();
@@ -247,17 +137,89 @@ const EventForm = ({ event }) => {
       }
     } catch (error) {
       const newErrors = {};
-
       error.inner.forEach((err) => {
         newErrors[err.path] = err.message;
       });
-
       setErrors(newErrors);
     } finally {
-      // Reset submitting state after 2 seconds
+      // Reset submitting state after 3 seconds
       setTimeout(() => {
         setIsSubmitting(false);
-      }, 2000); // 2000 milliseconds = 2 seconds
+      }, 3000);
+    }
+  };
+
+  const handleEventSubmission = async (startDate, endDate, status) => {
+    setIsLoading(true);
+
+    let uploadUrl;
+    try {
+      if (trackImage !== pickImage && pickImage !== "") {
+        const response = await uploadFileToIPFS(
+          pickImage,
+          "event",
+          `${pickImage.name}`
+        );
+        if (response.success === true) {
+          uploadUrl = response.pinataURL;
+        } else {
+          console.error("Error uploading image:", response.message);
+          throw new Error(response.message);
+        }
+      } else {
+        uploadUrl = formDetails.imageUrl;
+      }
+
+      const amountWei = ethers.utils.parseEther(
+        formDetails.ticketCost.toString()
+      );
+
+      // console.log("Amount in Wei:", amountWei.toString());
+
+      const response =
+        status === "update"
+          ? await updateEvent({
+              eventId: event.id,
+              title: formDetails.title,
+              description: formDetails.description,
+              imageUrl: uploadUrl,
+              ticketAmount: formDetails.ticketAmount,
+              ticketRemain:
+                formDetails.ticketAmount > formDetails.ticketPreviousAmount
+                  ? event.ticketRemain +
+                    (formDetails.ticketAmount -
+                      formDetails.ticketPreviousAmount)
+                  : event.ticketRemain -
+                    (formDetails.ticketPreviousAmount -
+                      formDetails.ticketAmount),
+              ticketCost: ethers.utils.parseEther(
+                formDetails.ticketCost.toString()
+              ),
+              startsAt: startDate,
+              endsAt: endDate,
+              location: formDetails.location,
+              category: formDetails.category,
+            })
+          : await createEvent({
+              title: formDetails.title,
+              description: formDetails.description,
+              imageUrl: uploadUrl,
+              ticketAmount: formDetails.ticketAmount,
+              ticketCost: ethers.utils.parseEther(
+                formDetails.ticketCost.toString()
+              ),
+              startsAt: startDate,
+              endsAt: endDate,
+              location: formDetails.location,
+              category: formDetails.category,
+            });
+
+      setIsLoading(false);
+      if (response) navigate("/");
+    } catch (error) {
+      console.error("Error handling event submission:", error);
+      setIsLoading(false);
+      notifySomethingWrong();
     }
   };
 
@@ -325,7 +287,7 @@ const EventForm = ({ event }) => {
                 <input
                   className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none"
                   type="text"
-                  value={formDetails.imageUrl}
+                  defaultValue={formDetails.imageUrl}
                 />
               )}
             </div>

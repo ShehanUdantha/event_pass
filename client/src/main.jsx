@@ -9,17 +9,18 @@ import {
 import { Sepolia } from "@thirdweb-dev/chains";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
+import { StateContextProvider } from "./context";
 import Home from "./pages/Home.jsx";
 import CreateEvent from "./pages/CreateEvent.jsx";
 import Profile from "./pages/Profile.jsx";
 import ViewEvent from "./pages/ViewEvent.jsx";
-import { StateContextProvider } from "./context";
 import EditEvent from "./pages/EditEvent.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import ViewTicket from "./pages/ViewTicket.jsx";
 import Scanner from "./pages/Scanner.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
-import { About } from "./pages/About.jsx";
+import Media from "./pages/Media.jsx";
+import About from "./pages/About.jsx";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
       {
         path: "/event/:id/dashboard",
         element: <Dashboard />,
+      },
+      {
+        path: "/event/:id/media",
+        element: <Media />,
       },
       {
         path: "/*",

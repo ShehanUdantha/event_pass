@@ -4,13 +4,13 @@ import toast, { Toaster } from "react-hot-toast";
 import {
   EmailIcon,
   FacebookIcon,
-  PinterestIcon,
+  TelegramIcon,
   RedditIcon,
-  TwitterIcon,
+  XIcon,
   WhatsappIcon,
   EmailShareButton,
   FacebookShareButton,
-  PinterestShareButton,
+  TelegramShareButton,
   RedditShareButton,
   TwitterShareButton,
   WhatsappShareButton,
@@ -60,15 +60,15 @@ const SocialMediaShareModal = ({ url, onClose }) => {
               <FacebookShareButton url={url}>
                 <FacebookIcon size={38} round={true} />
               </FacebookShareButton>
-              <PinterestShareButton url={url}>
-                <PinterestIcon size={38} round={true} />
-              </PinterestShareButton>
               <TwitterShareButton url={url}>
-                <TwitterIcon size={38} round={true} />
+                <XIcon size={38} round={true} />
               </TwitterShareButton>
               <RedditShareButton url={url}>
                 <RedditIcon size={38} round={true} />
               </RedditShareButton>
+              <TelegramShareButton url={url}>
+                <TelegramIcon size={38} round={true} />
+              </TelegramShareButton>
               <WhatsappShareButton url={url}>
                 <WhatsappIcon size={38} round={true} />
               </WhatsappShareButton>

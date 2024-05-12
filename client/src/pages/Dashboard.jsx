@@ -19,12 +19,14 @@ import {
   MdDeleteOutline,
   MdAttachMoney,
   MdOutlineArrowRightAlt,
+  MdOutlinePermMedia,
 } from "react-icons/md";
 import { IoTicketOutline } from "react-icons/io5";
 import { RiUserLine } from "react-icons/ri";
 import toast, { Toaster } from "react-hot-toast";
 import Loader from "../components/Loader";
 import LineChart from "../components/LineChart";
+import PageNotFound from "./NotFound";
 
 const Dashboard = () => {
   const { id } = useParams();
@@ -58,6 +60,7 @@ const Dashboard = () => {
   const notifyUnAuthorized = () => toast.error("Unauthorized entity");
   const notifyEventAlreadyOnGoing = () => toast.error("Event still ongoing");
   const notifyEventAlreadyPaid = () => toast.error("Event already paid out");
+  const notifyRefundRequest = () => toast.error("Refund request remaining");
 
   const fetchEvent = async (contractData) => {
     setIsSectionLoading(true);
@@ -175,13 +178,19 @@ const Dashboard = () => {
           updateTime(currentDateValue.date, currentDateValue.time)
         ).getTime()
       ) {
-        if (!event.paidOut) {
-          setIsLoaderLoading(true);
-          const response = await payout(event.id);
-          // console.log(response);
-          setIsLoaderLoading(false);
+        if (waitingForRefundTickets.length == 0) {
+          if (!event.paidOut) {
+            setIsLoaderLoading(true);
+            const response = await payout(event.id);
+            // console.log(response);
+            fetchEvent();
+            fetchTickets();
+            setIsLoaderLoading(false);
+          } else {
+            notifyEventAlreadyPaid();
+          }
         } else {
-          notifyEventAlreadyPaid();
+          notifyRefundRequest();
         }
       } else {
         notifyEventAlreadyOnGoing();
@@ -196,7 +205,8 @@ const Dashboard = () => {
       setIsLoaderLoading(true);
       const data = await refundTicket(ticket.eventId, ticket.id);
       // console.log(data);
-      window.location.reload(false);
+      fetchEvent();
+      fetchTickets();
       setIsLoaderLoading(false);
     } else {
       notifyUnAuthorized();
@@ -218,30 +228,28 @@ const Dashboard = () => {
         <>
           {event.id === 0 ||
           (event.owner != address && contractOwner != address) ? (
-            <div className="flex justify-center items-center text-[14px] h-screen">
-              <div className="text-3xl font-bold">Page Not Found</div>
-            </div>
+            <PageNotFound />
           ) : (
             <div className="bg-[#F6F8FD] pt-32 pb-16 h-full">
               <div className="mx-auto max-w-7xl px-4">
-                <main class="w-full min-h-screen transition-all main">
+                <main className="w-full min-h-screen transition-all main">
                   {/* first section */}
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                    <div class="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
-                      <div class="flex justify-between mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                    <div className="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
+                      <div className="flex justify-between mb-6">
                         <div>
-                          <div class="text-2xl font-semibold mb-1">
+                          <div className="text-2xl font-semibold mb-1">
                             {event.ticketAmount - event.ticketRemain}
                           </div>
-                          <div class="text-sm font-medium text-gray-400">
+                          <div className="text-sm font-medium text-gray-400">
                             Sold tickets
                           </div>
                         </div>
                       </div>
-                      <div class="flex items-center">
-                        <div class="w-full bg-gray-100 rounded-full h-4">
+                      <div className="flex items-center">
+                        <div className="w-full bg-gray-100 rounded-full h-4">
                           <div
-                            class="h-full bg-blue-500 rounded-full p-1"
+                            className="h-full bg-blue-500 rounded-full p-1"
                             style={{
                               width: `${calculatePercentage(
                                 event.ticketAmount,
@@ -249,10 +257,10 @@ const Dashboard = () => {
                               )}%`,
                             }}
                           >
-                            <div class="w-2 h-2 rounded-full bg-white ml-auto"></div>
+                            <div className="w-2 h-2 rounded-full bg-white ml-auto"></div>
                           </div>
                         </div>
-                        <span class="text-sm font-medium text-gray-600 ml-4">
+                        <span className="text-sm font-medium text-gray-600 ml-4">
                           {calculatePercentage(
                             event.ticketAmount,
                             event.ticketAmount - event.ticketRemain
@@ -261,36 +269,36 @@ const Dashboard = () => {
                         </span>
                       </div>
                     </div>
-                    <div class="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
-                      <div class="flex justify-between mb-4">
+                    <div className="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
+                      <div className="flex justify-between mb-4">
                         <div>
-                          <div class="flex items-center mb-1">
-                            <div class="text-2xl font-semibold">
+                          <div className="flex items-center mb-1">
+                            <div className="text-2xl font-semibold">
                               {verifiedTicketsCount}
                             </div>
                           </div>
-                          <div class="text-sm font-medium text-gray-400">
+                          <div className="text-sm font-medium text-gray-400">
                             Verified Tickets
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div class="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
-                      <div class="flex justify-between mb-6">
+                    <div className="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
+                      <div className="flex justify-between mb-6">
                         <div>
-                          <div class="text-2xl font-semibold mb-1">
-                            <span class="text-base font-normal text-gray-400 align-top mr-2">
+                          <div className="text-2xl font-semibold mb-1">
+                            <span className="text-base font-normal text-gray-400 align-top mr-2">
                               ETH
                             </span>
                             {convertWeiToEth(event.balance)}
                           </div>
-                          <div class="text-sm font-medium text-gray-400">
+                          <div className="text-sm font-medium text-gray-400">
                             Balance
                           </div>
                         </div>
                       </div>
-                      <div class="flex items-center overflow-x-auto">
-                        <span class="text-blue-500 font-medium text-sm hover:text-blue-600">
+                      <div className="flex items-center overflow-x-auto">
+                        <span className="text-blue-500 font-medium text-sm hover:text-blue-600">
                           Event End In:{" "}
                           <span className="text-gray-400">
                             {remainingTimes != "Expired"
@@ -303,35 +311,37 @@ const Dashboard = () => {
                   </div>
 
                   {/* second section */}
-                  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                    <div class="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md lg:col-span-2">
-                      <div class="flex justify-between mb-4 items-start">
-                        <div class="font-medium">Event Statistics</div>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <div className="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md lg:col-span-2">
+                      <div className="flex justify-between mb-4 items-start">
+                        <div className="font-medium">Event Statistics</div>
                       </div>
-                      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                        <div class="rounded-md border border-dashed border-gray-200 p-4">
-                          <div class="flex items-center mb-0.5">
-                            <span class="p-1 rounded text-[12px] font-semibold bg-blue-500/10 text-blue-500 leading-none ml-1">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                        <div className="rounded-md border border-dashed border-gray-200 p-4">
+                          <div className="flex items-center mb-0.5">
+                            <span className="p-1 rounded text-[12px] font-semibold bg-blue-500/10 text-blue-500 leading-none ml-1">
                               {event.ticketAmount - event.ticketRemain}
                             </span>
                           </div>
-                          <span class="text-gray-400 text-sm">Sold</span>
+                          <span className="text-gray-400 text-sm">Sold</span>
                         </div>
-                        <div class="rounded-md border border-dashed border-gray-200 p-4">
-                          <div class="flex items-center mb-0.5">
-                            <span class="p-1 rounded text-[12px] font-semibold bg-emerald-500/10 text-emerald-500 leading-none ml-1">
+                        <div className="rounded-md border border-dashed border-gray-200 p-4">
+                          <div className="flex items-center mb-0.5">
+                            <span className="p-1 rounded text-[12px] font-semibold bg-emerald-500/10 text-emerald-500 leading-none ml-1">
                               {verifiedTicketsCount}
                             </span>
                           </div>
-                          <span class="text-gray-400 text-sm">Verified</span>
+                          <span className="text-gray-400 text-sm">
+                            Verified
+                          </span>
                         </div>
-                        <div class="rounded-md border border-dashed border-gray-200 p-4">
-                          <div class="flex items-center mb-0.5">
-                            <span class="p-1 rounded text-[12px] font-semibold bg-rose-500/10 text-rose-500 leading-none ml-1">
+                        <div className="rounded-md border border-dashed border-gray-200 p-4">
+                          <div className="flex items-center mb-0.5">
+                            <span className="p-1 rounded text-[12px] font-semibold bg-rose-500/10 text-rose-500 leading-none ml-1">
                               {waitingForRefundTickets.length}
                             </span>
                           </div>
-                          <span class="text-gray-400 text-sm">
+                          <span className="text-gray-400 text-sm">
                             Refund Request
                           </span>
                         </div>
@@ -348,18 +358,18 @@ const Dashboard = () => {
                         />
                       </div>
                     </div>
-                    <div class="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md">
-                      <div class="flex justify-between mb-4 items-start">
-                        <div class="font-medium">Manage</div>
+                    <div className="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md">
+                      <div className="flex justify-between mb-4 items-start">
+                        <div className="font-medium">Manage</div>
                       </div>
-                      <div class="overflow-x-auto">
-                        <table class="w-full">
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
                           <tbody>
                             {/* event edit option */}
                             {address == event.owner ? (
                               <tr>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                  <div class="flex items-center">
+                                <td className="py-2 px-4 border-b border-b-gray-50">
+                                  <div className="flex items-center">
                                     <div className="w-8 h-8 rounded object-cover bg-gray-200 flex justify-center items-center">
                                       <FaRegEdit className="text-gray-600" />
                                     </div>
@@ -367,19 +377,19 @@ const Dashboard = () => {
                                       key={event.id + "edit"}
                                       to={"/event/" + event.id + "/edit"}
                                     >
-                                      <span class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate">
+                                      <span className="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate">
                                         Edit Event
                                       </span>
                                     </Link>
                                   </div>
                                 </td>
-                                {/* <td class="py-2 px-4 border-b border-b-gray-50">
-                              <span class="text-[13px] font-medium text-emerald-500">
+                                {/* <td className="py-2 px-4 border-b border-b-gray-50">
+                              <span className="text-[13px] font-medium text-emerald-500">
                                 +$235
                               </span>
                             </td>
-                            <td class="py-2 px-4 border-b border-b-gray-50">
-                              <span class="inline-block p-1 rounded bg-emerald-500/10 text-emerald-500 font-medium text-[12px] leading-none">
+                            <td className="py-2 px-4 border-b border-b-gray-50">
+                              <span className="inline-block p-1 rounded bg-emerald-500/10 text-emerald-500 font-medium text-[12px] leading-none">
                                 Pending
                               </span>
                             </td> */}
@@ -388,13 +398,13 @@ const Dashboard = () => {
                             {/* event withdraw option */}
                             {address == event.owner ? (
                               <tr>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                  <div class="flex items-center">
+                                <td className="py-2 px-4 border-b border-b-gray-50">
+                                  <div className="flex items-center">
                                     <div className="w-8 h-8 rounded object-cover bg-gray-200 flex justify-center items-center">
                                       <MdAttachMoney className="text-gray-600" />
                                     </div>
                                     <span
-                                      class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate cursor-pointer"
+                                      className="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate cursor-pointer"
                                       onClick={() => callPayout()}
                                     >
                                       Withdraw Money
@@ -405,13 +415,13 @@ const Dashboard = () => {
                             ) : null}
 
                             <tr>
-                              <td class="py-2 px-4 border-b border-b-gray-50">
-                                <div class="flex items-center">
+                              <td className="py-2 px-4 border-b border-b-gray-50">
+                                <div className="flex items-center">
                                   <div className="w-8 h-8 rounded object-cover bg-gray-200 flex justify-center items-center">
                                     <MdDeleteOutline className="text-gray-600" />
                                   </div>
                                   <span
-                                    class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate cursor-pointer"
+                                    className="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate cursor-pointer"
                                     onClick={() => callEventDelete()}
                                   >
                                     Delete Event
@@ -422,17 +432,36 @@ const Dashboard = () => {
                             {/* event scanner option */}
                             {address == event.owner ? (
                               <tr>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                  <div class="flex items-center">
+                                <td className="py-2 px-4 border-b border-b-gray-50">
+                                  <div className="flex items-center">
                                     <div className="w-8 h-8 rounded object-cover bg-gray-200 flex justify-center items-center">
                                       <MdQrCodeScanner className="text-gray-600" />
                                     </div>
                                     <Link
                                       key={event.id + "scanner"}
                                       to={"/event/" + event.id + "/scanner"}
-                                      class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate"
+                                      className="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate"
                                     >
-                                      <a href="#">Ticket Scanner</a>
+                                      <span>Ticket Scanner</span>
+                                    </Link>
+                                  </div>
+                                </td>
+                              </tr>
+                            ) : null}
+                            {/* event media option */}
+                            {address == event.owner ? (
+                              <tr>
+                                <td className="py-2 px-4 border-b border-b-gray-50">
+                                  <div className="flex items-center">
+                                    <div className="w-8 h-8 rounded object-cover bg-gray-200 flex justify-center items-center">
+                                      <MdOutlinePermMedia className="text-gray-600" />
+                                    </div>
+                                    <Link
+                                      key={event.id + "media"}
+                                      to={"/event/" + event.id + "/media"}
+                                      className="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate"
+                                    >
+                                      <span>Media</span>
                                     </Link>
                                   </div>
                                 </td>
@@ -445,56 +474,56 @@ const Dashboard = () => {
                   </div>
 
                   {/* third section */}
-                  <div class="grid grid-cols-1 gap-6 mb-6">
-                    <div class="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md">
-                      <div class="flex justify-between mb-4 items-start">
-                        <div class="font-medium">Ticket Refunds</div>
+                  <div className="grid grid-cols-1 gap-6 mb-6">
+                    <div className="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md">
+                      <div className="flex justify-between mb-4 items-start">
+                        <div className="font-medium">Ticket Refunds</div>
                       </div>
-                      <div class="overflow-x-auto">
-                        <table class="w-full min-w-[540px]">
+                      <div className="overflow-x-auto">
+                        <table className="w-full min-w-[540px]">
                           <thead>
                             <tr>
-                              <th class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+                              <th className="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
                                 Ticket Id
                               </th>
-                              <th class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+                              <th className="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
                                 Requested
                               </th>
-                              <th class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                              <th className="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
                                 Buyer
                               </th>
-                              <th class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                              <th className="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
                                 {" "}
                               </th>
-                              <th class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tr-md rounded-br-md"></th>
+                              <th className="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tr-md rounded-br-md"></th>
                             </tr>
                           </thead>
                           <tbody>
                             {waitingForRefundTickets.map((ticket, index) => (
                               <tr key={ticket.owner + index}>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                  <div class="flex items-center">
+                                <td className="py-2 px-4 border-b border-b-gray-50">
+                                  <div className="flex items-center">
                                     <div className="w-8 h-8 rounded object-cover bg-gray-200 flex justify-center items-center">
                                       <IoTicketOutline className="text-gray-600" />
                                     </div>
-                                    <span class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-4 truncate">
+                                    <span className="text-gray-600 text-sm font-medium hover:text-blue-500 ml-4 truncate">
                                       {ticket.id}
                                     </span>
                                   </div>
                                 </td>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                  <span class="text-[13px] font-medium text-gray-400">
+                                <td className="py-2 px-4 border-b border-b-gray-50">
+                                  <span className="text-[13px] font-medium text-gray-400">
                                     {calculateTimeAgo(ticket.refundTimestamp)}
                                   </span>
                                 </td>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                  <span class="text-[13px] font-medium text-gray-400">
+                                <td className="py-2 px-4 border-b border-b-gray-50">
+                                  <span className="text-[13px] font-medium text-gray-400">
                                     {ticket.owner}
                                   </span>
                                 </td>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                <td className="py-2 px-4 border-b border-b-gray-50">
                                   <span
-                                    class="text-[13px] font-medium text-[#4338ca] cursor-pointer"
+                                    className="text-[13px] font-medium text-[#4338ca] cursor-pointer"
                                     onClick={() => callRefundTicket(ticket)}
                                   >
                                     Refund
@@ -509,19 +538,19 @@ const Dashboard = () => {
                   </div>
 
                   {/* fourth section */}
-                  <div class="grid grid-cols-1 gap-6 mb-6">
-                    <div class="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md">
-                      <div class="flex justify-between mb-4 items-start">
-                        <div class="font-medium">Ticket History</div>
+                  <div className="grid grid-cols-1 gap-6 mb-6">
+                    <div className="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md">
+                      <div className="flex justify-between mb-4 items-start">
+                        <div className="font-medium">Ticket History</div>
                       </div>
-                      <div class="overflow-x-auto">
-                        <table class="w-full min-w-[540px]">
+                      <div className="overflow-x-auto">
+                        <table className="w-full min-w-[540px]">
                           <thead>
                             <tr>
-                              <th class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+                              <th className="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
                                 Ticket Id
                               </th>
-                              <th class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                              <th className="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
                                 Transfers
                               </th>
                             </tr>
@@ -529,18 +558,18 @@ const Dashboard = () => {
                           <tbody>
                             {ticketHistory.map((history, index) => (
                               <tr key={history.id + index}>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                  <div class="flex items-center">
+                                <td className="py-2 px-4 border-b border-b-gray-50">
+                                  <div className="flex items-center">
                                     <div className="w-8 h-8 rounded object-cover bg-gray-200 flex justify-center items-center">
                                       <RiUserLine className="text-gray-600" />
                                     </div>
-                                    <span class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-4 truncate">
+                                    <span className="text-gray-600 text-sm font-medium hover:text-blue-500 ml-4 truncate">
                                       {history.id}
                                     </span>
                                   </div>
                                 </td>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                  <div class="flex gap-1 ">
+                                <td className="py-2 px-4 border-b border-b-gray-50">
+                                  <div className="flex gap-1 ">
                                     {history.owners.map((owner, index) => (
                                       <div
                                         key={owner + index}

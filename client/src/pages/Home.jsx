@@ -3,10 +3,11 @@ import Hero from "../sections/Home/Hero";
 import GridView from "../components/EventGridView";
 import PaginationSection from "../sections/Home/PaginationSection";
 import { useStateContext } from "../context";
-import { eventCategoryList, videoPublicId } from "../constants/index";
+import { eventCategoryList, infoVideoUrl } from "../constants/index";
 import { IoSearchOutline } from "react-icons/io5";
 import HowItWorksSection from "../sections/Home/HowItWorksSection";
 import ChatWootWidget from "../widgets/ChatWootWidget";
+import videojs from "video.js";
 import VideoPlayer from "../components/VideoPlayer";
 
 const Home = () => {
@@ -14,6 +15,7 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState([]);
   const eventsRef = useRef(null);
+  const playerRef = useRef();
 
   const [searchInput, setSearchInput] = useState("");
   const [filteredCategory, setFilteredCategory] = useState();
@@ -67,6 +69,18 @@ const Home = () => {
 
   const scrollToEvents = () => {
     eventsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handlePlayerReady = (player) => {
+    playerRef.current = player;
+
+    player.on("waiting", () => {
+      videojs.log("player is waiting");
+    });
+
+    player.on("dispose", () => {
+      videojs.log("player will dispose");
+    });
   };
 
   return (
@@ -131,12 +145,9 @@ const Home = () => {
             }
           }}
         >
-          <VideoPlayer
-            id="blockchain-player"
-            publicId={videoPublicId}
-            width="1280"
-            height="720"
-          />
+          <div className="w-full md:w-3/5 aspect-video overflow-hidden rounded-[20px]">
+            <VideoPlayer onReady={handlePlayerReady} videoUrl={infoVideoUrl} />
+          </div>
         </div>
       ) : null}
     </div>

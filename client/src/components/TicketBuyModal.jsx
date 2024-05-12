@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useStorageUpload } from "@thirdweb-dev/react";
 import { IoClose } from "react-icons/io5";
 import {
   TOTAL_TICKET_CAN_PURCHASE,
@@ -16,8 +15,10 @@ import {
   calculateRemainingTime,
   dataURItoBlob,
   generateJson,
+  generateRandomRGB,
 } from "../utils/index";
 import { HfInference } from "@huggingface/inference";
+import { uploadFileToIPFS, uploadJSONToIPFS } from "../services/pinata";
 
 const TicketBuyModal = ({
   eventId,
@@ -32,7 +33,6 @@ const TicketBuyModal = ({
   if (!isVisible) return null;
 
   const { buyTickets, contract, address, connect, signer } = useStateContext();
-  const { mutateAsync: upload } = useStorageUpload();
 
   useEffect(() => {
     if (address) {
@@ -48,7 +48,10 @@ const TicketBuyModal = ({
       .typeError("Please enter the number of tickets")
       .positive("Ticket amount must be a positive number")
       .min(1, "Minimum ticket amount should be 1")
-      .max(5, "maximum ticket amount should be 5")
+      .max(
+        TOTAL_TICKET_CAN_PURCHASE,
+        `maximum ticket amount should be ${TOTAL_TICKET_CAN_PURCHASE}`
+      )
       .required("Please enter the number of tickets"),
   });
 
@@ -88,15 +91,51 @@ const TicketBuyModal = ({
               const generatedJsonArray = [];
               try {
                 for (let i = 0; i < data.ticketAmount; i++) {
-                  const result = await generateArt();
-                  const uploadedImage = await uploadToIPFS(result, true);
-                  const generatedJson = generateJson(uploadedImage);
-                  const uploadedJson = await uploadToIPFS(generatedJson, false);
+                  const randomColor = generateRandomRGB();
+                  const result = await generateArt(randomColor);
+                  const blob = dataURItoBlob(result);
+                  const newRandomNumber = Math.floor(Math.random() * 500) + 1;
 
-                  // console.log(uploadedImage);
-                  // console.log(generatedJson);
-                  // console.log(uploadedJson);
-                  generatedJsonArray.push(uploadedJson);
+                  const file = new File(
+                    [blob],
+                    `${eventId}_${newRandomNumber}_image.jpg`,
+                    {
+                      type: "image/jpeg",
+                    }
+                  );
+
+                  const uploadedImageResponse = await uploadFileToIPFS(
+                    file,
+                    `event_${eventId}`,
+                    `${file.name}`
+                  );
+
+                  if (uploadedImageResponse.success === true) {
+                    const generatedJson = generateJson(
+                      uploadedImageResponse.pinataURL,
+                      randomColor
+                    );
+                    const uploadedJsonResponse = await uploadJSONToIPFS(
+                      generatedJson,
+                      `${eventId}_${newRandomNumber}.json`
+                    );
+
+                    if (uploadedJsonResponse.success === true) {
+                      // console.log(randomColor);
+                      // console.log(uploadedImageResponse.pinataURL);
+                      // console.log(uploadedJsonResponse.pinataURL);
+
+                      generatedJsonArray.push(uploadedJsonResponse.pinataURL);
+                    } else {
+                      console.error("Error uploading json:", response.message);
+                      onLoading(false);
+                    }
+                  } else {
+                    console.error("Error uploading image:", response.message);
+                    onLoading(false);
+                  }
+
+                  setTimeout(() => {}, 2000);
                 }
 
                 if (generatedJsonArray.length === data.ticketAmount) {
@@ -141,12 +180,12 @@ const TicketBuyModal = ({
     }
   };
 
-  const generateArt = async () => {
+  const generateArt = async (randomColor) => {
     const huggingFace = new HfInference(import.meta.env.VITE_IMG_API_KEY);
 
     try {
       const response = await huggingFace.textToImage({
-        data: nftImageGenerateInput,
+        data: nftImageGenerateInput + randomColor,
         model: imageGenerateModel,
       });
 
@@ -169,34 +208,6 @@ const TicketBuyModal = ({
       somethingWentWrong();
       onLoading(false);
       return null;
-    }
-  };
-
-  const uploadToIPFS = async (url, isImage) => {
-    let uploadUrl;
-    try {
-      let tempValue;
-
-      if (isImage === true) {
-        const blob = dataURItoBlob(url);
-        const file = new File([blob], "image.jpg", { type: "image/jpeg" });
-        tempValue = file;
-      } else {
-        tempValue = url;
-      }
-
-      const tempUrl = await upload({
-        data: [tempValue],
-        options: {
-          uploadWithGatewayUrl: true,
-          uploadWithoutDirectory: true,
-        },
-      });
-      uploadUrl = tempUrl[0];
-      return uploadUrl;
-    } catch (error) {
-      console.error("Error uploading to IPFS:", error);
-      return;
     }
   };
 

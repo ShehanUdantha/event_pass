@@ -1,33 +1,79 @@
 import { useEffect, useRef } from "react";
+import videojs from "video.js";
+import "video.js/dist/video-js.css";
 
-const VideoPlayer = ({ id, publicId, ...props }) => {
+const VideoPlayer = (props) => {
   const videoRef = useRef();
-  const cloudinaryRef = useRef();
   const playerRef = useRef();
+  const { onReady, videoUrl } = props;
+
+  //video Options
+  const options = {
+    autoplay: false,
+    controls: true,
+    responsive: true,
+    fluid: true,
+    alwaysShowControls: true,
+    sources: [
+      {
+        src: videoUrl,
+        type: "video/mp4",
+      },
+    ],
+    controlBar: {
+      children: [
+        "playToggle",
+        "volumePanel",
+        "progressControl",
+        "currentTimeDisplay",
+        "timeDivider",
+        "durationDisplay",
+        "pictureInPictureToggle",
+        "qualitySelector",
+        "fullscreenToggle",
+      ],
+      durationDisplay: {
+        timeToShow: ["duration"],
+        countDown: false,
+      },
+    },
+  };
 
   useEffect(() => {
-    if (cloudinaryRef.current) return;
+    if (!playerRef.current) {
+      const videoElement = document.createElement("video-js");
 
-    cloudinaryRef.current = window.cloudinary;
+      videoElement.classList.add("vjs-big-play-centered");
+      videoRef.current.appendChild(videoElement);
 
-    playerRef.current = cloudinaryRef.current.videoPlayer(videoRef.current, {
-      cloud_name: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
-      secure: true,
-    });
-  }, []);
+      const player = (playerRef.current = videojs(videoElement, options, () => {
+        videojs.log("player is ready");
+        onReady && onReady(player);
+      }));
+    } else {
+      const player = playerRef.current;
+
+      player.autoplay(options.autoplay);
+      player.src(options.sources);
+    }
+  }, [options, videoRef]);
+
+  // Dispose the Video.js player when the functional component unmounts
+  useEffect(() => {
+    const player = playerRef.current;
+
+    return () => {
+      if (player && !player.isDisposed()) {
+        player.dispose();
+        playerRef.current = null;
+      }
+    };
+  }, [playerRef]);
 
   return (
-    <div className="w-full md:w-3/5 aspect-video overflow-hidden rounded-[20px]">
-      <video
-        ref={videoRef}
-        id={id}
-        className="cld-video-player cld-fluid"
-        controls
-        autoPlay
-        data-cld-public-id={publicId}
-        {...props}
-      />
-    </div>
+    <>
+      <div ref={videoRef} />
+    </>
   );
 };
 

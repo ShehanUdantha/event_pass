@@ -1,13 +1,33 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { calculateRemainingTime, formatDateAndTime } from "../utils/index";
 import { useStateContext } from "../context";
 import Spinner from "../assets/images/spinning-dots.svg";
 import TicketBuyModal from "../components/TicketBuyModal";
 import SocialMediaShareModal from "../components/SocialMediaShareModal";
-import SecondaryMarketSection from "../sections/ViewEvent/SecondaryMarketSection";
+import SecondaryMarketSection from "../sections/Event/SecondaryMarketSection";
+import EventMediaSection from "../sections/Event/EventMediaSection";
 import Loader from "../components/Loader";
 import { IoShareSocialSharp } from "react-icons/io5";
+import { HfInference } from "@huggingface/inference";
+import { nftImageGenerateInput, imageGenerateModel } from "../constants";
+import PageNotFound from "./NotFound";
+
+const useEventTimer = (startsAt) => {
+  const [remainingTime, setRemainingTime] = useState(
+    calculateRemainingTime(startsAt)
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRemainingTime(calculateRemainingTime(startsAt));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [startsAt]);
+
+  return remainingTime;
+};
 
 const ViewEvent = () => {
   const { id } = useParams();
@@ -17,7 +37,6 @@ const ViewEvent = () => {
   const [event, setEvent] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [isLoaderLoading, setIsLoaderLoading] = useState(false);
-  const [remainingTimes, setRemainingTimes] = useState(0);
   const [isVisibleBuy, setIsVisibleBuy] = useState(false);
   const [isVisibleShare, setIsVisibleShare] = useState(false);
   const [contractOwner, setContractOwner] = useState("");
@@ -30,19 +49,13 @@ const ViewEvent = () => {
         if (!isNaN(+id)) {
           const data = await getSingleEvent(id);
           setEvent(data);
-
-          // Start the timer here
-          if (data.startsAt) {
-            const interval = setInterval(() => {
-              setRemainingTimes(calculateRemainingTime(data.startsAt));
-            }, 1000);
-
-            return () => clearInterval(interval);
-          }
+          setIsLoading(false);
         } else {
           setEvent({ id: 0 });
+          setIsLoading(false);
         }
       } catch (error) {
+        setEvent({ id: 0 });
         setIsLoading(false);
         console.error("Error fetching event data: ", error);
       }
@@ -65,6 +78,9 @@ const ViewEvent = () => {
       setTimeout(() => {
         setIsLoading(false);
       }, 2000);
+
+      // development purpose
+      activateImageGenerateServer();
     }
   }, [contract, address, getSingleEvent, getContractOwner, id]);
 
@@ -73,21 +89,35 @@ const ViewEvent = () => {
       if (!isNaN(+id)) {
         const data = await getSingleEvent(id);
         setEvent(data);
-
-        // Start the timer here
-        if (data.startsAt) {
-          const interval = setInterval(() => {
-            setRemainingTimes(calculateRemainingTime(data.startsAt));
-          }, 1000);
-
-          return () => clearInterval(interval);
-        }
+        setIsLoading(false);
       } else {
         setEvent({ id: 0 });
+        setIsLoading(false);
       }
     } catch (error) {
+      setEvent({ id: 0 });
       setIsLoading(false);
       console.error("Error fetching event data: ", error);
+    }
+  };
+
+  const remainingTime = useEventTimer(event.startsAt);
+
+  const eventMediaSection = useMemo(() => {
+    return <EventMediaSection eventId={id} />;
+  }, [id]);
+
+  const activateImageGenerateServer = async () => {
+    const huggingFace = new HfInference(import.meta.env.VITE_IMG_API_KEY);
+
+    try {
+      const response = await huggingFace.textToImage({
+        data: nftImageGenerateInput,
+        model: imageGenerateModel,
+      });
+      // console.log("call to server", response);
+    } catch (error) {
+      console.error("Error making API request:", error);
     }
   };
 
@@ -106,9 +136,7 @@ const ViewEvent = () => {
       ) : (
         <>
           {event.id === 0 ? (
-            <div className="flex justify-center items-center text-[14px] h-screen">
-              <div className="text-3xl font-bold">Page Not Found</div>
-            </div>
+            <PageNotFound />
           ) : (
             <Fragment>
               <div className="bg-[#F6F8FD] pt-32 pb-16 h-full">
@@ -125,7 +153,7 @@ const ViewEvent = () => {
                   <div className="w-full">
                     <div className="flex items-center justify-between gap-1">
                       {/* event title */}
-                      <h3 className="font-bold text-2xl md:text-3xl md:leading-12">
+                      <h3 className="font-bold text-2xl md:text-3xl md:leading-8">
                         {event.title}
                       </h3>
                       <div className="flex items-center justify-between gap-3">
@@ -150,10 +178,10 @@ const ViewEvent = () => {
                       </div>
                     </div>
                     {/* event remaining and tickets left */}
-                    <div className="flex flex-col md:flex-row items-start md:items-center mt-1 justify-start">
+                    <div className="flex flex-col md:flex-row items-start md:items-center mt-3 justify-start">
                       <div className="text-[14px] text-[#b8b6b6] font-medium md:mr-10">
-                        {remainingTimes != "Expired"
-                          ? remainingTimes + " remaining"
+                        {remainingTime != "Expired"
+                          ? remainingTime + " remaining"
                           : "Expired"}
                       </div>
                       <div className="text-[14px] text-[#686666] font-medium mt-2 md:mt-0">
@@ -174,7 +202,7 @@ const ViewEvent = () => {
                       by {event.owner}
                     </div>
                     {/* buy ticket button */}
-                    {remainingTimes != "Expired" ? (
+                    {remainingTime != "Expired" && remainingTime != "0" ? (
                       <button
                         onClick={() => {
                           setIsVisibleBuy(true);
@@ -218,6 +246,9 @@ const ViewEvent = () => {
                   </div>
                 </div>
               </div>
+              {/* event media section */}
+              {eventMediaSection}
+
               {/* secondary market section */}
               <SecondaryMarketSection
                 eventId={id}
@@ -225,7 +256,6 @@ const ViewEvent = () => {
                   setIsLoaderLoading(value);
                 }}
               />
-
               {/* ticket buy modal */}
               {isVisibleBuy ? (
                 <TicketBuyModal
@@ -251,7 +281,6 @@ const ViewEvent = () => {
                   }}
                 />
               ) : null}
-
               {/* event share modal */}
               {isVisibleShare ? (
                 <SocialMediaShareModal

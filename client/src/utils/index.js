@@ -14,23 +14,27 @@ export const separateCurrentDateTime = () => {
 }
 
 export const calculateRemainingTime = (startedDate) => {
-  const start = new Date();
-  const end = new Date(startedDate);
+  if (startedDate) {
+    const start = new Date();
+    const end = new Date(startedDate);
 
-  // Calculate the difference in milliseconds
-  const difference = end - start;
+    // Calculate the difference in milliseconds
+    const difference = end - start;
 
-  // Convert milliseconds to days, hours, minutes, and seconds
-  const daysRemaining = Math.floor(difference / (1000 * 60 * 60 * 24));
-  const hoursRemaining = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutesRemaining = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)); // Corrected line
-  const secondsRemaining = Math.floor((difference % (1000 * 60)) / 1000);
+    // Convert milliseconds to days, hours, minutes, and seconds
+    const daysRemaining = Math.floor(difference / (1000 * 60 * 60 * 24));
+    const hoursRemaining = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutesRemaining = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)); // Corrected line
+    const secondsRemaining = Math.floor((difference % (1000 * 60)) / 1000);
 
-  if (daysRemaining <= 0 && hoursRemaining <= 0 && minutesRemaining <= 0 && secondsRemaining <= 0) {
-    return "Expired";
+    if (daysRemaining <= 0 && hoursRemaining <= 0 && minutesRemaining <= 0 && secondsRemaining <= 0) {
+      return "Expired";
+    }
+
+    return daysRemaining + ' days ' + hoursRemaining + ' hours ' + minutesRemaining + ' minutes ' + secondsRemaining + ' seconds';
+  } else {
+    return "0";
   }
-
-  return daysRemaining + ' days ' + hoursRemaining + ' hours ' + minutesRemaining + ' minutes ' + secondsRemaining + ' seconds';
 };
 
 export const formatDateAndTime = (inputDate) => {
@@ -152,7 +156,7 @@ export const dataURItoBlob = (dataURI) => {
   return new Blob([arrayBuffer], { type: mimeString });
 };
 
-export const generateJson = (url) => {
+export const generateJson = (url, colorName) => {
   return {
     "name": "Sketch Robot",
     "description": "A unique NFT featuring a sketched image of a robot with intricate design details, created by an EventPass.",
@@ -165,10 +169,21 @@ export const generateJson = (url) => {
       {
         "trait_type": "Complexity",
         "value": "Detailed"
+      },
+      {
+        "trait_type": "Color",
+        "value": `${colorName}`
       }
     ]
   };
 };
+
+export const generateRandomRGB = () => {
+  const r = Math.floor(Math.random() * 256);
+  const g = Math.floor(Math.random() * 256);
+  const b = Math.floor(Math.random() * 256);
+  return `rgb(${r}, ${g}, ${b})`;
+}
 
 export const calculatePercentage = (ticketAmount, ticketSold) => {
   ticketAmount = Number(ticketAmount);
@@ -182,11 +197,10 @@ export const calculatePercentage = (ticketAmount, ticketSold) => {
 export const getDateList = () => {
   const dateList = [];
   const today = new Date();
-
-  // Loop from today to 7 days ahead
-  for (let i = 0; i < 7; i++) {
+  // Loop from today to 6 days back
+  for (let i = 6; i >= 0; i--) {
     const date = new Date(today);
-    date.setDate(today.getDate() + i);
+    date.setDate(today.getDate() - i);
     dateList.push(date.toISOString().slice(0, 10)); // Push date in YYYY-MM-DD format
   }
 
@@ -196,6 +210,7 @@ export const getDateList = () => {
 export const formatDate = (date) => {
   return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
 }
+
 export const countTicketsByDate = (tickets, type) => {
   const dateList = getDateList();
 
@@ -223,5 +238,3 @@ export const countTicketsByDate = (tickets, type) => {
 
   return ticketCounts;
 }
-
-

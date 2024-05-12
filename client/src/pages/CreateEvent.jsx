@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import HeaderSection from "../sections/CreateEvent/HeaderSection";
-import FormSection from "../sections/CreateEvent/FormSection";
+import Header from "../components/Header";
+import FormSection from "../sections/Event/FormSection";
 
 const CreateEvent = () => {
   useEffect(() => {
@@ -10,7 +10,7 @@ const CreateEvent = () => {
   return (
     <div>
       {/* header section */}
-      <HeaderSection title={"Create"} />
+      <Header title={"Create Event"} />
       {/* form section */}
       <FormSection />
     </div>

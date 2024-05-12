@@ -6,32 +6,37 @@ import { Link, useNavigate } from "react-router-dom";
 import { openSeaUrl } from "../constants/index";
 
 const TicketMoreMenu = ({ event, ticket, onLoading }) => {
-  const {
-    resellTicket,
-    getBackResellTicket,
-    address,
-    requestRefundTicket,
-    cancelRefundTicket,
-  } = useStateContext();
+  const { address, resellOrUnsellTicket, requestOrCanceleRefundTicket } =
+    useStateContext();
 
   const navigate = useNavigate();
 
   const notifyEventExpired = () => toast.error("Event expired!");
   const notifyUnAuthorized = () => toast.error("Unauthorized entity");
   const notifyAlreadyResell = () => toast.error("Ticket already resell!");
-  const notifyNotResell = () => toast.error("Ticket not resell!");
   const notifyAlreadyRefunded = () => toast.error("Ticket already refunded!");
   const notifyAlreadyVerified = () => toast.error("Ticket already verified!");
 
-  const callResellTicket = async () => {
+  const callResellOrUnsellTicket = async (status) => {
     if (address == ticket.owner) {
       if (calculateRemainingTime(event.startsAt) != "Expired") {
         if (!ticket.verified) {
-          if (!ticket.reselled) {
+          if (!ticket.reselled || status === false) {
             onLoading(true);
-            const response = await resellTicket(event.id, ticket.id, address);
+            const response = await resellOrUnsellTicket(
+              event.id,
+              ticket.id,
+              address,
+              status
+            );
             onLoading(false);
-            if (response) navigate("/event/" + event.id);
+            if (response) {
+              if (status) {
+                navigate("/event/" + event.id);
+              } else {
+                window.location.reload(false);
+              }
+            }
           } else {
             notifyAlreadyResell();
           }
@@ -46,45 +51,15 @@ const TicketMoreMenu = ({ event, ticket, onLoading }) => {
     }
   };
 
-  const callGetBackFromResellTicket = async () => {
+  const callRequestOrCanceleRefundTicket = async (status) => {
     if (address == ticket.owner) {
-      if (ticket.reselled) {
+      if (!ticket.refunded) {
         onLoading(true);
-        const response = await getBackResellTicket(
+        const response = await requestOrCanceleRefundTicket(
           event.id,
           ticket.id,
-          address
+          status
         );
-        onLoading(false);
-        if (response) navigate("/event/" + event.id);
-      } else {
-        notifyNotResell();
-      }
-    } else {
-      notifyUnAuthorized();
-    }
-  };
-
-  const callRequestRefundTicket = async () => {
-    if (address == ticket.owner) {
-      if (!ticket.refunded) {
-        onLoading(true);
-        const response = await requestRefundTicket(event.id, ticket.id);
-        window.location.reload(false);
-        onLoading(false);
-      } else {
-        notifyAlreadyRefunded();
-      }
-    } else {
-      notifyUnAuthorized();
-    }
-  };
-
-  const callCancelRefundTicket = async () => {
-    if (address == ticket.owner) {
-      if (!ticket.refunded) {
-        onLoading(true);
-        const response = await cancelRefundTicket(event.id, ticket.id);
         window.location.reload(false);
         onLoading(false);
       } else {
@@ -101,14 +76,14 @@ const TicketMoreMenu = ({ event, ticket, onLoading }) => {
         <ul className="flex flex-col text-[12px]">
           {ticket.reselled ? (
             <div
-              onClick={callGetBackFromResellTicket}
+              onClick={() => callResellOrUnsellTicket(false)}
               className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
             >
-              <li>Get Back</li>
+              <li>UnSell</li>
             </div>
           ) : (
             <div
-              onClick={callResellTicket}
+              onClick={() => callResellOrUnsellTicket(true)}
               className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
             >
               <li>Resell</li>
@@ -117,14 +92,14 @@ const TicketMoreMenu = ({ event, ticket, onLoading }) => {
 
           {ticket.isWaitingForRefund ? (
             <div
-              onClick={callCancelRefundTicket}
+              onClick={() => callRequestOrCanceleRefundTicket(false)}
               className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
             >
               <li>Cancel</li>
             </div>
           ) : (
             <div
-              onClick={callRequestRefundTicket}
+              onClick={() => callRequestOrCanceleRefundTicket(true)}
               className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
             >
               <li>Req Refund</li>

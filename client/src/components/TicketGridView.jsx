@@ -5,7 +5,7 @@ import TicketCard from "./TicketCard";
 const TicketGridView = ({ tickets, isLoading, isSecondary, onLoading }) => {
   const fetchedTickets = tickets;
   return (
-    <section className="mt-10 md:mt-10">
+    <section className="mt-10">
       {isLoading ? (
         <div className="flex justify-center items-center text-[14px] h-[20rem]">
           <img

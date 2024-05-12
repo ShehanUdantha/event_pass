@@ -43,9 +43,6 @@ const ScanSection = () => {
     setTicketId(response.ticketId);
 
     if (response.eventId == id) {
-      // console.log(response.address);
-      // console.log(response.eventId);
-      // console.log(response.ticketId);
       await verifyTicket(response.address, response.ticketId, response.eventId);
       setIsLoading(false);
       checkTicketVerification(value);
