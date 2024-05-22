@@ -1,7 +1,10 @@
-import React from "react";
-import Footer from "../components/Footer";
+import React, { useEffect } from "react";
 
 const NotFound = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <>
       <div className="bg-[#F6F8FD] pt-32 pb-16 h-screen">
@@ -9,8 +12,6 @@ const NotFound = () => {
           <div className="text-3xl font-bold">Page Not Found</div>
         </div>
       </div>
-      {/* footer */}
-      <Footer />
     </>
   );
 };

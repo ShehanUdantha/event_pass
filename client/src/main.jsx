@@ -5,22 +5,22 @@ import {
   ThirdwebProvider,
   metamaskWallet,
   coinbaseWallet,
-  walletConnect,
 } from "@thirdweb-dev/react";
 import { Sepolia } from "@thirdweb-dev/chains";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
+import { StateContextProvider } from "./context";
 import Home from "./pages/Home.jsx";
 import CreateEvent from "./pages/CreateEvent.jsx";
 import Profile from "./pages/Profile.jsx";
 import ViewEvent from "./pages/ViewEvent.jsx";
-import { StateContextProvider } from "./context";
 import EditEvent from "./pages/EditEvent.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import ViewTicket from "./pages/ViewTicket.jsx";
 import Scanner from "./pages/Scanner.jsx";
-import TicketHistory from "./pages/TicketHistory.jsx";
-import RefundTicket from "./pages/RefundTicket.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import Media from "./pages/Media.jsx";
+import About from "./pages/About.jsx";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +31,10 @@ const router = createBrowserRouter([
       {
         path: "/create-event",
         element: <CreateEvent />,
+      },
+      {
+        path: "/about",
+        element: <About />,
       },
       {
         path: "/profile",
@@ -53,12 +57,12 @@ const router = createBrowserRouter([
         element: <Scanner />,
       },
       {
-        path: "/event/:id/ticket-history",
-        element: <TicketHistory />,
+        path: "/event/:id/dashboard",
+        element: <Dashboard />,
       },
       {
-        path: "/event/:id/ticket-refund",
-        element: <RefundTicket />,
+        path: "/event/:id/media",
+        element: <Media />,
       },
       {
         path: "/*",
@@ -71,20 +75,14 @@ const router = createBrowserRouter([
 const container = document.getElementById("root");
 const root = createRoot(container);
 root.render(
-  // <React.StrictMode>
   <ThirdwebProvider
     clientId={import.meta.env.VITE_TEMPLATE_CLIENT_ID}
     activeChain={Sepolia}
     switchToActiveChain={true}
-    supportedWallets={[
-      metamaskWallet({ recommended: true }),
-      coinbaseWallet(),
-      walletConnect(),
-    ]}
+    supportedWallets={[metamaskWallet({ recommended: true }), coinbaseWallet()]}
   >
     <StateContextProvider>
       <RouterProvider router={router} />
     </StateContextProvider>
   </ThirdwebProvider>
-  // </React.StrictMode>
 );

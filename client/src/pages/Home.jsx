@@ -1,16 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Hero from "../sections/Home/Hero";
 import GridView from "../components/EventGridView";
 import PaginationSection from "../sections/Home/PaginationSection";
-import Footer from "../components/Footer";
 import { useStateContext } from "../context";
-import { eventCategoryList } from "../constants/index";
+import { eventCategoryList, infoVideoUrl } from "../constants/index";
 import { IoSearchOutline } from "react-icons/io5";
+import HowItWorksSection from "../sections/Home/HowItWorksSection";
+import ChatWootWidget from "../widgets/ChatWootWidget";
+import videojs from "video.js";
+import VideoPlayer from "../components/VideoPlayer";
 
 const Home = () => {
   const { contract, address, getAllEvents } = useStateContext();
   const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState([]);
+  const eventsRef = useRef(null);
+  const playerRef = useRef();
 
   const [searchInput, setSearchInput] = useState("");
   const [filteredCategory, setFilteredCategory] = useState();
@@ -19,6 +24,7 @@ const Home = () => {
     "All",
     ...eventCategoryList,
   ]);
+  const [open, setOpen] = React.useState(false);
 
   const fetchEvents = async () => {
     setIsLoading(true);
@@ -55,20 +61,37 @@ const Home = () => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (contract) fetchEvents();
   }, [contract, address]);
 
-  console.log(events);
+  // console.log(events);
+
+  const scrollToEvents = () => {
+    eventsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handlePlayerReady = (player) => {
+    playerRef.current = player;
+
+    player.on("waiting", () => {
+      videojs.log("player is waiting");
+    });
+
+    player.on("dispose", () => {
+      videojs.log("player will dispose");
+    });
+  };
 
   return (
     <div>
       {/* hero section */}
-      <Hero />
+      <Hero scrollToEvents={scrollToEvents} onCallBack={() => setOpen(!open)} />
       {/* filter section */}
-      <section className="mt-10 md:mb-14 md:mt-16">
+      <section className="mt-10 md:mb-14 md:mt-16" ref={eventsRef}>
         <div className="mx-auto max-w-7xl px-4">
           {/* section title */}
-          <h2 className="font-bold text-[26px] leading-none tracking-tight">
+          <h2 className="font-bold text-3xl leading-none tracking-tight">
             All Events
           </h2>
 
@@ -107,8 +130,26 @@ const Home = () => {
       <GridView events={filteredEvents} isLoading={isLoading} />
       {/* pagination section */}
       <PaginationSection />
-      {/* footer */}
-      <Footer />
+      {/* how it works section */}
+      <HowItWorksSection />
+      {/* chatwoot */}
+      <ChatWootWidget />
+      {/* video player */}
+      {open ? (
+        <div
+          className="fixed inset-0 z-30 h-screen px-4 bg-[#000000b3] backdrop-blur-sm flex items-center justify-center"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              // Check if the clicked element is the div itself
+              setOpen(false);
+            }
+          }}
+        >
+          <div className="w-full md:w-3/5 aspect-video overflow-hidden rounded-[20px]">
+            <VideoPlayer onReady={handlePlayerReady} videoUrl={infoVideoUrl} />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 };

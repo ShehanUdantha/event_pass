@@ -6,7 +6,7 @@ const EventGridView = ({ events, isLoading }) => {
   const fetchedEvents = events;
 
   return (
-    <section className="mt-10 md:mt-10">
+    <section className="mt-10">
       {isLoading ? (
         <div className="flex justify-center items-center text-[14px] h-[20rem]">
           <img

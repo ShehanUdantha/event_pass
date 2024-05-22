@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useStateContext } from "../context";
-import { formatDateAndTime, calculateRemainingTime } from "../utils/index";
+import {
+  formatDateAndTime,
+  calculateRemainingTime,
+  calculateTimeAgo,
+} from "../utils/index";
 import Spinner from "../assets/images/spinning-dots.svg";
 import QRCode from "react-qr-code";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { MdMoreVert } from "react-icons/md";
 import TicketMoreMenu from "./TicketMoreMenu";
 import { ethers } from "ethers";
 import toast, { Toaster } from "react-hot-toast";
 import Loader from "./Loader";
 
-const TicketCard = ({ ticket, isSecondary }) => {
+const TicketCard = ({ ticket, isSecondary, onLoading }) => {
   const {
     contract,
     address,
@@ -23,7 +27,7 @@ const TicketCard = ({ ticket, isSecondary }) => {
 
   const [event, setEvent] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [isBuyLoading, setIsBuyLoading] = useState(false);
+  const [isLoaderLoading, setIsLoaderLoading] = useState(false);
   const [displayMoreMenu, setDisplayMoreMenu] = useState(false);
   const [remainingTimes, setRemainingTimes] = useState(0);
   const [userBalance, setUserBalance] = useState("0.0");
@@ -42,7 +46,7 @@ const TicketCard = ({ ticket, isSecondary }) => {
   const fetchEvent = async () => {
     setIsLoading(true);
     const data = await getSingleEvent(ticket.eventId);
-    console.log(data);
+    // console.log(data);
     setEvent(data);
     setRemainingTimes(calculateRemainingTime(data.startsAt));
     setIsLoading(false);
@@ -64,8 +68,8 @@ const TicketCard = ({ ticket, isSecondary }) => {
     );
   };
 
-  console.log(userBalance);
-  console.log(ticket.tokenId);
+  // console.log(userBalance);
+  // console.log(ticket.tokenId);
 
   const buyResellTicket = async () => {
     if (
@@ -78,7 +82,7 @@ const TicketCard = ({ ticket, isSecondary }) => {
           if (address != event.owner) {
             if (address != ticket.owner) {
               if (userBalance > event.ticketCost) {
-                setIsBuyLoading(true);
+                onLoading(true);
                 const response = await buyReselledTicket(
                   ticket.eventId,
                   ticket.id,
@@ -91,7 +95,7 @@ const TicketCard = ({ ticket, isSecondary }) => {
                 } else {
                   somethingWentWrong();
                 }
-                setIsBuyLoading(false);
+                onLoading(false);
               } else {
                 InsufficientAmount();
               }
@@ -118,8 +122,8 @@ const TicketCard = ({ ticket, isSecondary }) => {
 
   return (
     <>
-      {isBuyLoading && <Loader />}
-      <div className="cursor-pointer w-full">
+      {isLoaderLoading && <Loader />}
+      <div className="w-full">
         {isLoading ? (
           <div className="flex justify-center items-center text-[14px] h-[20rem]">
             <img
@@ -129,9 +133,9 @@ const TicketCard = ({ ticket, isSecondary }) => {
             />
           </div>
         ) : (
-          <div>
-            <div className="max-w-md w-full h-full mx-auto z-10 rounded-3xl">
-              <div className="bg-white relative drop-shadow-xl rounded-3xl p-4 m-4 overflow-clip">
+          <div onContextMenu={(e) => e.preventDefault()}>
+            <div className="max-w-md w-full h-full mx-auto z-10 rounded-3xl cursor-pointer transition-all duration-500 hover:scale-105">
+              <div className="bg-white relative drop-shadow-md rounded-3xl p-4 m-4 overflow-clip">
                 {/* top */}
                 <div className="w-full">
                   <div className="w-full flex justify-between">
@@ -145,7 +149,16 @@ const TicketCard = ({ ticket, isSecondary }) => {
                           className="cursor-pointer text-lg"
                         />
                         {displayMoreMenu ? (
-                          <TicketMoreMenu event={event} ticket={ticket} />
+                          <TicketMoreMenu
+                            event={event}
+                            ticket={ticket}
+                            onLoading={(value) => {
+                              setIsLoaderLoading(value);
+                              if (value === false) {
+                                setDisplayMoreMenu(false);
+                              }
+                            }}
+                          />
                         ) : null}
                       </div>
                     )}
@@ -183,6 +196,14 @@ const TicketCard = ({ ticket, isSecondary }) => {
                     </div>
                   ) : null}
                   <div className="w-full flex mt-1">
+                    <div className="text-[13px] font-medium mr-1">
+                      Purchased:
+                    </div>
+                    <div className="text-[12px] text-gray-600 font-medium text-ellipsis overflow-hidden">
+                      {calculateTimeAgo(ticket.timestamp)}
+                    </div>
+                  </div>
+                  <div className="w-full flex mt-1">
                     <div className="text-[13px] font-medium mr-1">Venue:</div>
                     <div className="text-[12px] text-gray-600 font-medium text-ellipsis overflow-hidden">
                       {event.location}
@@ -216,7 +237,7 @@ const TicketCard = ({ ticket, isSecondary }) => {
             </div>
           </div>
         )}
-        <Toaster position="bottom-right" />
+        <Toaster position="bottom-center" />
       </div>
     </>
   );

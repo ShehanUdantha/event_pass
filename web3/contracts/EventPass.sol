@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract EventPass is Ownable, ReentrancyGuard, ERC721 {
+contract EventPass is Ownable, ReentrancyGuard, ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _totalEvents;
     Counters.Counter private _totalTickets;
     Counters.Counter private _totalTokens;
+    Counters.Counter private _totalMedia;
 
     struct EventStruct {
         uint256 id;
@@ -46,11 +47,23 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
         bool isWaitingForRefund;
         bool refunded;
         bool minted;
+        uint256 verifiedTimestamp;
+        uint256 refundTimestamp;
     }
 
-    uint256 private constant TOTAL_TICKETS_CAN_PURCHASE = 5;
+    struct EventMediaStruct {
+        uint256 id;
+        uint256 eventId;
+        string title;
+        string videoUrl;
+        bool deleted;
+        uint256 timestamp;
+    }
+
+    uint256 private constant TOTAL_TICKETS_CAN_PURCHASE = 4;
 
     mapping(uint256 => EventStruct) private events;
+    mapping(uint256 => EventMediaStruct[]) private eventMedia;
     mapping(uint256 => TicketStruct[]) private tickets;
     mapping(uint256 => mapping(uint256 => address[])) private ticketHistory;
     mapping(uint256 => bool) private eventExists;
@@ -68,7 +81,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
         string memory location,
         string memory category
     ) public {
-        require(ticketCost > 0 ether, "TicketCost must be greater than zero");
+        require(ticketCost > 0 wei, "TicketCost must be greater than zero");
         require(ticketAmount > 0, "TicketAmount must be greater than zero");
         require(bytes(title).length > 0, "Title cannot be empty");
         require(bytes(description).length > 0, "Description cannot be empty");
@@ -145,7 +158,10 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
         require(!events[eventId].deleted, "Event already deleted");
 
         if (isRefunded == true) {
-            refundTickets(eventId);
+            for (uint i = 0; i < tickets[eventId].length; i++) {
+                refundTicket(eventId, tickets[eventId][i].id);
+            }
+            events[eventId].refunded = true;
             events[eventId].deleted = true;
         } else {
             events[eventId].deleted = true;
@@ -153,7 +169,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
     }
 
     function getAllEvents() public view returns (EventStruct[] memory Events) {
-        uint256 available;
+        uint256 available = 0;
         for (uint256 i = 1; i <= _totalEvents.current(); i++) {
             if (!events[i].deleted) {
                 available++;
@@ -161,7 +177,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
         }
 
         Events = new EventStruct[](available);
-        uint256 index;
+        uint256 index = 0;
         for (uint256 i = 1; i <= _totalEvents.current(); i++) {
             if (!events[i].deleted) {
                 Events[index++] = events[i];
@@ -169,34 +185,60 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
         }
     }
 
-    function getMyEvents(
-        address myAddress
-    ) public view returns (EventStruct[] memory Events) {
-        uint256 available;
-        for (uint256 i = 1; i <= _totalEvents.current(); i++) {
-            if (!events[i].deleted && events[i].owner == myAddress) {
-                available++;
+    function addEventMedia(
+        uint256 eventId,
+        string memory title,
+        string memory videoUrl
+    ) public {
+        require(eventExists[eventId], "Event not found");
+        require(events[eventId].owner == msg.sender, "Unauthorized entity");
+
+        _totalMedia.increment();
+        EventMediaStruct memory newMedia;
+
+        newMedia.id = _totalMedia.current();
+        newMedia.eventId = eventId;
+        newMedia.title = title;
+        newMedia.videoUrl = videoUrl;
+        newMedia.timestamp = currentTime();
+
+        eventMedia[eventId].push(newMedia);
+    }
+
+    function deleteEventMedia(uint256 eventId, uint256 mediaId) public {
+        require(eventExists[eventId], "Event not found");
+        require(eventMedia[eventId].length >= mediaId, "Media not found");
+        require(events[eventId].owner == msg.sender, "Unauthorized entity");
+
+        for (uint256 i = 0; i < eventMedia[eventId].length; i++) {
+            if (eventMedia[eventId][i].id == mediaId) {
+                eventMedia[eventId][i].deleted = true;
+                break;
             }
         }
-        Events = new EventStruct[](available);
-        uint256 index;
-        for (uint256 i = 1; i <= _totalEvents.current(); i++) {
-            if (!events[i].deleted && events[i].owner == myAddress) {
-                Events[index++] = events[i];
-            }
-        }
+    }
+
+    function getEventMediaByEventId(
+        uint256 eventId
+    ) public view returns (EventMediaStruct[] memory Events) {
+        require(eventExists[eventId], "Event not found");
+
+        return eventMedia[eventId];
     }
 
     function getSingleEvent(
         uint256 eventId
     ) public view returns (EventStruct memory) {
+        require(eventExists[eventId], "Event not found");
+
         return events[eventId];
     }
 
     function buyTickets(
         uint256 eventId,
         uint256 numOfTicket,
-        string memory baseUrl
+        string memory baseUrl,
+        string[] memory tokenURIs
     ) public payable {
         require(eventExists[eventId], "Event not found");
         require(
@@ -250,7 +292,8 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
 
                 // mint ticket
                 _totalTokens.increment();
-                _mint(msg.sender, _totalTokens.current());
+                _safeMint(msg.sender, _totalTokens.current());
+                _setTokenURI(_totalTokens.current(), tokenURIs[i]);
                 ticket.minted = true;
                 ticket.tokenId = _totalTokens.current();
 
@@ -264,6 +307,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
 
             events[eventId].ticketRemain -= numOfTicket;
             events[eventId].balance = events[eventId].balance += msg.value;
+            storeETHInContract();
         }
     }
 
@@ -298,14 +342,16 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
                 false,
                 false,
                 false,
-                false
+                false,
+                0,
+                0
             );
     }
 
     function getMyTickets(
         address myAddress
     ) public view returns (TicketStruct[] memory Tickets) {
-        uint256 available;
+        uint256 available = 0;
         for (uint256 i = 1; i <= _totalTickets.current(); i++) {
             for (uint256 j = 0; j < tickets[i].length; j++) {
                 if (
@@ -316,7 +362,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
             }
         }
         Tickets = new TicketStruct[](available);
-        uint256 index;
+        uint256 index = 0;
         for (uint256 i = 1; i <= _totalTickets.current(); i++) {
             for (uint256 j = 0; j < tickets[i].length; j++) {
                 if (
@@ -328,29 +374,26 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
         }
     }
 
-    function requestRefundTicket(uint256 eventId, uint256 ticketId) public {
-        require(
-            currentTime() < events[eventId].startsAt,
-            "Event has already occurred"
-        );
-        for (uint256 i = 0; i < tickets[eventId].length; i++) {
-            if (
-                !tickets[eventId][i].refunded &&
-                tickets[eventId][i].id == ticketId
-            ) {
-                tickets[eventId][i].isWaitingForRefund = true;
-                break;
-            }
+    function requestOrCancelRefundTicket(
+        uint256 eventId,
+        uint256 ticketId,
+        bool status
+    ) public {
+        if (status == true) {
+            require(
+                currentTime() < events[eventId].startsAt,
+                "Event has already occurred"
+            );
         }
-    }
-
-    function cancelRefundTicket(uint256 eventId, uint256 ticketId) public {
         for (uint256 i = 0; i < tickets[eventId].length; i++) {
             if (
                 !tickets[eventId][i].refunded &&
                 tickets[eventId][i].id == ticketId
             ) {
-                tickets[eventId][i].isWaitingForRefund = false;
+                tickets[eventId][i].isWaitingForRefund = status;
+                tickets[eventId][i].refundTimestamp = status == true
+                    ? currentTime()
+                    : 0;
                 break;
             }
         }
@@ -362,91 +405,46 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
             events[eventId].owner == msg.sender || msg.sender == owner(),
             "Unauthorized entity"
         );
-        require(!events[eventId].deleted, "Event already deleted");
 
         for (uint256 i = 0; i < tickets[eventId].length; i++) {
             if (tickets[eventId][i].id == ticketId) {
                 tickets[eventId][i].refunded = true;
                 tickets[eventId][i].isWaitingForRefund = false;
-                payTo(
-                    tickets[eventId][i].owner,
-                    tickets[eventId][i].ticketCost
-                );
+                tickets[eventId][i].refundTimestamp = currentTime();
                 events[eventId].balance = events[eventId].balance -= tickets[
                     eventId
                 ][i].ticketCost;
 
+                payTo(
+                    tickets[eventId][i].owner,
+                    tickets[eventId][i].ticketCost
+                );
+
                 break;
             }
         }
     }
 
-    function refundTickets(uint256 eventId) internal returns (bool) {
-        for (uint i = 0; i < tickets[eventId].length; i++) {
-            tickets[eventId][i].refunded = true;
-            tickets[eventId][i].isWaitingForRefund = false;
-            payTo(tickets[eventId][i].owner, tickets[eventId][i].ticketCost);
-            events[eventId].balance = events[eventId].balance -= tickets[
-                eventId
-            ][i].ticketCost;
-        }
-        events[eventId].refunded = true;
-        return true;
-    }
-
-    function resellTicket(
+    function resellOrUnsellTicket(
         uint256 eventId,
         uint256 ticketId,
-        address myAddress
+        address myAddress,
+        bool status
     ) public {
-        require(
-            currentTime() < events[eventId].startsAt,
-            "Event has already occurred"
-        );
+        if (status == true) {
+            require(
+                currentTime() < events[eventId].startsAt,
+                "Event has already occurred"
+            );
+        }
         for (uint256 i = 0; i < tickets[eventId].length; i++) {
             if (
                 !tickets[eventId][i].verified &&
                 tickets[eventId][i].id == ticketId &&
                 tickets[eventId][i].owner == myAddress
             ) {
-                tickets[eventId][i].reselled = true;
+                tickets[eventId][i].reselled = status;
                 break;
-            }
-        }
-    }
-
-    function getBackResellTicket(
-        uint256 eventId,
-        uint256 ticketId,
-        address myAddress
-    ) public {
-        for (uint256 i = 0; i < tickets[eventId].length; i++) {
-            if (
-                !tickets[eventId][i].verified &&
-                tickets[eventId][i].id == ticketId &&
-                tickets[eventId][i].owner == myAddress
-            ) {
-                tickets[eventId][i].reselled = false;
-                break;
-            }
-        }
-    }
-
-    function getResellTicketsByEventId(
-        uint256 eventId
-    ) public view returns (TicketStruct[] memory Tickets) {
-        uint256 available;
-        for (uint256 i = 0; i < tickets[eventId].length; i++) {
-            if (tickets[eventId][i].reselled) {
-                available++;
-            }
-        }
-
-        Tickets = new TicketStruct[](available);
-        uint256 index;
-        for (uint256 i = 0; i < tickets[eventId].length; i++) {
-            if (tickets[eventId][i].reselled) {
-                Tickets[index++] = tickets[eventId][i];
             }
         }
     }
@@ -468,14 +466,9 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
             eventId,
             newOwner
         );
-
         require(
             userBoughtTickets <= TOTAL_TICKETS_CAN_PURCHASE,
             "Ticket purchase limit reached"
-        );
-        require(
-            userBoughtTickets + 1 <= TOTAL_TICKETS_CAN_PURCHASE,
-            "You cannot purchase this amount of tickets"
         );
 
         for (uint256 i = 0; i < tickets[eventId].length; i++) {
@@ -504,6 +497,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
                 );
                 tickets[eventId][i].reselled = false;
                 ticketHistory[eventId][i].push(newOwner);
+
                 break;
             }
         }
@@ -513,7 +507,7 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
         uint256 eventId,
         address myAddress
     ) internal view returns (uint256) {
-        uint available;
+        uint available = 0;
         for (uint i = 0; i < tickets[eventId].length; i++) {
             if (tickets[eventId][i].owner == myAddress) {
                 available++;
@@ -534,7 +528,8 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
                 tickets[eventId][i].id == ticketId &&
                 tickets[eventId][i].owner == myAddress
             ) {
-                tickets[eventId][i].verified = false;
+                tickets[eventId][i].verified = true;
+                tickets[eventId][i].verifiedTimestamp = currentTime();
                 break;
             }
         }
@@ -546,24 +541,27 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
         uint256 eventId
     ) public view returns (string memory status) {
         require(eventExists[eventId], "Event does not exist");
-
-        for (uint256 i = 0; i < tickets[eventId].length; i++) {
-            if (
-                tickets[eventId][i].id == ticketId &&
-                tickets[eventId][i].owner == myAddress &&
-                tickets[eventId][i].eventId == eventId
-            ) {
-                if (tickets[eventId][i].verified) {
-                    status = "Verified";
-                    break;
-                } else {
-                    status = "Not Verified";
-                    break;
+        if (tickets[eventId].length == 0) {
+            status = "Not Found";
+        } else {
+            for (uint256 i = 0; i < tickets[eventId].length; i++) {
+                if (
+                    tickets[eventId][i].id == ticketId &&
+                    tickets[eventId][i].owner == myAddress &&
+                    tickets[eventId][i].eventId == eventId
+                ) {
+                    if (tickets[eventId][i].verified) {
+                        status = "Verified";
+                        break;
+                    } else {
+                        status = "Not Verified";
+                        break;
+                    }
+                } else if (i == tickets[eventId].length - 1) {
+                    status = "Not Found";
                 }
             }
         }
-
-        status = "Not Found";
     }
 
     function getEventTicketHistory(
@@ -583,13 +581,20 @@ contract EventPass is Ownable, ReentrancyGuard, ERC721 {
         );
 
         payTo(events[eventId].owner, events[eventId].balance);
+
         events[eventId].paidOut = true;
         events[eventId].balance = 0;
     }
 
-    function payTo(address to, uint256 amount) internal {
-        (bool success, ) = payable(to).call{value: amount}("");
-        require(success);
+    function storeETHInContract() public payable {}
+
+    function payTo(address recipient, uint256 amount) public returns (bool) {
+        (bool success, ) = payable(recipient).call{value: amount}("");
+        return success;
+    }
+
+    function getBalance() public view returns (uint) {
+        return address(this).balance;
     }
 
     function currentTime() internal view returns (uint256) {

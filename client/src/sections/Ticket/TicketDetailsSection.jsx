@@ -6,7 +6,7 @@ const TicketDetailsSection = ({ event, ticket }) => {
   const endedDateObject = new Date(event.endsAt);
 
   return (
-    <section className="my-10">
+    <section className="my-10" onContextMenu={(e) => e.preventDefault()}>
       <div className="flex flex-col md:flex-row mx-auto items-center justify-between max-w-7xl px-4">
         <div className="w-full">
           <form>

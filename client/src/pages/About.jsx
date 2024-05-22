@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import Header from "../components/Header";
-import FormSection from "../sections/Event/FormSection";
+import InfoSection from "../sections/About/InfoSection";
 
-const CreateEvent = () => {
+const About = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -10,11 +10,11 @@ const CreateEvent = () => {
   return (
     <div>
       {/* header section */}
-      <Header title={"Create Event"} />
-      {/* form section */}
-      <FormSection />
+      <Header title={"About Us"} />
+      {/* info section */}
+      <InfoSection />
     </div>
   );
 };
 
-export default CreateEvent;
+export default About;

@@ -43,11 +43,7 @@ const ScanSection = () => {
     setTicketId(response.ticketId);
 
     if (response.eventId == id) {
-      console.log(response.address);
-      console.log(response.eventId);
-      console.log(response.ticketId);
       await verifyTicket(response.address, response.ticketId, response.eventId);
-      setIsLoading(false);
       checkTicketVerification(value);
     } else {
       notifyWrongTicket();
@@ -61,15 +57,15 @@ const ScanSection = () => {
     setTicketId(response.ticketId);
 
     if (response.eventId == id) {
-      console.log(response.address);
-      console.log(response.eventId);
-      console.log(response.ticketId);
+      // console.log(response.address);
+      // console.log(response.eventId);
+      // console.log(response.ticketId);
       const data = await checkVerificationStatus(
         response.address,
         response.ticketId,
         response.eventId
       );
-      console.log(data);
+      // console.log(data);
       setTicketInfo(data);
       setIsLoading(false);
     } else {
@@ -79,7 +75,7 @@ const ScanSection = () => {
   };
 
   return (
-    <section className="my-10">
+    <section className="my-10 min-h-[50svh]">
       <div className="mx-auto max-w-7xl">
         <div className="w-full gap-0 md:gap-30 flex flex-col md:flex-row items-center justify-center">
           <div className="w-full flex items-center justify-center h-[15rem]">
@@ -117,7 +113,7 @@ const ScanSection = () => {
           </div>
         </div>
       </div>
-      <Toaster position="bottom-right" />
+      <Toaster position="bottom-center" />
     </section>
   );
 };

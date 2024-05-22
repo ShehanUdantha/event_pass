@@ -14,23 +14,27 @@ export const separateCurrentDateTime = () => {
 }
 
 export const calculateRemainingTime = (startedDate) => {
-  const start = new Date();
-  const end = new Date(startedDate);
+  if (startedDate) {
+    const start = new Date();
+    const end = new Date(startedDate);
 
-  // Calculate the difference in milliseconds
-  const difference = end - start;
+    // Calculate the difference in milliseconds
+    const difference = end - start;
 
-  // Convert milliseconds to days, hours, minutes, and seconds
-  const daysRemaining = Math.floor(difference / (1000 * 60 * 60 * 24));
-  const hoursRemaining = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutesRemaining = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)); // Corrected line
-  const secondsRemaining = Math.floor((difference % (1000 * 60)) / 1000);
+    // Convert milliseconds to days, hours, minutes, and seconds
+    const daysRemaining = Math.floor(difference / (1000 * 60 * 60 * 24));
+    const hoursRemaining = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutesRemaining = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)); // Corrected line
+    const secondsRemaining = Math.floor((difference % (1000 * 60)) / 1000);
 
-  if (daysRemaining <= 0 && hoursRemaining <= 0 && minutesRemaining <= 0 && secondsRemaining <= 0) {
-    return "Expired";
+    if (daysRemaining <= 0 && hoursRemaining <= 0 && minutesRemaining <= 0 && secondsRemaining <= 0) {
+      return "Expired";
+    }
+
+    return daysRemaining + ' days ' + hoursRemaining + ' hours ' + minutesRemaining + ' minutes ' + secondsRemaining + ' seconds';
+  } else {
+    return "0";
   }
-
-  return daysRemaining + ' days ' + hoursRemaining + ' hours ' + minutesRemaining + ' minutes ' + secondsRemaining + ' seconds';
 };
 
 export const formatDateAndTime = (inputDate) => {
@@ -40,16 +44,6 @@ export const formatDateAndTime = (inputDate) => {
   const formattedDateTime = parsedDateTime.toLocaleDateString('en-US', options);
   return formattedDateTime;
 }
-
-export const checkIfImage = (url, callback) => {
-  const img = new Image();
-  img.src = url;
-
-  if (img.complete) callback(true);
-
-  img.onload = () => callback(true);
-  img.onerror = () => callback(false);
-};
 
 export const updateTime = (date, time) => {
   const updatedTime = time + ":00";
@@ -100,7 +94,7 @@ export function convertBigNumberToInt(bigNumber) {
 }
 
 export const getUrlParams = (url) => {
-  console.log(url);
+  // console.log(url);
   const urlParts = url.toString().split('/');
   const address = urlParts[4];
   const eventId = parseInt(urlParts[5]);
@@ -122,3 +116,125 @@ export const convertWeiToEth = (weiValue) => {
     return "0.0";
   }
 };
+
+export const calculateTimeAgo = (timestamp) => {
+  const currentTime = new Date();
+  const previousTime = new Date(parseInt(timestamp, 10));
+  const timeDifference = currentTime - previousTime;
+  const minutes = Math.floor(timeDifference / 60000);
+
+  if (minutes < 1) {
+    return 'Just now';
+  } else if (minutes < 60) {
+    return `${minutes}m ago`;
+  } else {
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+      return `${hours}h ago`;
+    } else {
+      const days = Math.floor(hours / 24);
+      if (days < 7) {
+        return `${days}d ago`;
+      } else {
+        const weeks = Math.floor(days / 7);
+        return `${weeks}w ago`;
+      }
+    }
+  }
+};
+
+export const dataURItoBlob = (dataURI) => {
+  const byteString = atob(dataURI.split(',')[1]);
+  const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+  const arrayBuffer = new ArrayBuffer(byteString.length);
+  const uintArray = new Uint8Array(arrayBuffer);
+
+  for (let i = 0; i < byteString.length; i++) {
+    uintArray[i] = byteString.charCodeAt(i);
+  }
+
+  return new Blob([arrayBuffer], { type: mimeString });
+};
+
+export const generateJson = (url, colorName) => {
+  return {
+    "name": "Sketch Robot",
+    "description": "A unique NFT featuring a sketched image of a robot with intricate design details, created by an EventPass.",
+    "image": url,
+    "attributes": [
+      {
+        "trait_type": "Style",
+        "value": "Sketch"
+      },
+      {
+        "trait_type": "Complexity",
+        "value": "Detailed"
+      },
+      {
+        "trait_type": "Color",
+        "value": `${colorName}`
+      }
+    ]
+  };
+};
+
+export const generateRandomRGB = () => {
+  const r = Math.floor(Math.random() * 256);
+  const g = Math.floor(Math.random() * 256);
+  const b = Math.floor(Math.random() * 256);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+export const calculatePercentage = (ticketAmount, ticketSold) => {
+  ticketAmount = Number(ticketAmount);
+  ticketSold = Number(ticketSold);
+
+  const percentage = (ticketSold / ticketAmount) * 100;
+
+  return percentage;
+}
+
+export const getDateList = () => {
+  const dateList = [];
+  const today = new Date();
+  // Loop from today to 6 days back
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    dateList.push(date.toISOString().slice(0, 10)); // Push date in YYYY-MM-DD format
+  }
+
+  return dateList;
+}
+
+export const formatDate = (date) => {
+  return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+}
+
+export const countTicketsByDate = (tickets, type) => {
+  const dateList = getDateList();
+
+  // Create an array to store the count of tickets for each date
+  const ticketCounts = [];
+
+  // Loop through each date in dateList
+  for (let i = 0; i < dateList.length; i++) {
+    const date = new Date(dateList[i]);
+
+    // Count the tickets within the date range
+    const count = tickets.filter(ticket => {
+      const getTimestamp = type === 1 ? ticket.timestamp : type === 2 ? ticket.verifiedTimestamp : type === 3 ? ticket.refundTimestamp : ticket.timestamp;
+      const ticketBigNumberDate = convertBigNumberToDate(getTimestamp);
+      const ticketDate = new Date(ticketBigNumberDate);
+      const ticketDateString = formatDate(ticketDate);
+      const dateString = formatDate(date);
+
+      return ticketDateString === dateString;
+    }).length;
+
+    // Add the count to ticketCounts array
+    ticketCounts.push(count);
+  }
+
+  return ticketCounts;
+}

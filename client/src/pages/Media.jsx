@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
-import ScanSection from "../sections/Scanner/ScanSection";
+import PageNotFound from "./NotFound";
+import MediaSection from "../sections/Media/MediaSection";
 import { useStateContext } from "../context";
 import { useParams } from "react-router-dom";
 import Spinner from "../assets/images/spinning-dots.svg";
-import PageNotFound from "./NotFound";
 
-const Scanner = () => {
+const Media = () => {
   const { id } = useParams();
 
   const { contract, address, getSingleEvent } = useStateContext();
@@ -18,7 +18,6 @@ const Scanner = () => {
 
     if (!isNaN(+id)) {
       const data = await getSingleEvent(id);
-      // console.log(data);
       setEvent(data);
     } else {
       setEvent({ id: 0 });
@@ -33,11 +32,8 @@ const Scanner = () => {
 
   return (
     <div>
-      {/* header section */}
-      <Header title={"Verify Your Tickets"} />
-      {/* scan section */}
       {isLoading ? (
-        <div className="flex justify-center items-center text-[14px] h-[50svh]">
+        <div className="flex justify-center items-center text-[14px] h-screen">
           <img
             src={Spinner}
             alt="spinner"
@@ -49,7 +45,11 @@ const Scanner = () => {
           {event.id === 0 || event.owner != address ? (
             <PageNotFound />
           ) : (
-            <ScanSection />
+            <div>
+              {/* header section */}
+              <Header title={"Manage Media"} />
+              <MediaSection />
+            </div>
           )}
         </>
       )}
@@ -57,4 +57,4 @@ const Scanner = () => {
   );
 };
 
-export default Scanner;
+export default Media;

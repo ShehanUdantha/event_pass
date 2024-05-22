@@ -1,14 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
-import { TOTAL_TICKET_CAN_PURCHASE } from "../constants";
+import {
+  TOTAL_TICKET_CAN_PURCHASE,
+  nftImageGenerateInput,
+  imageGenerateModel,
+} from "../constants";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useStateContext } from "../context";
 import toast, { Toaster } from "react-hot-toast";
 import { ethers } from "ethers";
-import Loader from "./Loader";
-import { calculateRemainingTime } from "../utils/index";
+import {
+  calculateRemainingTime,
+  dataURItoBlob,
+  generateJson,
+  generateRandomRGB,
+} from "../utils/index";
+import { HfInference } from "@huggingface/inference";
+import { uploadFileToIPFS, uploadJSONToIPFS } from "../services/pinata";
 
 const TicketBuyModal = ({
   eventId,
@@ -18,6 +28,7 @@ const TicketBuyModal = ({
   isVisible,
   onClose,
   onCallBack,
+  onLoading,
 }) => {
   if (!isVisible) return null;
 
@@ -37,7 +48,10 @@ const TicketBuyModal = ({
       .typeError("Please enter the number of tickets")
       .positive("Ticket amount must be a positive number")
       .min(1, "Minimum ticket amount should be 1")
-      .max(5, "maximum ticket amount should be 5")
+      .max(
+        TOTAL_TICKET_CAN_PURCHASE,
+        `maximum ticket amount should be ${TOTAL_TICKET_CAN_PURCHASE}`
+      )
       .required("Please enter the number of tickets"),
   });
 
@@ -58,7 +72,6 @@ const TicketBuyModal = ({
     resolver: yupResolver(schema),
   });
 
-  const [isLoading, setIsLoading] = useState(false);
   const [userBalance, setUserBalance] = useState("0.0");
 
   const getBalance = async () => {
@@ -74,19 +87,78 @@ const TicketBuyModal = ({
         if (calculateRemainingTime(startsAt) != "Expired") {
           if (address != eventOwner) {
             if (userBalance > ticketCost * data.ticketAmount) {
-              setIsLoading(true);
-              const response = await buyTickets({
-                eventId: eventId,
-                numOfTicket: data.ticketAmount,
-                ticketCost: ticketCost,
-              });
-              if (response) {
-                onClose();
-                onCallBack();
-              } else {
+              onLoading(true);
+              const generatedJsonArray = [];
+              try {
+                for (let i = 0; i < data.ticketAmount; i++) {
+                  const randomColor = generateRandomRGB();
+                  const result = await generateArt(randomColor);
+                  const blob = dataURItoBlob(result);
+                  const newRandomNumber = Math.floor(Math.random() * 500) + 1;
+
+                  const file = new File(
+                    [blob],
+                    `${eventId}_${newRandomNumber}_image.jpg`,
+                    {
+                      type: "image/jpeg",
+                    }
+                  );
+
+                  const uploadedImageResponse = await uploadFileToIPFS(
+                    file,
+                    `event_${eventId}`,
+                    `${file.name}`
+                  );
+
+                  if (uploadedImageResponse.success === true) {
+                    const generatedJson = generateJson(
+                      uploadedImageResponse.pinataURL,
+                      randomColor
+                    );
+                    const uploadedJsonResponse = await uploadJSONToIPFS(
+                      generatedJson,
+                      `${eventId}_${newRandomNumber}.json`
+                    );
+
+                    if (uploadedJsonResponse.success === true) {
+                      // console.log(randomColor);
+                      // console.log(uploadedImageResponse.pinataURL);
+                      // console.log(uploadedJsonResponse.pinataURL);
+
+                      generatedJsonArray.push(uploadedJsonResponse.pinataURL);
+                    } else {
+                      console.error("Error uploading json:", response.message);
+                      onLoading(false);
+                    }
+                  } else {
+                    console.error("Error uploading image:", response.message);
+                    onLoading(false);
+                  }
+
+                  setTimeout(() => {}, 2000);
+                }
+
+                if (generatedJsonArray.length === data.ticketAmount) {
+                  const response = await buyTickets({
+                    eventId: eventId,
+                    numOfTicket: data.ticketAmount,
+                    ticketCost: ticketCost,
+                    tokenURIs: generatedJsonArray,
+                  });
+
+                  if (response) {
+                    onCallBack();
+                    onClose();
+                  } else {
+                    somethingWentWrong();
+                  }
+                }
+              } catch (error) {
+                console.error("Error generating art or buying tickets:", error);
+                onLoading(false);
                 somethingWentWrong();
               }
-              setIsLoading(false);
+              onLoading(false);
             } else {
               InsufficientAmount();
             }
@@ -108,10 +180,39 @@ const TicketBuyModal = ({
     }
   };
 
+  const generateArt = async (randomColor) => {
+    const huggingFace = new HfInference(import.meta.env.VITE_IMG_API_KEY);
+
+    try {
+      const response = await huggingFace.textToImage({
+        data: nftImageGenerateInput + randomColor,
+        model: imageGenerateModel,
+      });
+
+      const reader = new FileReader();
+
+      return new Promise((resolve, reject) => {
+        reader.onload = () => {
+          const myDataUrl = reader.result;
+          resolve(myDataUrl);
+        };
+
+        reader.onerror = (error) => {
+          reject(error);
+        };
+
+        reader.readAsDataURL(response);
+      });
+    } catch (error) {
+      console.error("Error making API request:", error);
+      somethingWentWrong();
+      onLoading(false);
+      return null;
+    }
+  };
+
   return (
     <>
-      {isLoading && <Loader />}
-
       <div className="fixed inset-0 z-30 h-screen px-4 bg-[#000000b3] backdrop-blur-sm flex items-center justify-center">
         <div className="w-[600px] flex flex-col bg-white p-6 rounded-xl">
           {/* modal close button */}
@@ -131,7 +232,7 @@ const TicketBuyModal = ({
                   type="number"
                   min={1}
                   max={TOTAL_TICKET_CAN_PURCHASE}
-                  placeholder="Enter the number between 1 to 5"
+                  placeholder={`Enter the number between 1 to ${TOTAL_TICKET_CAN_PURCHASE}`}
                   name="ticketAmount"
                   {...register("ticketAmount")}
                 />
@@ -150,7 +251,7 @@ const TicketBuyModal = ({
             </div>
           </form>
         </div>
-        <Toaster position="bottom-right" />
+        <Toaster position="bottom-center" />
       </div>
     </>
   );

@@ -1,14 +1,33 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { calculateRemainingTime, formatDateAndTime } from "../utils/index";
 import { useStateContext } from "../context";
-import { MdMoreVert } from "react-icons/md";
-import EventMoreMenu from "../components/EventMoreMenu";
 import Spinner from "../assets/images/spinning-dots.svg";
-import Footer from "../components/Footer";
 import TicketBuyModal from "../components/TicketBuyModal";
-import SecondaryMarketSection from "../sections/ViewEvent/SecondaryMarketSection";
-import { FaRegEdit } from "react-icons/fa";
+import SocialMediaShareModal from "../components/SocialMediaShareModal";
+import SecondaryMarketSection from "../sections/Event/SecondaryMarketSection";
+import EventMediaSection from "../sections/Event/EventMediaSection";
+import Loader from "../components/Loader";
+import { IoShareSocialSharp } from "react-icons/io5";
+import { HfInference } from "@huggingface/inference";
+import { nftImageGenerateInput, imageGenerateModel } from "../constants";
+import PageNotFound from "./NotFound";
+
+const useEventTimer = (startsAt) => {
+  const [remainingTime, setRemainingTime] = useState(
+    calculateRemainingTime(startsAt)
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRemainingTime(calculateRemainingTime(startsAt));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [startsAt]);
+
+  return remainingTime;
+};
 
 const ViewEvent = () => {
   const { id } = useParams();
@@ -17,57 +36,95 @@ const ViewEvent = () => {
 
   const [event, setEvent] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [remainingTimes, setRemainingTimes] = useState(0);
-  const [displayMoreMenu, setDisplayMoreMenu] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isLoaderLoading, setIsLoaderLoading] = useState(false);
+  const [isVisibleBuy, setIsVisibleBuy] = useState(false);
+  const [isVisibleShare, setIsVisibleShare] = useState(false);
   const [contractOwner, setContractOwner] = useState("");
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     const fetchEventData = async () => {
-      setIsLoading(true);
       try {
         if (!isNaN(+id)) {
           const data = await getSingleEvent(id);
           setEvent(data);
-
-          // Start the timer here
-          if (data.startsAt) {
-            const interval = setInterval(() => {
-              setRemainingTimes(calculateRemainingTime(data.startsAt));
-            }, 1000);
-
-            return () => clearInterval(interval);
-          }
+          setIsLoading(false);
         } else {
           setEvent({ id: 0 });
+          setIsLoading(false);
         }
       } catch (error) {
-        console.error("Error fetching event data: ", error);
-      } finally {
+        setEvent({ id: 0 });
         setIsLoading(false);
+        console.error("Error fetching event data: ", error);
       }
     };
 
     const fetchContractOwner = async () => {
-      setIsLoading(true);
       try {
         const data = await getContractOwner();
         setContractOwner(data);
       } catch (error) {
-        console.error("Error fetching contract owner: ", error);
-      } finally {
         setIsLoading(false);
+        console.error("Error fetching contract owner: ", error);
       }
     };
 
-    if (contract && id) {
+    if (contract && id && !isLoaderLoading) {
+      setIsLoading(true);
       fetchContractOwner();
       fetchEventData();
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 2000);
+
+      // development purpose
+      activateImageGenerateServer();
     }
   }, [contract, address, getSingleEvent, getContractOwner, id]);
 
+  const fetchEventDataNormally = async () => {
+    try {
+      if (!isNaN(+id)) {
+        const data = await getSingleEvent(id);
+        setEvent(data);
+        setIsLoading(false);
+      } else {
+        setEvent({ id: 0 });
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setEvent({ id: 0 });
+      setIsLoading(false);
+      console.error("Error fetching event data: ", error);
+    }
+  };
+
+  const remainingTime = useEventTimer(event.startsAt);
+
+  const eventMediaSection = useMemo(() => {
+    return <EventMediaSection eventId={id} />;
+  }, [id]);
+
+  const activateImageGenerateServer = async () => {
+    const huggingFace = new HfInference(import.meta.env.VITE_IMG_API_KEY);
+
+    try {
+      const response = await huggingFace.textToImage({
+        data: nftImageGenerateInput,
+        model: imageGenerateModel,
+      });
+      // console.log("call to server", response);
+    } catch (error) {
+      console.error("Error making API request:", error);
+    }
+  };
+
   return (
     <>
+      {isLoaderLoading && <Loader />}
+
       {isLoading ? (
         <div className="flex justify-center items-center text-[14px] h-screen">
           <img
@@ -79,9 +136,7 @@ const ViewEvent = () => {
       ) : (
         <>
           {event.id === 0 ? (
-            <div className="flex justify-center items-center text-[14px] h-screen">
-              <div className="text-3xl font-bold">Page Not Found</div>
-            </div>
+            <PageNotFound />
           ) : (
             <Fragment>
               <div className="bg-[#F6F8FD] pt-32 pb-16 h-full">
@@ -98,51 +153,39 @@ const ViewEvent = () => {
                   <div className="w-full">
                     <div className="flex items-center justify-between gap-1">
                       {/* event title */}
-                      <h3 className="font-bold text-2xl md:text-3xl md:leading-12">
+                      <h3 className="font-bold text-2xl md:text-3xl md:leading-8">
                         {event.title}
                       </h3>
-                      {/* event more option button */}
-                      {event.owner == address || contractOwner == address ? (
-                        <div className="flex">
-                          {address == event.owner ? (
-                            <div className="mr-2">
-                              <Link
-                                key={event.id + "edit"}
-                                to={"/event/" + event.id + "/edit"}
-                              >
-                                <FaRegEdit
-                                  onClick={() => setDisplayMoreMenu(false)}
-                                  className="cursor-pointer text-lg"
-                                />
-                              </Link>
-                            </div>
-                          ) : null}
-                          <div>
-                            <MdMoreVert
-                              onClick={() =>
-                                setDisplayMoreMenu(!displayMoreMenu)
-                              }
-                              className="cursor-pointer text-lg"
-                            />
-                            {displayMoreMenu ? (
-                              <EventMoreMenu
-                                event={event}
-                                contractOwner={contractOwner}
-                              />
-                            ) : null}
-                          </div>
-                        </div>
-                      ) : null}
+                      <div className="flex items-center justify-between gap-3">
+                        {/* event share option */}
+                        <IoShareSocialSharp
+                          onClick={() => {
+                            setIsVisibleShare(true);
+                            setIsVisibleBuy(false);
+                          }}
+                          className="cursor-pointer text-lg"
+                        />
+                        {/* event manage button */}
+                        {event.owner == address || contractOwner == address ? (
+                          <Link
+                            key={event.id + "dashboard"}
+                            to={"/event/" + event.id + "/dashboard"}
+                            className="text-[#4338ca] bg-[#ecebf3] text-[14px] px-[1.2rem] py-[0.4rem] font-medium rounded hover:bg-[#c9caf3] transition-all duration-200 ease-in"
+                          >
+                            Manage
+                          </Link>
+                        ) : null}
+                      </div>
                     </div>
                     {/* event remaining and tickets left */}
-                    <div className="flex flex-col md:flex-row items-start md:items-center mt-1 justify-start">
+                    <div className="flex flex-col md:flex-row items-start md:items-center mt-3 justify-start">
                       <div className="text-[14px] text-[#b8b6b6] font-medium md:mr-10">
-                        {remainingTimes != "Expired"
-                          ? remainingTimes + " remaining"
+                        {remainingTime != "Expired"
+                          ? remainingTime + " remaining"
                           : "Expired"}
                       </div>
                       <div className="text-[14px] text-[#686666] font-medium mt-2 md:mt-0">
-                        {event.ticketRemain} ticket's left
+                        {event.ticketRemain} tickets left
                       </div>
                     </div>
                     {/* event ticket price and event owner */}
@@ -159,9 +202,14 @@ const ViewEvent = () => {
                       by {event.owner}
                     </div>
                     {/* buy ticket button */}
-                    {remainingTimes != "Expired" ? (
+                    {remainingTime != "Expired" && remainingTime != "0" ? (
                       <button
-                        onClick={() => setIsVisible(true)}
+                        onClick={() => {
+                          setIsVisibleBuy(true);
+                          setIsVisibleShare(false);
+                          // development purpose
+                          activateImageGenerateServer();
+                        }}
                         className="bg-[#4338ca] text-white px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in mt-5"
                       >
                         Get Tickets
@@ -200,24 +248,47 @@ const ViewEvent = () => {
                   </div>
                 </div>
               </div>
-              {/* secondary market section */}
-              <SecondaryMarketSection eventId={id} />
-              {/* footer */}
-              <Footer />
+              {/* event media section */}
+              {eventMediaSection}
 
+              {/* secondary market section */}
+              <SecondaryMarketSection
+                eventId={id}
+                onLoading={(value) => {
+                  setIsLoaderLoading(value);
+                }}
+              />
               {/* ticket buy modal */}
-              {isVisible ? (
+              {isVisibleBuy ? (
                 <TicketBuyModal
                   eventId={event.id}
                   eventOwner={event.owner}
                   ticketCost={event.ticketCost}
                   startsAt={event.startsAt}
-                  isVisible={isVisible}
+                  isVisible={isVisibleBuy}
                   onClose={() => {
-                    setIsVisible(false);
+                    setIsVisibleBuy(false);
+                    setIsLoaderLoading(false);
                   }}
                   onCallBack={() => {
-                    if (contract && id && address) fetchEvent();
+                    if (contract && id && address) {
+                      fetchEventDataNormally();
+                    }
+                  }}
+                  onLoading={(value) => {
+                    setIsLoaderLoading(value);
+                    if (value === false) {
+                      setIsVisibleBuy(false);
+                    }
+                  }}
+                />
+              ) : null}
+              {/* event share modal */}
+              {isVisibleShare ? (
+                <SocialMediaShareModal
+                  url={window.location.href}
+                  onClose={() => {
+                    setIsVisibleShare(false);
                   }}
                 />
               ) : null}

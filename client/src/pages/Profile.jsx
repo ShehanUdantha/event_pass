@@ -1,17 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import HeaderSection from "../sections/Profile/HeaderSection";
 import TabSection from "../sections/Profile/TabSection";
-import Footer from "../components/Footer";
 
 const Profile = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div>
       {/* header section */}
       <HeaderSection />
       {/* tab section */}
       <TabSection />
-      {/* footer */}
-      <Footer />
     </div>
   );
 };

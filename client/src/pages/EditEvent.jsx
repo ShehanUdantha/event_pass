@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
-import HeaderSection from "../sections/CreateEvent/HeaderSection";
-import FormSection from "../sections/CreateEvent/FormSection";
+import Header from "../components/Header";
+import FormSection from "../sections/Event/FormSection";
 import { useParams } from "react-router-dom";
 import { useStateContext } from "../context";
-import Footer from "../components/Footer";
 import Spinner from "../assets/images/spinning-dots.svg";
 
 const EditEvent = () => {
   const { id } = useParams();
-  console.log(id);
   const { contract, address, getSingleEvent } = useStateContext();
 
   const [event, setEvent] = useState({});
@@ -27,15 +25,16 @@ const EditEvent = () => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (contract && id) fetchEvent();
   }, [contract, address]);
 
-  console.log(event);
+  // console.log(event);
 
   return (
     <div>
       {/* header section */}
-      <HeaderSection title={"Edit"} />
+      <Header title={"Edit Event"} />
       {/* form section */}
       {isLoading ? (
         <div className="flex justify-center items-center text-[14px] h-[20rem]">
@@ -48,8 +47,6 @@ const EditEvent = () => {
       ) : (
         <FormSection event={event} />
       )}
-      {/* footer */}
-      <Footer />
     </div>
   );
 };

@@ -1,37 +1,42 @@
-import React, { useState } from "react";
+import React from "react";
 import { useStateContext } from "../context";
 import toast, { Toaster } from "react-hot-toast";
 import { calculateRemainingTime } from "../utils/index";
-import Loader from "./Loader";
 import { Link, useNavigate } from "react-router-dom";
+import { openSeaUrl } from "../constants/index";
 
-const TicketMoreMenu = ({ event, ticket }) => {
-  const {
-    resellTicket,
-    getBackResellTicket,
-    address,
-    requestRefundTicket,
-    cancelRefundTicket,
-  } = useStateContext();
-  const [isLoading, setIsLoading] = useState(false);
+const TicketMoreMenu = ({ event, ticket, onLoading }) => {
+  const { address, resellOrUnsellTicket, requestOrCancelRefundTicket } =
+    useStateContext();
+
   const navigate = useNavigate();
 
   const notifyEventExpired = () => toast.error("Event expired!");
   const notifyUnAuthorized = () => toast.error("Unauthorized entity");
   const notifyAlreadyResell = () => toast.error("Ticket already resell!");
-  const notifyNotResell = () => toast.error("Ticket not resell!");
   const notifyAlreadyRefunded = () => toast.error("Ticket already refunded!");
   const notifyAlreadyVerified = () => toast.error("Ticket already verified!");
 
-  const callResellTicket = async () => {
+  const callResellOrUnsellTicket = async (status) => {
     if (address == ticket.owner) {
       if (calculateRemainingTime(event.startsAt) != "Expired") {
         if (!ticket.verified) {
-          if (!ticket.reselled) {
-            setIsLoading(true);
-            const response = await resellTicket(event.id, ticket.id, address);
-            setIsLoading(false);
-            if (response) navigate("/event/" + event.id);
+          if (!ticket.reselled || status === false) {
+            onLoading(true);
+            const response = await resellOrUnsellTicket(
+              event.id,
+              ticket.id,
+              address,
+              status
+            );
+            onLoading(false);
+            if (response) {
+              if (status) {
+                navigate("/event/" + event.id);
+              } else {
+                window.location.reload(false);
+              }
+            }
           } else {
             notifyAlreadyResell();
           }
@@ -46,47 +51,17 @@ const TicketMoreMenu = ({ event, ticket }) => {
     }
   };
 
-  const callGetBackFromResellTicket = async () => {
+  const callRequestOrCancelRefundTicket = async (status) => {
     if (address == ticket.owner) {
-      if (ticket.reselled) {
-        setIsLoading(true);
-        const response = await getBackResellTicket(
+      if (!ticket.refunded) {
+        onLoading(true);
+        const response = await requestOrCancelRefundTicket(
           event.id,
           ticket.id,
-          address
+          status
         );
-        setIsLoading(false);
-        if (response) navigate("/event/" + event.id);
-      } else {
-        notifyNotResell();
-      }
-    } else {
-      notifyUnAuthorized();
-    }
-  };
-
-  const callRequestRefundTicket = async () => {
-    if (address == ticket.owner) {
-      if (!ticket.refunded) {
-        setIsLoading(true);
-        const response = await requestRefundTicket(event.id, ticket.id);
         window.location.reload(false);
-        setIsLoading(false);
-      } else {
-        notifyAlreadyRefunded();
-      }
-    } else {
-      notifyUnAuthorized();
-    }
-  };
-
-  const callCancelRefundTicket = async () => {
-    if (address == ticket.owner) {
-      if (!ticket.refunded) {
-        setIsLoading(true);
-        const response = await cancelRefundTicket(event.id, ticket.id);
-        window.location.reload(false);
-        setIsLoading(false);
+        onLoading(false);
       } else {
         notifyAlreadyRefunded();
       }
@@ -97,19 +72,18 @@ const TicketMoreMenu = ({ event, ticket }) => {
 
   return (
     <>
-      {isLoading && <Loader />}
       <div className="flex flex-col absolute w-[100px] bg-white border-spacing-1 mt-2 border border-gray right-[1.5rem]">
         <ul className="flex flex-col text-[12px]">
           {ticket.reselled ? (
             <div
-              onClick={callGetBackFromResellTicket}
+              onClick={() => callResellOrUnsellTicket(false)}
               className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
             >
-              <li>Get Back</li>
+              <li>UnSell</li>
             </div>
           ) : (
             <div
-              onClick={callResellTicket}
+              onClick={() => callResellOrUnsellTicket(true)}
               className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
             >
               <li>Resell</li>
@@ -118,14 +92,14 @@ const TicketMoreMenu = ({ event, ticket }) => {
 
           {ticket.isWaitingForRefund ? (
             <div
-              onClick={callCancelRefundTicket}
+              onClick={() => callRequestOrCancelRefundTicket(false)}
               className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
             >
               <li>Cancel</li>
             </div>
           ) : (
             <div
-              onClick={callRequestRefundTicket}
+              onClick={() => callRequestOrCancelRefundTicket(true)}
               className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
             >
               <li>Req Refund</li>
@@ -134,11 +108,21 @@ const TicketMoreMenu = ({ event, ticket }) => {
 
           <Link key={ticket.id} to={ticket.qrCode}>
             <div className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100">
-              <li>View</li>
+              <li>View Info</li>
+            </div>
+          </Link>
+
+          <Link
+            key={ticket.tokenId}
+            to={openSeaUrl + ticket.tokenId}
+            target="_blank"
+          >
+            <div className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100">
+              <li>View NFT</li>
             </div>
           </Link>
         </ul>
-        <Toaster position="bottom-right" />
+        <Toaster position="bottom-center" />
       </div>
     </>
   );
