@@ -6,7 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { openSeaUrl } from "../constants/index";
 
 const TicketMoreMenu = ({ event, ticket, onLoading }) => {
-  const { address, resellOrUnsellTicket, requestOrCanceleRefundTicket } =
+  const { address, resellOrUnsellTicket, requestOrCancelRefundTicket } =
     useStateContext();
 
   const navigate = useNavigate();
@@ -51,11 +51,11 @@ const TicketMoreMenu = ({ event, ticket, onLoading }) => {
     }
   };
 
-  const callRequestOrCanceleRefundTicket = async (status) => {
+  const callRequestOrCancelRefundTicket = async (status) => {
     if (address == ticket.owner) {
       if (!ticket.refunded) {
         onLoading(true);
-        const response = await requestOrCanceleRefundTicket(
+        const response = await requestOrCancelRefundTicket(
           event.id,
           ticket.id,
           status
@@ -92,14 +92,14 @@ const TicketMoreMenu = ({ event, ticket, onLoading }) => {
 
           {ticket.isWaitingForRefund ? (
             <div
-              onClick={() => callRequestOrCanceleRefundTicket(false)}
+              onClick={() => callRequestOrCancelRefundTicket(false)}
               className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
             >
               <li>Cancel</li>
             </div>
           ) : (
             <div
-              onClick={() => callRequestOrCanceleRefundTicket(true)}
+              onClick={() => callRequestOrCancelRefundTicket(true)}
               className="border-b cursor-pointer p-2 flex justify-center items-center bg-white hover:bg-gray-100"
             >
               <li>Req Refund</li>

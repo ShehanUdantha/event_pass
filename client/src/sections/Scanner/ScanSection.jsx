@@ -44,7 +44,6 @@ const ScanSection = () => {
 
     if (response.eventId == id) {
       await verifyTicket(response.address, response.ticketId, response.eventId);
-      setIsLoading(false);
       checkTicketVerification(value);
     } else {
       notifyWrongTicket();

@@ -609,7 +609,7 @@ export const StateContextProvider = ({ children }) => {
 
   // 20. request or cancel refund
   const {
-    mutateAsync: requestOrCanceleRefundTicket,
+    mutateAsync: requestOrCancelRefundTicket,
     isRequestOrCancelRefundLoading,
   } = useContractWrite(contract, "requestOrCancelRefundTicket");
 

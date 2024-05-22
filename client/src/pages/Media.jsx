@@ -47,7 +47,7 @@ const Media = () => {
           ) : (
             <div>
               {/* header section */}
-              <Header title={"Event Media"} />
+              <Header title={"Manage Media"} />
               <MediaSection />
             </div>
           )}

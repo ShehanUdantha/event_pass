@@ -207,6 +207,8 @@ const ViewEvent = () => {
                         onClick={() => {
                           setIsVisibleBuy(true);
                           setIsVisibleShare(false);
+                          // development purpose
+                          activateImageGenerateServer();
                         }}
                         className="bg-[#4338ca] text-white px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in mt-5"
                       >
