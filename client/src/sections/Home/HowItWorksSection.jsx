@@ -7,13 +7,13 @@ import { BsShopWindow } from "react-icons/bs";
 
 const HowItWorksSection = () => {
   return (
-    <section className="bg-[#F6F8FD] py-[4rem]">
-      <div className="px-4 py-3 max-w-7xl mx-auto flex flex-col gap-1 justify-center items-center">
+    <section className="bg-white py-[4rem] px-5 md:px-0">
+      <div className="py-3 max-w-4xl mx-auto flex flex-col justify-center items-center">
         {/* section title */}
-        <h2 className="font-bold text-3xl leading-none tracking-tight mb-8">
+        <span className="max-w-sm font-semibold text-[25px] leading-none tracking-tight md:text-[38px]">
           How it Works?
-        </h2>
-        <div className="mx-auto max-w-7xl px-2 md:px-4 grid md:grid-cols-4 grid-cols-1 gap-3 md:gap-6">
+        </span>
+        <div className="mt-[4.5rem] mx-auto w-full grid md:grid-cols-4 grid-cols-1 gap-3 md:gap-9">
           <WorkProgressCard
             icon={<BsWallet2 />}
             title={"Set up your Wallet"}

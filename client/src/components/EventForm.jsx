@@ -439,7 +439,7 @@ const EventForm = ({ event }) => {
         {/* submit button */}
         <div className="flex mt-5 text-white justify-center">
           <input
-            className="bg-[#4338ca] cursor-pointer px-10 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in"
+            className="bg-[#4338ca] cursor-pointer w-[8.3rem] h-[3rem] font-medium border rounded-3xl hover:bg-[#6366f1] transition-all duration-200 ease-in"
             type="submit"
             disabled={isSubmitting}
           />

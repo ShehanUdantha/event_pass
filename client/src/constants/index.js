@@ -5,6 +5,7 @@ export const TOTAL_TICKET_CAN_PURCHASE = 4;
 export const navLinks = [
   { path: "/", link: "Home" },
   { path: "/create-event", link: "Create Event" },
+  { path: "/how-it-works", link: "How It Works" },
   { path: "/about", link: "About Us" },
   { path: "/profile", link: "Profile" },
 ];

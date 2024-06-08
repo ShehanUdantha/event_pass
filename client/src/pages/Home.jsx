@@ -9,6 +9,11 @@ import HowItWorksSection from "../sections/Home/HowItWorksSection";
 import ChatWootWidget from "../widgets/ChatWootWidget";
 import videojs from "video.js";
 import VideoPlayer from "../components/VideoPlayer";
+import SocialSection from "../sections/Home/SocialSection";
+import StartEventSection from "../sections/Home/StartEventSection";
+import AudienceSection from "../sections/Home/AudienceSection";
+import InfoRow from "../sections/Home/InfoRow";
+import BuyTicketsSection from "../sections/Home/BuyTicketsSection";
 
 const Home = () => {
   const { contract, address, getAllEvents } = useStateContext();
@@ -71,71 +76,40 @@ const Home = () => {
     eventsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const handlePlayerReady = (player) => {
-    playerRef.current = player;
+  // const handlePlayerReady = (player) => {
+  //   playerRef.current = player;
 
-    player.on("waiting", () => {
-      videojs.log("player is waiting");
-    });
+  //   player.on("waiting", () => {
+  //     videojs.log("player is waiting");
+  //   });
 
-    player.on("dispose", () => {
-      videojs.log("player will dispose");
-    });
-  };
+  //   player.on("dispose", () => {
+  //     videojs.log("player will dispose");
+  //   });
+  // };
 
   return (
     <div>
       {/* hero section */}
       <Hero scrollToEvents={scrollToEvents} onCallBack={() => setOpen(!open)} />
-      {/* filter section */}
-      <section className="mt-10 md:mb-14 md:mt-16" ref={eventsRef}>
-        <div className="mx-auto max-w-7xl px-4">
-          {/* section title */}
-          <h2 className="font-bold text-3xl leading-none tracking-tight">
-            All Events
-          </h2>
+      {/* info row */}
+      <InfoRow />
+      {/* buy tickets */}
+      <BuyTicketsSection />
+      {/* promote events */}
+      <SocialSection />
+      {/* start new event */}
+      <StartEventSection />
+      {/* audience */}
+      <AudienceSection />
 
-          {/* search and filters */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-8 md:gap-56">
-            {/* search */}
-            <div className="min-h-[40px] flex rounded-2xl w-full bg-[#F6F6F6] px-4 py-[7px] mt-3 md:mt-0">
-              <IoSearchOutline className="mt-1 text-gray-500 mr-3" />
-              <input
-                className="bg-[#F6F6F6] border border-[#F6F6F6] w-full text-gray-900 focus:outline-none"
-                type="search"
-                placeholder="Search events"
-                onChange={handleSearchChange}
-                value={searchInput}
-              />
-            </div>
-            {/* filter */}
-            <div className="min-h-[40px] rounded-2xl w-full bg-[#F6F6F6] px-4 py-2 mt-3 md:mt-0 cursor-pointer">
-              <select
-                className="bg-[#F6F6F6] border border-[#F6F6F6] text-[14px] w-full text-gray-900 focus:outline-none cursor-pointer"
-                name="category"
-                value={filteredCategory}
-                onChange={handleFilterChange}
-              >
-                {categoryList.map((item) => (
-                  <option value={item} key={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* grid view */}
-      <GridView events={filteredEvents} isLoading={isLoading} />
-      {/* pagination section */}
-      <PaginationSection />
       {/* how it works section */}
-      <HowItWorksSection />
+      {/* <HowItWorksSection /> */}
+
       {/* chatwoot */}
       <ChatWootWidget />
       {/* video player */}
-      {open ? (
+      {/* {open ? (
         <div
           className="fixed inset-0 z-30 h-screen px-4 bg-[#000000b3] backdrop-blur-sm flex items-center justify-center"
           onClick={(e) => {
@@ -149,7 +123,7 @@ const Home = () => {
             <VideoPlayer onReady={handlePlayerReady} videoUrl={infoVideoUrl} />
           </div>
         </div>
-      ) : null}
+      ) : null} */}
     </div>
   );
 };

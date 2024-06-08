@@ -4,35 +4,38 @@ import { IoPlay } from "react-icons/io5";
 
 const Hero = ({ scrollToEvents, onCallBack }) => {
   return (
-    <section className="bg-[#F6F8FD] pt-32">
-      <div className="flex flex-col md:flex-row mx-auto items-center justify-between max-w-7xl px-4">
+    <section className="bg-white pt-32">
+      <div className="flex flex-col md:flex-row mx-auto items-center justify-center max-w-7xl px-4">
         {/* hero title and description */}
-        <div className="text-center md:text-start">
-          <span className="max-w-sm font-bold text-[32px] leading-none tracking-tight md:text-[54px]">
-            Enhance, Secure <br />
-            & Celebrate with <br />
-            Our Guaranteed way.
+        <div className="text-center md:text-center mt-[3rem]">
+          <span className="max-w-sm font-semibold text-[32px] leading-none tracking-tight md:text-[67px]">
+            Decentralized Event Ticketing <br /> & Managing Solution.
           </span>
           <br />
-          <div className="pt-5 justify-center md:justify-start">
-            <span className="max-w-sm text-[1.1rem] leading-none text-gray-light/80 tracking-tight">
-              Explore the limitless possibilities of event hosting with our
+          <div className="pt-5 justify-center md:justify-start mt-2">
+            <span className="max-w-sm text-[1.2rem] leading-none text-gray-500 text-medium tracking-tight">
+              {/* Explore the limitless possibilities of event hosting with our
               platform,
               <br />
               where convenience meets celebration, and connections become
               <br />
-              unforgettable moments.
+              unforgettable moments. */}
+              Events Simplified. Transparency Unified.
             </span>
           </div>
-          <div className="flex flex-col-reverse md:flex-row gap-y-5 gap-x-10 text-white mt-8 justify-center md:justify-start mb-10 items-center">
-            <button
+          <div className="flex flex-col-reverse md:flex-row gap-y-5 gap-x-10 text-white mt-10 justify-center md:justify-center mb-10 items-center">
+            {/* <button
               className=" bg-[#4338ca] px-6 py-2 max-h-[2.6rem] font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in"
               onClick={scrollToEvents}
             >
               Explore Now
-            </button>
+            </button> */}
 
-            <div className="flex items-center gap-2">
+            <div className="w-[10rem] h-[3rem] border rounded-3xl flex justify-center items-center cursor-pointer text-white bg-[#4338ca] hover:bg-[#6366f1] transition hover:-translate-y-1 hover:scale-105 duration-900">
+              <span className="text-[1.01rem] font-semibold">View Events</span>
+            </div>
+
+            {/* <div className="flex items-center gap-2">
               <div
                 className="relative flex justify-center items-center cursor-pointer transition-all duration-200 hover:scale-105"
                 onClick={onCallBack}
@@ -46,13 +49,13 @@ const Hero = ({ scrollToEvents, onCallBack }) => {
                 </div>
               </div>
               <div className="text-black font-medium">Learn More</div>
-            </div>
+            </div> */}
           </div>
         </div>
         {/* hero bg */}
-        <div className="hidden md:block">
+        {/* <div className="hidden md:block">
           <img src={HeroBg} alt="HeroBg" width={620} />
-        </div>
+        </div> */}
       </div>
     </section>
   );

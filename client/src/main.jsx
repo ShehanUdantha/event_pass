@@ -21,6 +21,7 @@ import Scanner from "./pages/Scanner.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Media from "./pages/Media.jsx";
 import About from "./pages/About.jsx";
+import HowItWorks from "./pages/HowItWorks.jsx";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
       {
         path: "/create-event",
         element: <CreateEvent />,
+      },
+      {
+        path: "/how-it-works",
+        element: <HowItWorks />,
       },
       {
         path: "/about",
