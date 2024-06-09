@@ -1,16 +1,17 @@
 import React from "react";
-import SellingTickets from "../../assets/images/sellTicket.jpg";
+import { TicketOnLinSellingImage } from "../../constants";
 
 const StartEventSection = () => {
   return (
     <section className="bg-white py-[4rem] px-5 md:px-0">
-      <div className="max-w-4xl h-[50rem] md:h-[33rem] overflow-hidden mx-auto flex flex-col md:flex-row gap-1 justify-center items-center">
-        <div className="w-full h-full">
-          <div className="w-full h-full bg-slate-50 rounded-3xl">
-            <img
-              src={SellingTickets}
-              alt="sellingTickets"
-              className="p-14 h-full w-full object-cover rounded-[5rem]"
+      <div className="max-w-4xl h-[55rem] md:h-[33rem] overflow-hidden mx-auto flex flex-col md:flex-row gap-1 justify-center items-center">
+        <div className="w-full h-full bg-slate-50 rounded-3xl">
+          <div className="p-14 h-full w-full">
+            <div
+              className="bg-cover bg-center min-h-[15.5rem] h-full w-full rounded-[1.5rem]"
+              style={{
+                backgroundImage: `url(${TicketOnLinSellingImage})`,
+              }}
             />
           </div>
         </div>

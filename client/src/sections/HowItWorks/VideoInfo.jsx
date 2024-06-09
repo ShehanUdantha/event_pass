@@ -20,7 +20,7 @@ const VideoInfo = () => {
 
   return (
     <section className="bg-white mt-[7.4rem] pb-10">
-      <div className="flex flex-col md:flex-row mx-auto items-center justify-center max-w-7xl px-4 gap-4 md:gap-6">
+      <div className="flex flex-col md:flex-row mx-auto items-center justify-center max-w-6xl px-4 gap-4 md:gap-6">
         <div className="w-full md:w-4/5 aspect-video overflow-hidden rounded-[20px]">
           <VideoPlayer onReady={handlePlayerReady} videoUrl={infoVideoUrl} />
         </div>

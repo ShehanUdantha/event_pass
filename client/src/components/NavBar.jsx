@@ -29,22 +29,7 @@ const NavBar = () => {
         {/* nav items */}
         <ul className="md:flex gap-12 hidden text-md font-medium text-[#1e1b4b]">
           {navLinks.map((item) =>
-            item.path === "/create-event" ? (
-              address ? (
-                <li key={item.path}>
-                  <NavLink
-                    className={({ isActive, isPending }) =>
-                      isActive ? "active" : ""
-                    }
-                    onClick={toggleMenu}
-                    to={item.path}
-                    key={item.path}
-                  >
-                    {item.link}
-                  </NavLink>
-                </li>
-              ) : null
-            ) : item.path === "/profile" ? (
+            item.path === "/profile" ? (
               address ? (
                 <li key={item.path}>
                   <NavLink
@@ -84,7 +69,7 @@ const NavBar = () => {
               modalSize={"compact"}
               detailsBtn={() => {
                 return (
-                  <div className="w-[10rem] h-[2.7rem] border rounded-3xl flex justify-center items-center cursor-pointer bg-[#4338ca] text-white">
+                  <div className="wallet-btn">
                     <span className="text-[1.01rem] font-semibold">
                       Disconnect
                     </span>
@@ -118,22 +103,7 @@ const NavBar = () => {
           } `}
         >
           {navLinks.map((item) =>
-            item.path === "/create-event" ? (
-              address ? (
-                <li key={item.path}>
-                  <NavLink
-                    className={({ isActive, isPending }) =>
-                      isActive ? "active" : ""
-                    }
-                    onClick={toggleMenu}
-                    to={item.path}
-                    key={item.path}
-                  >
-                    {item.link}
-                  </NavLink>
-                </li>
-              ) : null
-            ) : item.path === "/profile" ? (
+            item.path === "/profile" ? (
               address ? (
                 <li key={item.path}>
                   <NavLink
@@ -171,9 +141,11 @@ const NavBar = () => {
                 modalSize={"compact"}
                 detailsBtn={() => {
                   return (
-                    <button className="bg-[#4338ca] text-white px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in">
-                      Disconnect
-                    </button>
+                    <div className="wallet-btn">
+                      <span className="text-[1.01rem] font-semibold">
+                        Disconnect
+                      </span>
+                    </div>
                   );
                 }}
                 className="wallet-btn"

@@ -1,5 +1,5 @@
 import React from "react";
-import Share from "../../../assets/images/share.png";
+import { ShareImage } from "../../../constants";
 import { Ethereum, Wallet1 } from "iconsax-react";
 
 const PromoteEvent = () => {
@@ -44,11 +44,12 @@ const PromoteEvent = () => {
           </div>
         </div>
         <div className="w-full h-full">
-          <div className="w-full h-full  rounded-3xl">
-            <img
-              src={Share}
-              alt="share"
-              className="p-14 h-full w-full object-cover rounded-[5rem]"
+          <div className="p-14 h-full w-full">
+            <div
+              className="bg-cover bg-center h-full w-full rounded-[1.5rem]"
+              style={{
+                backgroundImage: `url(${ShareImage})`,
+              }}
             />
           </div>
         </div>

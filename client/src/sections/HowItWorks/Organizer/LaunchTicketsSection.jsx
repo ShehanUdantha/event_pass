@@ -1,5 +1,5 @@
 import React from "react";
-import NftSell from "../../../assets/images/nftSell.png";
+import { LaunchTicketImage } from "../../../constants";
 import { Ethereum, Wallet1 } from "iconsax-react";
 
 const LaunchTicketsSection = () => {
@@ -44,11 +44,12 @@ const LaunchTicketsSection = () => {
           </div>
         </div>
         <div className="w-full h-full">
-          <div className="w-full h-full  rounded-3xl">
-            <img
-              src={NftSell}
-              alt="NftSell"
-              className="p-14 h-full w-full object-cover rounded-[5rem]"
+          <div className="p-14 h-full w-full">
+            <div
+              className="bg-cover bg-center h-full w-full rounded-[1.5rem]"
+              style={{
+                backgroundImage: `url(${LaunchTicketImage})`,
+              }}
             />
           </div>
         </div>

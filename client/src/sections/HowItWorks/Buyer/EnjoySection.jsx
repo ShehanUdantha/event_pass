@@ -1,5 +1,5 @@
 import React from "react";
-import EnjoyTicket from "../../../assets/images/enjoyTicket.png";
+import { EnjoyTicketImage } from "../../../constants";
 import { Ethereum, Wallet1 } from "iconsax-react";
 
 const EnjoySection = () => {
@@ -44,11 +44,12 @@ const EnjoySection = () => {
           </div>
         </div>
         <div className="w-full h-full">
-          <div className="w-full h-full  rounded-3xl">
-            <img
-              src={EnjoyTicket}
-              alt="enjoyTicket"
-              className="p-14 h-full w-full object-cover rounded-[5rem]"
+          <div className="p-14 h-full w-full">
+            <div
+              className="bg-cover bg-center h-full w-full rounded-[1.5rem]"
+              style={{
+                backgroundImage: `url(${EnjoyTicketImage})`,
+              }}
             />
           </div>
         </div>

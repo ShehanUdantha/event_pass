@@ -1,5 +1,5 @@
 import React from "react";
-import BuyTicket from "../../../assets/images/buyTicket.png";
+import { BuyTicketImage } from "../../../constants";
 import { Ethereum, Wallet1 } from "iconsax-react";
 
 const BuyNFTTicketSection = () => {
@@ -44,11 +44,12 @@ const BuyNFTTicketSection = () => {
           </div>
         </div>
         <div className="w-full h-full">
-          <div className="w-full h-full  rounded-3xl">
-            <img
-              src={BuyTicket}
-              alt="buyTicket"
-              className="p-14 h-full w-full object-cover rounded-[5rem]"
+          <div className="p-14 h-full w-full">
+            <div
+              className="bg-cover bg-center h-full w-full rounded-[1.5rem]"
+              style={{
+                backgroundImage: `url(${BuyTicketImage})`,
+              }}
             />
           </div>
         </div>

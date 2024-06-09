@@ -1,5 +1,5 @@
 import React from "react";
-import Customer from "../../assets/images/customer.jpg";
+import { CustomerImage } from "../../constants";
 import { Ethereum, Wallet1 } from "iconsax-react";
 
 const AudienceSection = () => {
@@ -41,12 +41,13 @@ const AudienceSection = () => {
             <span className="text-[1.01rem] font-semibold">Connect Wallet</span>
           </div>
         </div>
-        <div className="w-full h-full">
-          <div className="w-full h-full bg-slate-50 rounded-3xl">
-            <img
-              src={Customer}
-              alt="customer"
-              className="p-14 h-full w-full object-cover rounded-[5rem]"
+        <div className="w-full h-full bg-slate-50 rounded-3xl">
+          <div className="p-14 h-full w-full">
+            <div
+              className="bg-cover bg-center h-full w-full rounded-[1.5rem]"
+              style={{
+                backgroundImage: `url(${CustomerImage})`,
+              }}
             />
           </div>
         </div>

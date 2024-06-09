@@ -22,6 +22,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Media from "./pages/Media.jsx";
 import About from "./pages/About.jsx";
 import HowItWorks from "./pages/HowItWorks.jsx";
+import AllEvents from "./pages/AllEvents.jsx";
 
 const router = createBrowserRouter([
   {
@@ -30,8 +31,8 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Home /> },
       {
-        path: "/create-event",
-        element: <CreateEvent />,
+        path: "/events",
+        element: <AllEvents />,
       },
       {
         path: "/how-it-works",
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "/create-event",
+        element: <CreateEvent />,
       },
       {
         path: "/event/:id",

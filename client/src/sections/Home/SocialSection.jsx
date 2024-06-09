@@ -1,6 +1,6 @@
 import React from "react";
-import Socials from "../../assets/images/socialMedia.png";
 import { Sms, Instagram } from "iconsax-react";
+import { SocialMediaImage } from "../../constants";
 
 const SocialSection = () => {
   return (
@@ -41,11 +41,19 @@ const SocialSection = () => {
           </div>
         </div>
         <div className="w-full h-full">
-          <img
+          {/* <img
             src={Socials}
             alt="socials"
             className="w-full h-full object-cover rounded-bl-3xl rounded-br-3xl md:rounded-bl-[0px] md:rounded-tr-3xl"
-          />
+          /> */}
+          <div className="h-full w-full">
+            <div
+              className="bg-cover bg-center h-full w-full"
+              style={{
+                backgroundImage: `url(${SocialMediaImage})`,
+              }}
+            />
+          </div>
         </div>
       </div>
     </section>
