@@ -23,7 +23,7 @@ const BuyTicketsSection = () => {
         </div>
         <div className="w-full h-full p-12 md:p-14">
           <span className="max-w-sm font-semibold text-[25px] leading-none tracking-tight md:text-[38px]">
-            NFT Tickets
+            NFT Collectibles
           </span>
           <div className="pt-5 justify-center md:justify-start">
             <span className="max-w-sm text-[1.01rem] font-normal leading-none tracking-tight text-gray-500">

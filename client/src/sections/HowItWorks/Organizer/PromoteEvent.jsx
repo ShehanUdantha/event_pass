@@ -15,10 +15,10 @@ const PromoteEvent = () => {
           </span>
           <div className="pt-5 justify-center md:justify-start">
             <span className="max-w-sm text-[1.01rem] font-normal leading-none tracking-tight text-gray-500">
-              No more fumbling with complex settings. Set up your event in
-              moments. From multiple ticket types to time slots, from event
-              checkout settings to real-time notifications, we've got you
-              covered.
+              Leverage powerhouse marketing tools from Google, Facebook, TikTok,
+              and more. And here's the cherry on top: we'll blast your event
+              across our media channels to make sure you're the talk of the
+              town.
             </span>
           </div>
           <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-5">

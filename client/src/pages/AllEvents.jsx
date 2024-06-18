@@ -42,11 +42,11 @@ const AllEvents = () => {
   const filterEvents = (category, search) => {
     let filtered = events;
 
-    if (category !== "All") {
+    if (category && category !== "All") {
       filtered = filtered.filter((item) => item.category === category);
     }
 
-    if (search !== "") {
+    if (search && search.trim() !== "") {
       filtered = filtered.filter((item) =>
         item.title.toLowerCase().includes(search.toLowerCase())
       );

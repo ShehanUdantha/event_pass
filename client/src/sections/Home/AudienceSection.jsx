@@ -1,6 +1,6 @@
 import React from "react";
 import { CustomerImage } from "../../constants";
-import { Ethereum, Wallet1 } from "iconsax-react";
+import { Ethereum, GalleryFavorite } from "iconsax-react";
 
 const AudienceSection = () => {
   return (
@@ -29,7 +29,7 @@ const AudienceSection = () => {
 
             <div className="flex justify-start items-center gap-3">
               <div className="bg-gray-100 rounded-full flex items-center justify-center w-8 h-8">
-                <Wallet1 size={19} />
+                <GalleryFavorite size={19} />
               </div>
               <span className="text-[1.01rem] font-semibold">
                 Save tickets as NFT

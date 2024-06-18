@@ -15,10 +15,9 @@ const CreateEventSection = () => {
           </span>
           <div className="pt-5 justify-center md:justify-start">
             <span className="max-w-sm text-[1.01rem] font-normal leading-none tracking-tight text-gray-500">
-              No more fumbling with complex settings. Set up your event in
-              moments. From multiple ticket types to time slots, from event
-              checkout settings to real-time notifications, we've got you
-              covered.
+              Seamlessly host events with our tools, robust tech, and dedicated
+              support. Manage attendees and detailed sales reports, whether for
+              one-time, recurring, or timed-entry events.
             </span>
           </div>
           <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-5">

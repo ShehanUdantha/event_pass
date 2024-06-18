@@ -28,7 +28,7 @@ const EventMediaSection = ({ eventId }) => {
   return (
     <>
       {videos.length > 0 ? (
-        <section className="pt-5 pb-16 bg-[#F6F8FD] h-[23rem]">
+        <section className="pt-5 pb-16 bg-white h-[23rem]">
           <div className="mx-auto max-w-7xl px-4">
             {/* section title */}
             <h2 className="font-bold text-[26px] leading-none tracking-tight">

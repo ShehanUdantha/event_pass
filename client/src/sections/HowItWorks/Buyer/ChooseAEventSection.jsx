@@ -1,6 +1,6 @@
 import React from "react";
 import { ChooseEventImage } from "../../../constants";
-import { Ethereum, Wallet1 } from "iconsax-react";
+import { Cake, Blend, Calendar, Clock } from "iconsax-react";
 
 const ChooseAEventSection = () => {
   return (
@@ -24,18 +24,37 @@ const ChooseAEventSection = () => {
           <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-5">
             <div className="flex justify-start items-center gap-3">
               <div className="bg-gray-100 rounded-full flex items-center justify-center w-8 h-8">
-                <Ethereum size={19} />
+                <Cake size={19} />
               </div>
-              <span className="text-[1.01rem] font-semibold">Ethereum Pay</span>
+              <span className="text-[1.01rem] font-semibold">
+                Single-day events
+              </span>
             </div>
 
             <div className="flex justify-start items-center gap-3">
               <div className="bg-gray-100 rounded-full flex items-center justify-center w-8 h-8">
-                <Wallet1 size={19} />
+                <Calendar size={19} />
               </div>
               <span className="text-[1.01rem] font-semibold">
-                Save tickets as NFT
+                Multiple-day events
               </span>
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-5">
+            <div className="flex justify-start items-center gap-3">
+              <div className="bg-gray-100 rounded-full flex items-center justify-center w-8 h-8">
+                <Blend size={19} />
+              </div>
+              <span className="text-[1.01rem] font-semibold">
+                Recurring events
+              </span>
+            </div>
+
+            <div className="flex justify-start items-center gap-3">
+              <div className="bg-gray-100 rounded-full flex items-center justify-center w-8 h-8">
+                <Clock size={19} />
+              </div>
+              <span className="text-[1.01rem] font-semibold">Timed entry</span>
             </div>
           </div>
 

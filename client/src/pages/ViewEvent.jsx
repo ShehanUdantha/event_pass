@@ -139,7 +139,7 @@ const ViewEvent = () => {
             <PageNotFound />
           ) : (
             <Fragment>
-              <div className="bg-[#F6F8FD] pt-32 pb-16 h-full">
+              <div className="bg-white pt-32 pb-16 h-full">
                 <div className="flex flex-col md:flex-row mx-auto items-center md:items-start justify-center md:justify-start gap-5 max-w-7xl px-4">
                   {/* event image */}
                   <div className="w-full">

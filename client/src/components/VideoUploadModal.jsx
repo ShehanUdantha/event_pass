@@ -161,7 +161,7 @@ const VideoUploadModal = ({
             </div>
             <div className="w-full mt-2">
               <p className="text-[14px] font-medium mb-1">Video</p>
-              <div className="flex items-center justify-center border border-dashed border-indigo-600 rounded p-4 cursor-pointer h-20 relative">
+              <div className="flex items-center justify-center border border-dashed border-indigo-300 rounded-2xl p-4 cursor-pointer h-24 relative">
                 <label
                   className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-gray-600 text-[14px] cursor-pointer px-2"
                   htmlFor="video"

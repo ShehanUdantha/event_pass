@@ -1,6 +1,6 @@
 import React from "react";
 import { ConnectWalletImage } from "../../constants";
-import { Ethereum, Wallet1 } from "iconsax-react";
+import { Ethereum, BitcoinCard } from "iconsax-react";
 
 const WalletConnectSection = () => {
   return (
@@ -15,10 +15,10 @@ const WalletConnectSection = () => {
           </span>
           <div className="pt-5 justify-center md:justify-start">
             <span className="max-w-sm text-[1.01rem] font-normal leading-none tracking-tight text-gray-500">
-              No more fumbling with complex settings. Set up your event in
-              moments. From multiple ticket types to time slots, from event
-              checkout settings to real-time notifications, we've got you
-              covered.
+              To sell anything online, we use the MetaMask wallet and Ethereum
+              for handling payments. MetaMask ensures that your customer's
+              payment reaches you securely. Just like any other service, there
+              is a small transaction fee associated with each payment.
             </span>
           </div>
           <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-5">
@@ -31,11 +31,9 @@ const WalletConnectSection = () => {
 
             <div className="flex justify-start items-center gap-3">
               <div className="bg-gray-100 rounded-full flex items-center justify-center w-8 h-8">
-                <Wallet1 size={19} />
+                <BitcoinCard size={19} />
               </div>
-              <span className="text-[1.01rem] font-semibold">
-                Save tickets as NFT
-              </span>
+              <span className="text-[1.01rem] font-semibold">E-Wallet</span>
             </div>
           </div>
 
