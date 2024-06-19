@@ -6,7 +6,7 @@ const OurMissionSection = () => {
     <section className="bg-white pb-[4rem] px-5 md:px-0">
       <div className="max-w-4xl h-[45rem] md:h-[28rem] bg-slate-50 rounded-3xl overflow-hidden mx-auto flex flex-col-reverse md:flex-row gap-1 justify-center items-center">
         <div className="w-full h-full">
-          <div className="p-14 h-full w-full">
+          <div className="p-10 md:p-14 h-full w-full">
             <div
               className="bg-cover bg-center h-full w-full min-h-[15.5rem] rounded-[1.5rem]"
               style={{
@@ -15,7 +15,7 @@ const OurMissionSection = () => {
             />
           </div>
         </div>
-        <div className="w-full h-full p-12 md:p-14">
+        <div className="w-full h-full p-12 md:p-14 max-h-[18rem] md:max-h-full">
           <span className="max-w-sm font-semibold text-[25px] leading-none tracking-tight md:text-[38px]">
             Our Mission
           </span>

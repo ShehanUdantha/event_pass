@@ -38,7 +38,7 @@ export const LaunchTicketImage = pinataUrl + 'QmYsouZsmkDYL49GiBKhVYKRf3yooPxbiv
 export const ManageImage = pinataUrl + 'QmRZKwHEQYUtzpWhC8LR1kazUgmQSnFHoqWpjhAaXncYG3';
 export const EnjoyTicketImage = pinataUrl + 'QmRNBD8u2VromJ6YGybkCWqfipoBNUr7c7Rokaf7PGjtHh';
 export const CreateEventImage = pinataUrl + 'QmU2J3Ex5MVJq8mW6QYF8MzbHZjwoDytv6t6M8kRRZ32hT';
-export const ChooseEventImage = pinataUrl + 'QmX9UzHKbY63Xt3i5PVBfXGXdNv1Eyi3yTzwnxsL2cWjq8';
+export const ChooseEventImage = pinataUrl + 'QmeX2cH5UkjJtxd5ySYLda8Kn1eSB3b1QQ1nBCHYcj9Ccc';
 export const BuyTicketImage = pinataUrl + 'QmdRzx86tpR29yAZwxmLHKEpguJxSgC3dhajUSCGTGNtsE';
 export const ConnectWalletImage = pinataUrl + 'Qmf68muEoenpAi1BhprVYFTTunn9Kf72eaTVeqN2sPkxEp';
 

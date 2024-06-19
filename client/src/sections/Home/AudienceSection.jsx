@@ -6,7 +6,7 @@ const AudienceSection = () => {
   return (
     <section className="bg-white py-[4rem] px-5 md:px-0">
       <div className="max-w-4xl h-[60rem] md:h-[33rem] overflow-hidden mx-auto flex flex-col-reverse md:flex-row gap-1 justify-center items-center">
-        <div className="w-full h-full p-12 md:p-14">
+        <div className="w-full h-full p-8 md:p-14">
           <span className="max-w-sm font-semibold text-[25px] leading-none tracking-tight md:text-[38px]">
             Keep Your Customers Coming Back
           </span>
@@ -37,12 +37,12 @@ const AudienceSection = () => {
             </div>
           </div>
 
-          <div className="mt-[4rem] w-[10rem] h-[3rem] border rounded-3xl flex justify-center items-center cursor-pointer bg-[#4338ca] text-white">
+          {/* <div className="mt-[4rem] w-[10rem] h-[3rem] border rounded-3xl flex justify-center items-center cursor-pointer bg-[#4338ca] text-white">
             <span className="text-[1.01rem] font-semibold">Connect Wallet</span>
-          </div>
+          </div> */}
         </div>
         <div className="w-full h-full bg-slate-50 rounded-3xl">
-          <div className="p-14 h-full w-full">
+          <div className="p-10 md:p-14 h-full w-full">
             <div
               className="bg-cover bg-center h-full w-full rounded-[1.5rem]"
               style={{

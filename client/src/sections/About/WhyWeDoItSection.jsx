@@ -28,7 +28,7 @@ const WhyWeDoItSection = () => {
           </div>
         </div>
         <div className="w-full h-full">
-          <div className="p-14 h-full w-full">
+          <div className="p-10 md:p-14 h-full w-full">
             <div
               className="bg-cover bg-center h-full w-full min-h-[15.5rem] rounded-[1.5rem]"
               style={{

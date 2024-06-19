@@ -6,7 +6,7 @@ const SocialSection = () => {
   return (
     <section className="bg-white py-[4rem] px-5 md:px-0">
       <div className="max-w-4xl h-[50rem] md:h-[33rem] overflow-hidden border rounded-3xl mx-auto flex flex-col md:flex-row gap-1 justify-center items-center">
-        <div className="w-full h-full p-12 md:p-14">
+        <div className="w-full h-full p-8 md:p-14">
           <span className="max-w-sm font-semibold text-[25px] leading-none tracking-tight md:text-[38px]">
             Promote Events And Increase Your Reach
           </span>
@@ -36,9 +36,9 @@ const SocialSection = () => {
             </div>
           </div>
 
-          <div className="mt-[4rem] w-[8.3rem] h-[3rem] border rounded-3xl flex justify-center items-center cursor-pointer">
+          {/* <div className="mt-[4rem] w-[8.3rem] h-[3rem] border rounded-3xl flex justify-center items-center cursor-pointer">
             <span className="text-[1.01rem] font-semibold">Start Today</span>
-          </div>
+          </div> */}
         </div>
         <div className="w-full h-full">
           {/* <img

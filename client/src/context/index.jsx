@@ -85,7 +85,20 @@ export const StateContextProvider = ({ children }) => {
       const data = await contract.call("getAllEvents");
 
       parsedEvents = data
-        .filter((event) => event.paidOut === false)
+        .filter((event) => {
+          const eventStartDate = convertBigNumberToDate(event.startsAt);
+          const formattedNow = new Date().toLocaleString("en-US", {
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+            hour12: true,
+          });
+
+          return event.paidOut === false && eventStartDate >= formattedNow;
+        })
         .map((event, i) => ({
           id: convertBigNumberToInt(event.id),
           title: event.title,
