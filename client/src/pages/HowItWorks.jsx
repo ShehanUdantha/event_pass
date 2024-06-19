@@ -33,7 +33,7 @@ const HowItWorks = () => {
         </div>
       </section>
       {/* steps */}
-      <WalletConnectSection />
+      <WalletConnectSection isTicket={true} />
       <ChooseAEventSection />
       <BuyNFTTicketSection />
       <EnjoySection />

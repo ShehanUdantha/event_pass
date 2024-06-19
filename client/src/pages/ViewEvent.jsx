@@ -202,7 +202,9 @@ const ViewEvent = () => {
                       by {event.owner}
                     </div>
                     {/* buy ticket button */}
-                    {remainingTime != "Expired" && remainingTime != "0" ? (
+                    {remainingTime != "Expired" &&
+                    remainingTime != "0" &&
+                    address ? (
                       <button
                         onClick={() => {
                           setIsVisibleBuy(true);

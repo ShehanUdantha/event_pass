@@ -15,10 +15,10 @@ const BuyNFTTicketSection = () => {
           </span>
           <div className="pt-5 justify-center md:justify-start">
             <span className="max-w-sm text-[1.01rem] font-normal leading-none tracking-tight text-gray-500">
-              No more fumbling with complex settings. Set up your event in
-              moments. From multiple ticket types to time slots, from event
-              checkout settings to real-time notifications, we've got you
-              covered.
+              Experience seamless and secure event access with NFT tickets.
+              Purchase your ticket using your preferred crypto wallet, with
+              blockchain technology ensuring authenticity and eliminating fraud.
+              Transaction fees apply.
             </span>
           </div>
           <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-5">

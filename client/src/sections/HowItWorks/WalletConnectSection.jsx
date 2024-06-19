@@ -2,7 +2,7 @@ import React from "react";
 import { ConnectWalletImage } from "../../constants";
 import { Ethereum, BitcoinCard } from "iconsax-react";
 
-const WalletConnectSection = () => {
+const WalletConnectSection = ({ isTicket }) => {
   return (
     <section className="bg-white py-[4rem] px-5 md:px-0">
       <div className="max-w-4xl h-[60rem] md:h-[33rem] bg-slate-50 rounded-3xl overflow-hidden mx-auto flex flex-col-reverse md:flex-row gap-1 justify-center items-center">
@@ -15,10 +15,11 @@ const WalletConnectSection = () => {
           </span>
           <div className="pt-5 justify-center md:justify-start">
             <span className="max-w-sm text-[1.01rem] font-normal leading-none tracking-tight text-gray-500">
-              To sell anything online, we use the MetaMask wallet and Ethereum
-              for handling payments. MetaMask ensures that your customer's
-              payment reaches you securely. Just like any other service, there
-              is a small transaction fee associated with each payment.
+              To {isTicket ? "purchase a ticket" : "create an event"}, we use
+              the MetaMask wallet and Ethereum for handling payments. MetaMask
+              ensures that your payment is processed securely. Just like any
+              other service, there is a small transaction fee associated with
+              each payment.
             </span>
           </div>
           <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-5">

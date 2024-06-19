@@ -27,10 +27,8 @@ const BuyTicketsSection = () => {
           </span>
           <div className="pt-5 justify-center md:justify-start">
             <span className="max-w-sm text-[1.01rem] font-normal leading-none tracking-tight text-gray-500">
-              Your event deserves the spotlight. With cutting-edge marketing
-              tools spanning from Google to TikTok, and our special touch of
-              promotion, watch as your event ripples across the digital
-              landscape, drawing attendees like never before.
+              Proof of attendance NFTs, Superfan Collectibles & Loyalty Rewards.
+              Connect with your communities and celebrate your fans.
             </span>
           </div>
           <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-5">
