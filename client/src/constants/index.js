@@ -14,6 +14,8 @@ export const eventCategoryList = [
   "Other", "Concerts", "Sports", "Festivals", "Expos",
 ];
 
+export const chatWootBaseUrl = 'https://app.chatwoot.com';
+
 export const nftImageGenerateInput = 'A unique NFT featuring a sketched image of a robot face with intricate design details and the robot color should be: ';
 export const imageGenerateModel = 'xbesing/output_nft';
 // export const defaultImageUrl = 'https://d391b93f5f62d9c15f67142e43841acc.ipfscdn.io/ipfs/bafybeihjpeaqbd5r2cpoe7wy4xvulr3kuznpxo4lvqtbk556tl5ndlefki/a7ed2263-3cb4-480a-9659-26415b42514c.jpg';

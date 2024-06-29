@@ -10,6 +10,7 @@ import PromoteEvent from "../sections/HowItWorks/Organizer/PromoteEvent";
 import ChooseAEventSection from "../sections/HowItWorks/Buyer/ChooseAEventSection";
 import BuyNFTTicketSection from "../sections/HowItWorks/Buyer/BuyNFTTicketSection";
 import EnjoySection from "../sections/HowItWorks/Buyer/EnjoySection";
+import TitleSection from "../sections/HowItWorks/TitleSection";
 
 const HowItWorks = () => {
   useEffect(() => {
@@ -25,13 +26,7 @@ const HowItWorks = () => {
       {/* video player */}
       <VideoInfo />
       {/* buyer steps title */}
-      <section className="bg-white mt-[3rem] pb-8">
-        <div className="flex flex-col md:flex-row mx-auto items-center justify-center max-w-4xl px-4 gap-4 md:gap-6">
-          <span className=" text-center font-medium text-[28px] tracking-tight md:text-[45px]">
-            4 Easy Steps To Purchase A Ticket
-          </span>
-        </div>
-      </section>
+      <TitleSection title={"4 Easy Steps To Purchase A Ticket"} />
       {/* steps */}
       <WalletConnectSection isTicket={true} />
       <ChooseAEventSection />
@@ -39,13 +34,7 @@ const HowItWorks = () => {
       <EnjoySection />
 
       {/* organizer steps title */}
-      <section className="bg-white mt-[4rem] pb-8">
-        <div className="flex flex-col md:flex-row mx-auto items-center justify-center max-w-4xl px-4 gap-4 md:gap-6">
-          <span className="font-medium text-[28px] text-center tracking-tight md:text-[45px]">
-            5 Easy Steps To Start A Successful Event
-          </span>
-        </div>
-      </section>
+      <TitleSection title={"5 Easy Steps To Start A Successful Event"} />
       {/* steps */}
       <WalletConnectSection />
       <CreateEventSection />

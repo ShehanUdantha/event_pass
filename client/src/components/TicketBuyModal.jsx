@@ -244,12 +244,10 @@ const TicketBuyModal = ({
 
             {/* submit button */}
             <div className="flex mt-5 justify-center">
-              <div className="w-[8rem] h-[2.5rem] border rounded-3xl flex justify-center items-center cursor-pointer text-white bg-[#4338ca] hover:bg-[#6366f1] transition hover:-translate-y-1 hover:scale-105 duration-900">
-                <input
-                  className="text-[1.01rem] cursor-pointer font-semibold"
-                  type="submit"
-                />
-              </div>
+              <input
+                className="text-[1.01rem] cursor-pointer font-semibold w-[8rem] h-[2.5rem] border rounded-3xl flex justify-center items-center text-white bg-[#4338ca] hover:bg-[#6366f1] transition hover:-translate-y-1 hover:scale-105 duration-900"
+                type="submit"
+              />
             </div>
           </form>
         </div>
