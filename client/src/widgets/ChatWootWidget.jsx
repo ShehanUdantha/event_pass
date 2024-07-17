@@ -1,8 +1,9 @@
 import { useEffect } from "react";
+import { chatWootBaseUrl } from "../constants";
 
 export default function ChatWootWidget() {
   useEffect(() => {
-    // Add Chatwoot Settings
+    // Chatwoot Settings
     window.chatwootSettings = {
       position: "right",
       type: "expanded_bubble",
@@ -11,17 +12,16 @@ export default function ChatWootWidget() {
   });
 
   (function (d, t) {
-    var BASE_URL = "https://app.chatwoot.com";
     var g = d.createElement(t),
       s = d.getElementsByTagName(t)[0];
-    g.src = BASE_URL + "/packs/js/sdk.js";
+    g.src = chatWootBaseUrl + "/packs/js/sdk.js";
     g.defer = true;
     g.async = true;
     s.parentNode.insertBefore(g, s);
     g.onload = function () {
       window.chatwootSDK.run({
-        websiteToken: "u2Np5DPfCLersXNKRXAPhBpk",
-        baseUrl: BASE_URL,
+        websiteToken: import.meta.env.VITE_CHAT_WOOT_TOKEN,
+        baseUrl: chatWootBaseUrl,
       });
     };
   })(document, "script");

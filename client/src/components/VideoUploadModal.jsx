@@ -161,7 +161,7 @@ const VideoUploadModal = ({
             </div>
             <div className="w-full mt-2">
               <p className="text-[14px] font-medium mb-1">Video</p>
-              <div className="flex items-center justify-center border border-dashed border-indigo-600 rounded p-4 cursor-pointer h-20 relative">
+              <div className="flex items-center justify-center border border-dashed border-indigo-300 rounded-2xl p-4 cursor-pointer h-24 relative">
                 <label
                   className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-gray-600 text-[14px] cursor-pointer px-2"
                   htmlFor="video"
@@ -183,7 +183,7 @@ const VideoUploadModal = ({
             </div>
             <div className="flex mt-5 text-white justify-end">
               <input
-                className="bg-[#4338ca] cursor-pointer px-10 py-1 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in"
+                className="text-[1.01rem] cursor-pointer font-semibold w-[8rem] h-[2.5rem] border rounded-3xl flex justify-center items-center text-white bg-[#4338ca] hover:bg-[#6366f1] transition hover:-translate-y-1 hover:scale-105 duration-900"
                 type="submit"
               />
             </div>

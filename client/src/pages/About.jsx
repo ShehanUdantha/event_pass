@@ -1,6 +1,9 @@
 import React, { useEffect } from "react";
-import Header from "../components/Header";
-import InfoSection from "../sections/About/InfoSection";
+import Hero from "../sections/About/Hero";
+import InfoRow from "../sections/About/InfoRow";
+import WhoWeAre from "../sections/About/WhoWeAre";
+import OurMissionSection from "../sections/About/OurMissionSection";
+import WhyWeDoItSection from "../sections/About/WhyWeDoItSection";
 
 const About = () => {
   useEffect(() => {
@@ -9,10 +12,14 @@ const About = () => {
 
   return (
     <div>
-      {/* header section */}
-      <Header title={"About Us"} />
+      {/* hero section */}
+      <Hero />
+      {/* info row */}
+      <InfoRow />
       {/* info section */}
-      <InfoSection />
+      <WhoWeAre />
+      <OurMissionSection />
+      <WhyWeDoItSection />
     </div>
   );
 };

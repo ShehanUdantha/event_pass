@@ -85,7 +85,11 @@ export const StateContextProvider = ({ children }) => {
       const data = await contract.call("getAllEvents");
 
       parsedEvents = data
-        .filter((event) => event.paidOut === false)
+        .filter((event) => {
+          const eventEndDate = new Date(convertBigNumberToDate(event.endsAt));
+          const now = new Date();
+          return event.paidOut === false && eventEndDate >= now;
+        })
         .map((event, i) => ({
           id: convertBigNumberToInt(event.id),
           title: event.title,
@@ -105,7 +109,6 @@ export const StateContextProvider = ({ children }) => {
           refunded: event.refunded,
           balance: convertBigNumberToInt(event.balance),
         }));
-
       // console.info("contract call success", data);
     } catch (err) {
       // triggerErrorToast(err);

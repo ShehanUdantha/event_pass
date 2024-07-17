@@ -139,7 +139,7 @@ const ViewEvent = () => {
             <PageNotFound />
           ) : (
             <Fragment>
-              <div className="bg-[#F6F8FD] pt-32 pb-16 h-full">
+              <div className="bg-white pt-32 pb-16 h-full">
                 <div className="flex flex-col md:flex-row mx-auto items-center md:items-start justify-center md:justify-start gap-5 max-w-7xl px-4">
                   {/* event image */}
                   <div className="w-full">
@@ -202,7 +202,10 @@ const ViewEvent = () => {
                       by {event.owner}
                     </div>
                     {/* buy ticket button */}
-                    {remainingTime != "Expired" && remainingTime != "0" ? (
+                    {remainingTime != "Expired" &&
+                    remainingTime != "0" &&
+                    address &&
+                    address != event.owner ? (
                       <button
                         onClick={() => {
                           setIsVisibleBuy(true);
@@ -210,11 +213,14 @@ const ViewEvent = () => {
                           // development purpose
                           activateImageGenerateServer();
                         }}
-                        className="bg-[#4338ca] text-white px-6 py-2 font-medium rounded hover:bg-[#6366f1] transition-all duration-200 ease-in mt-5"
+                        className="mt-5 w-[8rem] h-[2.5rem] border rounded-3xl flex justify-center items-center cursor-pointer text-white bg-[#4338ca] hover:bg-[#6366f1] transition hover:-translate-y-1 hover:scale-105 duration-900"
                       >
-                        Get Tickets
+                        <span className="text-[1.01rem] font-semibold">
+                          Get Tickets
+                        </span>
                       </button>
                     ) : null}
+
                     {/* event time */}
                     <div className="flex flex-col md:flex-row items-start md:items-center mt-5 justify-start">
                       <div className="flex flex-row">

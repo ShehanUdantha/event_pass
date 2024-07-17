@@ -134,12 +134,12 @@ const TicketCard = ({ ticket, isSecondary, onLoading }) => {
           </div>
         ) : (
           <div onContextMenu={(e) => e.preventDefault()}>
-            <div className="max-w-md w-full h-full mx-auto z-10 rounded-3xl cursor-pointer transition-all duration-500 hover:scale-105">
-              <div className="bg-white relative drop-shadow-md rounded-3xl p-4 m-4 overflow-clip">
+            <div className="max-w-md w-full h-full mx-auto z-10 cursor-pointer transition-all duration-500 hover:scale-105">
+              <div className="bg-white relative border rounded-3xl shadow-sm p-4 m-4 overflow-clip">
                 {/* top */}
                 <div className="w-full">
                   <div className="w-full flex justify-between">
-                    <div className="font-medium text-md md:text-lg text-ellipsis overflow-hidden">
+                    <div className="font-semibold leading-none tracking-tight text-lg text-ellipsis overflow-hidden">
                       {event.title}
                     </div>
                     {isSecondary ? null : (
@@ -163,7 +163,7 @@ const TicketCard = ({ ticket, isSecondary, onLoading }) => {
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center mt-2">
+                  <div className="flex items-center mt-3">
                     <div className="p-[0.2rem] bg-green-100 text-green-500 font-bold text-[10px] rounded-md mr-2">
                       ETH {event.ticketCost}
                     </div>

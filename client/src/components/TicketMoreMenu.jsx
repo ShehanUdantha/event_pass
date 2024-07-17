@@ -122,7 +122,6 @@ const TicketMoreMenu = ({ event, ticket, onLoading }) => {
             </div>
           </Link>
         </ul>
-        <Toaster position="bottom-center" />
       </div>
     </>
   );
