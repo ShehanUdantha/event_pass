@@ -86,18 +86,9 @@ export const StateContextProvider = ({ children }) => {
 
       parsedEvents = data
         .filter((event) => {
-          const eventStartDate = convertBigNumberToDate(event.startsAt);
-          const formattedNow = new Date().toLocaleString("en-US", {
-            year: "numeric",
-            month: "numeric",
-            day: "numeric",
-            hour: "numeric",
-            minute: "numeric",
-            second: "numeric",
-            hour12: true,
-          });
-
-          return event.paidOut === false && eventStartDate >= formattedNow;
+          const eventEndDate = new Date(convertBigNumberToDate(event.endsAt));
+          const now = new Date();
+          return event.paidOut === false && eventEndDate >= now;
         })
         .map((event, i) => ({
           id: convertBigNumberToInt(event.id),
@@ -118,7 +109,6 @@ export const StateContextProvider = ({ children }) => {
           refunded: event.refunded,
           balance: convertBigNumberToInt(event.balance),
         }));
-
       // console.info("contract call success", data);
     } catch (err) {
       // triggerErrorToast(err);
